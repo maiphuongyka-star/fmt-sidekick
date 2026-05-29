@@ -411,7 +411,7 @@ function rTeacherDash(){
 function loadDashData(){
   if(!sb)return;
   Promise.all([
-    sb.from('classes').select('id,name').eq('teacher_id',SB_USER.id),
+    sb.from('classes').select('id,name'),
     sb.from('profiles').select('count',{count:'exact',head:true}).eq('role','student'),
     sb.from('submissions').select('count',{count:'exact',head:true}).eq('status','submitted'),
     sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(4)
@@ -490,7 +490,7 @@ function rClasses(){
   setTB('Quản lý lớp học','');
   g('pg').innerHTML='<div class="sh"><div style="font-size:14px;font-weight:600;color:var(--bd)">Tất cả lớp</div><button class="btn bp" onclick="om(\'m-cls\')">+ Tạo lớp</button></div><div id="cls-list"><div class="loading"><div class="spinner"></div></div></div>';
   if(!sb)return;
-  sb.from('classes').select('*').eq('teacher_id',SB_USER.id).then(function(r){
+  sb.from('classes').select('*').then(function(r){
     var classes=r.data||[];
     var el=g('cls-list');
     if(!el)return;
@@ -504,8 +504,8 @@ function rClasses(){
         +'<div style="font-size:15px;font-weight:700;color:var(--bd);margin:6px 0 2px" onclick="navToClass('+c.id+')">'+c.name+'</div>'
         +'<div style="font-size:10px;color:var(--mt)">'+( c.semester||'')+'</div>'
         +'<div style="font-size:9px;color:var(--mt);margin-top:6px;display:flex;gap:10px">'
-        +(c.start_date?'<span>📅 '+c.start_date+'</span>':'')
-        +(c.end_date?'<span>🏁 '+c.end_date+'</span>':'')+'</div>'
+        +(c.mid_date?'<span>📅 Midterm: '+c.mid_date+'</span>':'')
+        +(c.final_date?'<span>🏁 Final: '+c.final_date+'</span>':'')+'</div>'
         +'<div style="font-size:9px;color:var(--mt);margin-top:4px;font-style:italic">double-click để sửa trực tiếp</div>'
         +'</div>';}).join('')
       +'</div>'
@@ -783,7 +783,7 @@ async function saveGrade(){
 // ===== CREATE CLASS =====
 async function createClass(){
   var n=v('cls-n').trim();if(!n){toast('Vui lòng nhập tên lớp',true);return;}
-  var r=await sb.from('classes').insert({name:n,subject:v('cls-s').trim(),semester:v('cls-t').trim(),start_date:v('cls-sd')||null,end_date:v('cls-ed')||null,teacher_id:SB_USER.id});
+  var r=await sb.from('classes').insert({name:n,subject:v('cls-s').trim(),semester:v('cls-t').trim(),mid_date:v('cls-sd')||null,final_date:v('cls-ed')||null});
   if(r.error){toast('Lỗi: '+r.error.message,true);}
   else{toast('✅ Tạo lớp thành công!',false);cm('m-cls');['cls-n','cls-s','cls-t','cls-sd','cls-ed'].forEach(function(id){if(g(id))g(id).value='';});rClasses();}
 }
@@ -909,7 +909,7 @@ function rAnnounce(){
       +'</div>';}).join(''):'<p style="color:var(--mt);font-size:11px">Chưa có thông báo nào</p>';
   });
   // Load class list for modal
-  if(sb){sb.from('classes').select('id,name').eq('teacher_id',SB_USER.id).then(function(r){
+  if(sb){sb.from('classes').select('id,name').then(function(r){
     var sel=g('ann-cls');if(!sel)return;
     sel.innerHTML='<option value="">-- Tất cả lớp --</option>'+(r.data||[]).map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
   });}
