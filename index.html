@@ -929,7 +929,7 @@ async function createAnn(){
   var cid=parseInt(v('ann-cls'))||null;
   var clsName='';
   if(cid){var cr=await sb.from('classes').select('name').eq('id',cid).limit(1);clsName=cr.data&&cr.data[0]?cr.data[0].name:'';}
-  var r=await sb.from('announcements').insert({title:t,body:v('ann-b').trim()||null,class_id:cid,class_name:clsName,teacher_id:SB_USER.id});
+  var r=await sb.from('announcements').insert({title:t,body:v('ann-b').trim()||null,class_id:cid,class_name:clsName});
   if(r.error)toast('Lỗi: '+r.error.message,true);
   else{toast('✅ Đã đăng thông báo!',false);cm('m-ann');if(g('ann-t'))g('ann-t').value='';if(g('ann-b'))g('ann-b').value='';rAnnounce();}
 }
