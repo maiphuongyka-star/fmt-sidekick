@@ -996,11 +996,14 @@ function renderLogin(){
     +'<button class="btn bp" style="width:100%" onclick="doLogin()">Đăng nhập</button>'
     +'</div>'
     +'<div id="auth-reg-form" style="display:none">'
-    +'<div class="fg"><label class="fl">Mã mời *</label><input class="fi" id="reg-code" placeholder="VD: AFS2026" style="text-transform:uppercase"/></div>'
-    +'<div class="fg"><label class="fl">Họ tên *</label><input class="fi" id="reg-name" placeholder="Nguyễn Văn A"/></div>'
-    +'<div class="fg"><label class="fl">Email *</label><input class="fi" id="reg-email" type="email" placeholder="email@example.com"/></div>'
-    +'<div class="fg"><label class="fl">Mật khẩu *</label><input class="fi" id="reg-pwd" type="password" placeholder="Ít nhất 6 ký tự"/></div>'
-    +'<button class="btn bp" style="width:100%" onclick="doRegister()">Đăng ký</button>'
+    +'<div style="background:#fff8f0;border:1px solid #f0d8c0;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:10px;color:var(--mt)">'
+    +'📋 Học viên chỉ cần <b>Mã lớp</b> và <b>Tên</b> đúng với danh sách giáo viên đã tạo. Không cần email xác nhận!'
+    +'</div>'
+    +'<div class="fg"><label class="fl">Mã lớp *</label><input class="fi" id="reg-code" placeholder="VD: AFS2026DEMO" style="text-transform:uppercase"/></div>'
+    +'<div class="fg"><label class="fl">Họ tên *</label><input class="fi" id="reg-name" placeholder="Đúng với danh sách lớp"/></div>'
+    +'<div class="fg"><label class="fl">Email (tùy chọn)</label><input class="fi" id="reg-email" type="email" placeholder="Để trống nếu không có"/></div>'
+    +'<div class="fg"><label class="fl">Tạo mật khẩu *</label><input class="fi" id="reg-pwd" type="password" placeholder="Ít nhất 6 ký tự"/></div>'
+    +'<button class="btn bp" style="width:100%;margin-top:4px" onclick="doRegister()">Vào lớp học →</button>'
     +'</div>'
     +'</div></div>';
 }
@@ -1036,27 +1039,51 @@ async function doLogin(){
 async function doRegister(){
   var code=v('reg-code').toUpperCase().trim();
   var name=v('reg-name').trim();
-  var email=v('reg-email').trim();
+  var emailInput=v('reg-email').trim();
   var pass=v('reg-pwd');
-  if(!code||!name||!email||!pass){setAuthMsg('Vui lòng điền đầy đủ thông tin',true);return;}
+  if(!code||!name||!pass){setAuthMsg('Vui lòng điền Mã lớp, Họ tên và Mật khẩu',true);return;}
   if(pass.length<6){setAuthMsg('Mật khẩu ít nhất 6 ký tự',true);return;}
   if(!sb){setAuthMsg('⚠️ Chưa cấu hình Supabase',true);return;}
-  setAuthMsg('Đang kiểm tra mã mời...',false);
+  setAuthMsg('Đang kiểm tra mã lớp...',false);
   try{
-    var ic=await sb.from('invite_codes').select('*').eq('code',code).is('used_by',null).limit(1);
+    // 1. Check invite code
+    var ic=await sb.from('invite_codes').select('*').eq('code',code).limit(1);
     if(ic.error||!ic.data||!ic.data.length){
-      setAuthMsg('Mã mời không hợp lệ, đã dùng, hoặc không tồn tại. Lỗi: '+(ic.error?ic.error.message:'không tìm thấy'),true);
-      return;
+      setAuthMsg('Mã lớp không đúng. Kiểm tra lại với giáo viên.',true);return;
     }
     var inv=ic.data[0];
+    var classId=inv.class_id;
+    
+    // 2. Check if name exists in teacher's student list for this class
+    var nameCheck=await sb.from('profiles').select('id,name,email').eq('class_id',classId).eq('role','student').ilike('name',name);
+    
+    // 3. Generate email if not provided
+    var email=emailInput||name.toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9.]/g,'')+'@fmt.local';
+    
+    // 4. Check if already registered
+    var existing=await sb.from('profiles').select('id,email').eq('class_id',classId).ilike('name',name).limit(1);
+    if(existing.data&&existing.data.length>0&&existing.data[0].email&&!existing.data[0].email.includes('@fmt.local')){
+      setAuthMsg('Tên này đã được đăng ký. Vui lòng đăng nhập hoặc liên hệ giáo viên.',true);return;
+    }
+    
     setAuthMsg('Đang tạo tài khoản...',false);
-    var reg=await sb.auth.signUp({email:email,password:pass});
+    
+    // 5. Sign up with Supabase
+    var reg=await sb.auth.signUp({email:email,password:pass,options:{emailRedirectTo:window.location.origin,data:{name:name}}});
     if(reg.error)throw reg.error;
     var uid=reg.data.user.id;
-    await sb.from('profiles').insert({id:uid,name:name,email:email,role:'student',class_id:inv.class_id});
-    await sb.from('invite_codes').update({used_by:uid,used_at:new Date().toISOString()}).eq('code',code);
-    setAuthMsg('✅ Đăng ký thành công! Email: '+email+' | Mật khẩu: '+pass+' — ghi nhớ để đăng nhập!',false);
-    setTimeout(function(){switchAuth('login');if(g('auth-email'))g('auth-email').value=email;},3000);
+    
+    // 6. Create/update profile
+    var profInsert=await sb.from('profiles').upsert({id:uid,name:name,email:email,role:'student',class_id:classId},{onConflict:'id'});
+    
+    // 7. Mark invite code used (allow reuse - one code per class)
+    // Don't mark as used_by to allow multiple students
+    
+    setAuthMsg('✅ Đã vào lớp '+inv.class_name+'! Đăng nhập với email: '+email+' | mật khẩu: '+pass,false);
+    setTimeout(function(){
+      switchAuth('login');
+      if(g('auth-email'))g('auth-email').value=email;
+    },3000);
   } catch(err){
     setAuthMsg('Lỗi: '+err.message,true);
   }
@@ -1067,6 +1094,39 @@ function logout(){
   SB_USER=null;SB_PROFILE=null;
   g('sb').style.display='none';g('topbar').style.display='none';g('main').style.marginLeft='0';
   renderLogin();
+}
+
+// ===== TEACHER ADD STUDENT DIRECTLY =====
+function addStudentDirect(){
+  var form=g('add-stu-form');
+  if(form) form.style.display=form.style.display==='none'?'block':'none';
+}
+
+async function saveStudentDirect(){
+  var name=v('stu-add-name').trim();
+  var phone=v('stu-add-phone').trim();
+  if(!name){toast('Vui lòng nhập tên học viên',true);return;}
+  if(!CUR_CLS){toast('Lỗi: không có lớp',true);return;}
+  // Generate a placeholder email for teacher-added students
+  var email=name.toLowerCase().replace(/\s+/g,'.').replace(/[^a-z0-9.]/g,'')+'@fmt.local';
+  var r=await sb.from('profiles').insert({
+    name:name, email:email, role:'student', class_id:parseInt(CUR_CLS), phone:phone||null
+  });
+  if(r.error){toast('Lỗi: '+r.error.message,true);}
+  else{
+    toast('✅ Đã thêm học viên: '+name,false);
+    if(g('stu-add-name'))g('stu-add-name').value='';
+    if(g('stu-add-phone'))g('stu-add-phone').value='';
+    if(g('add-stu-form'))g('add-stu-form').style.display='none';
+    rTab('students');
+  }
+}
+
+async function removeStudent(id){
+  if(!confirm('Xóa học viên này khỏi lớp?'))return;
+  var r=await sb.from('profiles').delete().eq('id',id);
+  if(r.error)toast('Lỗi: '+r.error.message,true);
+  else{toast('Đã xóa học viên',false);rTab('students');}
 }
 </script>
 </body>
