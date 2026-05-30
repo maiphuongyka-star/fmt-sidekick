@@ -554,15 +554,35 @@ function rTab(t){
   if(t==='students'){
     sb.from('profiles').select('*').eq('class_id',CUR_CLS).eq('role','student').then(function(res){
       var data=res.data||[];
-      tc.innerHTML='<div class="sh"><div class="st">Học viên ('+data.length+')</div></div>'
+      tc.innerHTML='<div class="sh"><div class="st">Học viên ('+data.length+')</div>'
+        +'<button class="btn bp" onclick="addStudentDirect()">+ Thêm học viên</button></div>'
+        +'<div id="add-stu-form" style="display:none;background:#fff8f0;border:1px solid var(--br);border-radius:10px;padding:12px;margin-bottom:12px">'
+        +'<div style="font-size:11px;font-weight:600;color:var(--bd);margin-bottom:8px">➕ Thêm học viên vào lớp</div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+        +'<div><label class="fl">Họ tên *</label><input class="fi" id="stu-add-name" placeholder="Nguyễn Văn A"/></div>'
+        +'<div><label class="fl">Ghi chú (SĐT/Mã SV)</label><input class="fi" id="stu-add-phone" placeholder="0912345678"/></div>'
+        +'</div>'
+        +'<div style="display:flex;gap:8px">'
+        +'<button class="btn bp" onclick="saveStudentDirect()">Lưu</button>'
+        +'<button class="btn bo" onclick="g(\'add-stu-form\').style.display=\'none\'">Hủy</button>'
+        +'</div></div>'
+        +'<div style="background:#f0f8ff;border:1px solid #bee3f8;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:10px">'
+        +'💡 <b>Học viên đăng ký:</b> Vào trang → Đăng ký → nhập mã lớp + tên (đúng với danh sách) + tạo mật khẩu. Không cần xác nhận email!</div>'
         +'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">'
-        +'<tr style="background:var(--br)"><th style="padding:7px 10px;text-align:left;border-radius:4px">Học viên</th><th style="padding:7px 10px;text-align:left">Email</th><th style="padding:7px 10px;text-align:left">Midterm</th></tr>'
-        +data.map(function(s){return '<tr style="border-bottom:1px solid var(--br);cursor:pointer" onclick="navStu(\''+s.id+'\')">'
-          +'<td style="padding:7px 10px;font-weight:600">'+s.name+'</td><td style="padding:7px 10px;color:var(--mt)">'+s.email+'</td><td style="padding:7px 10px">'+( s.midterm||'—')+'</td></tr>';}).join('')
+        +'<tr style="background:var(--br)"><th style="padding:7px 10px;text-align:left">Học viên</th><th style="padding:7px 10px;text-align:left">Ghi chú</th><th style="padding:7px 10px;text-align:left">Trạng thái</th><th style="padding:7px 10px"></th></tr>'
+        +data.map(function(s){
+          var registered=s.email&&!s.email.includes('@fmt.local');
+          return '<tr style="border-bottom:1px solid var(--br)">'
+            +'<td style="padding:7px 10px;font-weight:600">'+s.name+'</td>'
+            +'<td style="padding:7px 10px;color:var(--mt)">'+(s.email&&!s.email.includes('@fmt.local')?s.email:'—')+'</td>'
+            +'<td style="padding:7px 10px"><span class="bdg '+(registered?'bok':'bwt')+'">'+(registered?'✅ Đã đăng nhập':'⏳ Chờ đăng ký')+'</span></td>'
+            +'<td style="padding:7px 10px"><button class="btn" style="font-size:8px;padding:1px 5px;background:#fce4ec;color:#c0392b" onclick="removeStudent(\''+s.id+'\')">🗑</button></td>'
+            +'</tr>';
+        }).join('')
         +'</table></div>'
-        +(data.length===0?'<p style="color:var(--mt);font-size:11px;margin-top:10px">Chưa có học viên. Tạo mã mời để học viên tham gia.</p>':'');
+        +(data.length===0?'<p style="color:var(--mt);font-size:11px;margin-top:10px">Chưa có học viên. Click "+ Thêm học viên" để thêm danh sách, sau đó chia sẻ mã mời để học viên tự đăng ký.</p>':'');
     });
-  } else if(t==='sessions'){
+    } else if(t==='sessions'){
     sb.from('sessions').select('*').eq('class_id',CUR_CLS).order('session_date').then(function(res){
       var data=res.data||[];
       tc.innerHTML='<div class="sh"><div class="st">Buổi học ('+data.length+')</div><button class="btn bp" onclick="om(\'m-sess\')">+ Thêm</button></div>'
