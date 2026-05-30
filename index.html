@@ -107,7 +107,7 @@ textarea.fi{resize:vertical;min-height:70px}
       <div><div class="sb-nm" id="sb-nm">Chị Phương</div><div class="sb-rl" id="sb-rl">● Giáo viên</div></div>
     </div>
     <div id="sb-nav"></div>
-    <div class="sb-out"><button onclick="logout()">Đăng xuất</button></div>
+    <div class="sb-out"><button onclick="logout()" style="background:rgba(255,50,50,0.15);color:rgba(255,180,180,0.9)">🚪 Đăng xuất</button></div>
   </div>
   <div id="main">
     <div id="topbar">
@@ -273,6 +273,15 @@ function initSB(){
 
 // Auth init
 var tries=0;
+// Failsafe: if spinner shows for >8s, redirect to login
+var _spinnerTimeout = setTimeout(function(){
+  var pg = document.getElementById('pg');
+  if(pg && pg.innerHTML.includes('spinner')) {
+    console.warn('Spinner timeout - forcing login');
+    if(typeof renderLogin === 'function') renderLogin();
+    else pg.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh"><div style="text-align:center;padding:20px"><div style="font-size:14px;color:var(--mt);margin-bottom:12px">Phiên đăng nhập hết hạn.</div><button onclick="window.location.reload()" style="background:var(--r);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:13px">🔄 Đăng nhập lại</button></div></div>';
+  }
+}, 8000);
 function tryInit(){
   tries++;
   if(typeof supabase!=='undefined'){
@@ -711,7 +720,7 @@ function rInvites(){
 }
 
 async function openInviteModal(){
-  var r=await sb.from('classes').select('id,name').eq('teacher_id',SB_USER.id);
+  var r=await sb.from('classes').select('id,name');
   var classes=r.data||[];
   var sel=g('inv-cls');
   if(sel)sel.innerHTML='<option value="">-- Chọn lớp --</option>'+classes.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');
