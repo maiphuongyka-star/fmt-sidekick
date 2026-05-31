@@ -97,6 +97,10 @@ textarea.fi{resize:vertical;min-height:70px}
 #npanel.open{right:0}
 .notif-item{padding:10px 0;border-bottom:1px solid var(--br);font-size:10px}
 .notif-time{font-size:9px;color:var(--mt)}
+
+.submit-status-label { cursor:pointer; display:flex; align-items:center; gap:5px; border:2px solid transparent; border-radius:8px; padding:8px; font-size:10px; font-weight:600; transition: border-color 0.2s; }
+.submit-status-label:has(input:checked) { border-color: currentColor; }
+
 </style>
 </head>
 <body>
@@ -981,20 +985,154 @@ function rMyHW(){
   setTB('Bài tập của tôi','');
   g('pg').innerHTML='<div id="myhw-list"><div class="loading"><div class="spinner"></div></div></div>';
   if(!sb)return;
-  sb.from('exercises').select('*,sessions(title,session_date,class_id)').then(function(r){
-    // Filter by student's class
-    var allEx=r.data||[];
-    var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
-    var ex=clsId?allEx.filter(function(e){return e.sessions&&e.sessions.class_id===clsId;}):allEx;
+  var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
+  if(!clsId){g('myhw-list').innerHTML='<p style="color:var(--mt)">Chưa vào lớp nào</p>';return;}
+  
+  sb.from('sessions').select('id').eq('class_id',clsId).then(async function(sR){
+    var sessIds=(sR.data||[]).map(function(s){return s.id;});
+    if(!sessIds.length){var el=g('myhw-list');if(el)el.innerHTML='<p style="color:var(--mt);font-size:11px">Chưa có buổi học</p>';return;}
+    
+    var exR=await sb.from('exercises').select('*').in('session_id',sessIds).order('id');
+    var ex=exR.data||[];
+    
+    // Load submissions của học sinh này
+    var subR=ex.length?await sb.from('submissions').select('*').in('exercise_id',ex.map(function(e){return e.id;})).eq('student_id',SB_USER.id):null;
+    var subs=subR?subR.data||[]:[];
+    var subMap={};
+    subs.forEach(function(s){subMap[s.exercise_id]=s;});
+    
     var el=g('myhw-list');if(!el)return;
-    el.innerHTML=ex.length?ex.map(function(e){return '<div class="card" style="margin-bottom:8px">'
-      +'<div style="display:flex;justify-content:space-between;margin-bottom:3px"><b style="font-size:11px;color:var(--bd)">'+e.code+': '+e.title+'</b>'
-      +(e.deadline?'<span style="font-size:9px;color:var(--mt)">⏰ '+e.deadline+'</span>':'')+'</div>'
-      +(e.body?'<div style="font-size:10px;color:var(--mt);margin-bottom:6px">'+e.body+'</div>':'')
-      +'<button class="btn bp" style="font-size:9px" onclick="submitHW(\''+e.id+'\')">📤 Nộp bài</button>'
-      +'</div>';}).join(''):'<p style="color:var(--mt);font-size:11px">Chưa có bài tập nào</p>';
+    
+    // Stats
+    var total=ex.length;
+    var done=subs.filter(function(s){return s.status==='submitted'||s.status==='graded';}).length;
+    var graded=subs.filter(function(s){return s.status==='graded';}).length;
+    var cantdo=subs.filter(function(s){return s.status==='cantdo';}).length;
+    
+    var h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">'
+      +'<div class="sc"><div class="sv">'+total+'</div><div class="sl">Tổng bài</div></div>'
+      +'<div class="sc"><div class="sv" style="color:#2d9e6b">'+done+'</div><div class="sl">Đã nộp</div></div>'
+      +'<div class="sc"><div class="sv" style="color:var(--gold)">'+graded+'</div><div class="sl">Có điểm</div></div>'
+      +'<div class="sc"><div class="sv" style="color:var(--r)">'+(total-done-cantdo)+'</div><div class="sl">Chưa nộp</div></div>'
+      +'</div>';
+    
+    ex.forEach(function(e){
+      var sub=subMap[e.id];
+      var catBdg=e.category==='key'
+        ?'<span style="background:#fce8e8;color:#c0392b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">🔑 Key</span>'
+        :'<span style="background:#e8f5e9;color:#2d9e6b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">➕ Additional</span>';
+      
+      var statusHtml='';
+      if(!sub){
+        statusHtml='<button class="btn bp" style="font-size:9px" onclick="openSubmitModal(''+e.id+'',''+e.code+': '+e.title.replace(/'/g,'')+'')">📤 Nộp bài</button>';
+      } else if(sub.status==='graded'){
+        statusHtml='<span class="bdg bok">✅ Đã chấm: '+(sub.score||'—')+'đ</span>'
+          +(sub.feedback?'<div style="font-size:9px;color:var(--mt);margin-top:3px;font-style:italic">💬 '+sub.feedback+'</div>':'')
+          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(''+e.id+'',''+e.code+': '+e.title.replace(/'/g,'')+'',true)">✏️ Cập nhật</button>';
+      } else if(sub.status==='submitted'){
+        statusHtml='<span class="bdg bwt">📨 Chờ chấm</span>'
+          +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">📝 '+sub.note+'</div>':'')
+          +(sub.img_url?'<div style="margin-top:4px"><img src="'+sub.img_url+'" style="max-height:60px;border-radius:4px;cursor:pointer" onclick="viewImg(''+sub.img_url+'')" onerror="this.style.display='none'"></div>':'')
+          +(sub.drive_url?'<div style="margin-top:3px"><a href="'+sub.drive_url+'" target="_blank" style="font-size:9px;color:#4285f4">📎 Xem file đính kèm</a></div>':'')
+          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(''+e.id+'',''+e.code+': '+e.title.replace(/'/g,'')+'',true)">✏️ Sửa</button>';
+      } else if(sub.status==='cantdo'){
+        statusHtml='<span class="bdg bno">❓ Khó/chưa làm</span>'
+          +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">📝 '+sub.note+'</div>':'')
+          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(''+e.id+'',''+e.code+': '+e.title.replace(/'/g,'')+'',true)">✏️ Cập nhật</button>';
+      }
+      
+      h+='<div class="card" style="margin-bottom:8px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+catBdg
+        +(e.deadline?'<span style="font-size:9px;color:var(--mt)">⏰ '+e.deadline+'</span>':'')+'</div></div>'
+        +'<b style="font-size:11px;color:var(--bd)">'+(e.code?e.code+': ':'')+e.title+'</b>'
+        +(e.body?'<div style="font-size:10px;color:var(--mt);margin:4px 0;line-height:1.5">'+e.body+'</div>':'')
+        +(e.img_url?'<img src="'+e.img_url+'" style="max-width:100%;border-radius:6px;margin:4px 0;cursor:pointer;max-height:120px;object-fit:cover" onclick="viewImg(''+e.img_url+'')" onerror="this.style.display='none'">':'')
+        +'<div style="margin-top:6px">'+statusHtml+'</div>'
+        +'</div>';
+    });
+    
+    if(!ex.length) h+='<p style="color:var(--mt);font-size:11px">Chưa có bài tập nào</p>';
+    el.innerHTML=h;
   });
 }
+
+function openSubmitModal(exId, exTitle, isUpdate){
+  window._submitExId=exId;
+  var info=g('submit-ex-info');
+  if(info)info.innerHTML='<b>'+exTitle+'</b>'+(isUpdate?' — Cập nhật bài nộp':'');
+  // Reset form
+  ['submit-note','submit-link','submit-img'].forEach(function(id){if(g(id))g(id).value='';});
+  if(g('submit-img-preview'))g('submit-img-preview').innerHTML='';
+  // Set default status
+  var done=g('status-done');if(done){done.checked=true;}
+  
+  // Paste image handler
+  if(g('submit-img')){
+    g('submit-img').onpaste=function(e){
+      var items=e.clipboardData?.items;
+      if(!items)return;
+      for(var i=0;i<items.length;i++){
+        if(items[i].type.includes('image')){
+          var file=items[i].getAsFile();
+          var reader=new FileReader();
+          reader.onload=function(ev){
+            g('submit-img').value=ev.target.result;
+            var prev=g('submit-img-preview');
+            if(prev)prev.innerHTML='<img src="'+ev.target.result+'" style="max-height:80px;border-radius:6px;margin-top:4px">';
+          };
+          reader.readAsDataURL(file);
+          e.preventDefault();
+          break;
+        }
+      }
+    };
+  }
+  
+  om('m-submit');
+}
+
+async function confirmSubmit(){
+  var exId=window._submitExId;
+  if(!exId){toast('Lỗi: không có bài tập',true);return;}
+  
+  var statusEl=document.querySelector('input[name="submit-status"]:checked');
+  var status=statusEl?statusEl.value:'done';
+  var note=v('submit-note').trim();
+  var link=v('submit-link').trim();
+  var img=v('submit-img').trim();
+  
+  // Map status
+  var sbStatus=status==='done'?'submitted':status==='partial'?'submitted':'cantdo';
+  var noteText=(status==='partial'?'[Làm một phần] ':status==='cantdo'?'[Khó/chưa làm được] ':'')+note;
+  
+  var payload={
+    exercise_id:exId,
+    student_id:SB_USER.id,
+    status:sbStatus,
+    submitted_at:new Date().toISOString()
+  };
+  if(note) payload.note=noteText;
+  if(img) payload.img_url=img;
+  if(link) payload.drive_url=link;
+  
+  // Upsert (tạo mới hoặc cập nhật)
+  var r=await sb.from('submissions').upsert(payload,{onConflict:'exercise_id,student_id'});
+  if(r.error){
+    // Nếu upsert lỗi do thiếu cột, thử insert đơn giản
+    var r2=await sb.from('submissions').upsert({
+      exercise_id:exId,student_id:SB_USER.id,
+      status:sbStatus,submitted_at:new Date().toISOString()
+    },{onConflict:'exercise_id,student_id'});
+    if(r2.error){toast('Lỗi: '+r2.error.message,true);return;}
+  }
+  
+  var statusMsg=status==='done'?'✅ Đã nộp bài!':status==='partial'?'⚠️ Đã báo làm một phần':'❓ Đã báo khó/chưa làm được';
+  toast(statusMsg,false);
+  cm('m-submit');
+  nav('myhw');
+}
+
 
 function submitHW(exId){toast('Tính năng nộp bài đang phát triển',false);}
 function rMyGrades(){setTB('Kết quả học tập','');g('pg').innerHTML='<p style="color:var(--mt);font-size:11px">Đang tải...</p>';if(!sb)return;sb.from('submissions').select('*,exercises(title,code)').eq('student_id',SB_USER.id).eq('status','graded').then(function(r){var subs=r.data||[];g('pg').innerHTML=subs.length?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px"><tr style="background:var(--br)"><th style="padding:7px 10px;text-align:left">Bài tập</th><th style="padding:7px 10px;text-align:right">Điểm</th></tr>'+subs.map(function(s){var ex=s.exercises||{};return '<tr style="border-bottom:1px solid var(--br)"><td style="padding:7px 10px">'+( ex.code||'')+(ex.code?': ':'')+(ex.title||'')+'</td><td style="padding:7px 10px;text-align:right;font-weight:700;color:var(--bp)">'+(s.score||'—')+'</td></tr>';}).join('')+'</table></div>':'<p style="color:var(--mt);font-size:11px">Chưa có điểm nào</p>';});}
@@ -1150,5 +1288,43 @@ async function removeStudent(id){
   else{toast('Đã xóa học viên',false);rTab('students');}
 }
 </script>
+
+<div class="mo" id="m-submit"><div class="md" style="max-width:500px">
+  <div class="mh">📤 Nộp bài</div>
+  <div id="submit-ex-info" style="background:#f0f8ff;border:1px solid #bee3f8;border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--bd)"></div>
+  <div class="fg">
+    <label class="fl">Trạng thái bài làm *</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      <label style="cursor:pointer;display:flex;align-items:center;gap:5px;background:#e8f5e9;border:2px solid transparent;border-radius:8px;padding:8px;font-size:10px;font-weight:600;color:#2d9e6b" id="status-done-lbl">
+        <input type="radio" name="submit-status" value="done" id="status-done" style="accent-color:#2d9e6b"> ✅ Đã làm xong
+      </label>
+      <label style="cursor:pointer;display:flex;align-items:center;gap:5px;background:#fff3e0;border:2px solid transparent;border-radius:8px;padding:8px;font-size:10px;font-weight:600;color:#e8a020" id="status-partial-lbl">
+        <input type="radio" name="submit-status" value="partial" id="status-partial" style="accent-color:#e8a020"> ⚠️ Làm một phần
+      </label>
+      <label style="cursor:pointer;display:flex;align-items:center;gap:5px;background:#fce4ec;border:2px solid transparent;border-radius:8px;padding:8px;font-size:10px;font-weight:600;color:#c0392b" id="status-hard-lbl">
+        <input type="radio" name="submit-status" value="cantdo" id="status-hard" style="accent-color:#c0392b"> ❓ Khó, chưa làm được
+      </label>
+    </div>
+  </div>
+  <div class="fg">
+    <label class="fl">📝 Ghi chú / Câu hỏi cho giáo viên</label>
+    <textarea class="fi" id="submit-note" rows="3" placeholder="Ghi chú bài làm, hoặc câu hỏi nếu chưa hiểu..."></textarea>
+  </div>
+  <div class="fg">
+    <label class="fl">🔗 Link bài làm (Google Drive, PDF, ảnh...)</label>
+    <input class="fi" id="submit-link" placeholder="https://drive.google.com/... hoặc link khác"/>
+    <div style="font-size:9px;color:var(--mt);margin-top:3px">💡 Upload file lên Google Drive rồi paste link chia sẻ vào đây</div>
+  </div>
+  <div class="fg">
+    <label class="fl">📸 Ảnh bài làm (URL hoặc paste Ctrl+V)</label>
+    <input class="fi" id="submit-img" placeholder="https://... hoặc paste ảnh vào đây"/>
+    <div id="submit-img-preview" style="margin-top:6px"></div>
+  </div>
+  <div class="mdf">
+    <button class="btn bo" onclick="cm('m-submit')">Hủy</button>
+    <button class="btn bp" onclick="confirmSubmit()">📤 Nộp bài</button>
+  </div>
+</div></div>
+
 </body>
 </html>
