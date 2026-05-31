@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FMT Sidekick v2.1 built 2026-05-31 05:45:14 -->
+<!-- FMT Sidekick v2.2 2026-05-31 17:20:18 -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -982,80 +982,117 @@ async function changePwd(){
 
 // ===== STUDENT PAGES =====
 function rMyHW(){
-  setTB('Bài tập của tôi','');
+  setTB('B\u00e0i t\u1eadp c\u1ee7a t\u00f4i','');
   g('pg').innerHTML='<div id="myhw-list"><div class="loading"><div class="spinner"></div></div></div>';
   if(!sb)return;
   var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
-  if(!clsId){g('myhw-list').innerHTML='<p style="color:var(--mt)">Chưa vào lớp nào</p>';return;}
-  
+  if(!clsId){var el=g('myhw-list');if(el)el.innerHTML='<p style="color:var(--mt)">Ch\u01b0a v\u00e0o l\u1edbp n\u00e0o</p>';return;}
   sb.from('sessions').select('id').eq('class_id',clsId).then(async function(sR){
     var sessIds=(sR.data||[]).map(function(s){return s.id;});
-    if(!sessIds.length){var el=g('myhw-list');if(el)el.innerHTML='<p style="color:var(--mt);font-size:11px">Chưa có buổi học</p>';return;}
-    
+    if(!sessIds.length){var el2=g('myhw-list');if(el2)el2.innerHTML='<p style="color:var(--mt);font-size:11px">Ch\u01b0a c\u00f3 bu\u1ed5i h\u1ecdc</p>';return;}
     var exR=await sb.from('exercises').select('*').in('session_id',sessIds).order('id');
     var ex=exR.data||[];
-    
-    // Load submissions của học sinh này
     var subR=ex.length?await sb.from('submissions').select('*').in('exercise_id',ex.map(function(e){return e.id;})).eq('student_id',SB_USER.id):null;
     var subs=subR?subR.data||[]:[];
-    var subMap={};
-    subs.forEach(function(s){subMap[s.exercise_id]=s;});
-    
+    var subMap={};subs.forEach(function(s){subMap[s.exercise_id]=s;});
     var el=g('myhw-list');if(!el)return;
-    
-    // Stats
-    var total=ex.length;
-    var done=subs.filter(function(s){return s.status==='submitted'||s.status==='graded';}).length;
+    var total=ex.length,done=subs.filter(function(s){return s.status==='submitted'||s.status==='graded';}).length;
     var graded=subs.filter(function(s){return s.status==='graded';}).length;
-    var cantdo=subs.filter(function(s){return s.status==='cantdo';}).length;
-    
     var h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">'
-      +'<div class="sc"><div class="sv">'+total+'</div><div class="sl">Tổng bài</div></div>'
-      +'<div class="sc"><div class="sv" style="color:#2d9e6b">'+done+'</div><div class="sl">Đã nộp</div></div>'
-      +'<div class="sc"><div class="sv" style="color:var(--gold)">'+graded+'</div><div class="sl">Có điểm</div></div>'
-      +'<div class="sc"><div class="sv" style="color:var(--r)">'+(total-done-cantdo)+'</div><div class="sl">Chưa nộp</div></div>'
+      +'<div class="sc"><div class="sv">'+total+'</div><div class="sl">T\u1ed5ng b\u00e0i</div></div>'
+      +'<div class="sc"><div class="sv" style="color:#2d9e6b">'+done+'</div><div class="sl">\u0110\u00e3 n\u1ed9p</div></div>'
+      +'<div class="sc"><div class="sv" style="color:var(--gold)">'+graded+'</div><div class="sl">C\u00f3 \u0111i\u1ec3m</div></div>'
+      +'<div class="sc"><div class="sv" style="color:var(--r)">'+(total-done)+'</div><div class="sl">Ch\u01b0a n\u1ed9p</div></div>'
       +'</div>';
-    
     ex.forEach(function(e){
       var sub=subMap[e.id];
       var catBdg=e.category==='key'
-        ?'<span style="background:#fce8e8;color:#c0392b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">🔑 Key</span>'
-        :'<span style="background:#e8f5e9;color:#2d9e6b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">➕ Additional</span>';
-      
+        ?'<span style="background:#fce8e8;color:#c0392b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">\uD83D\uDD11 Key</span>'
+        :'<span style="background:#e8f5e9;color:#2d9e6b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">\u2795 Additional</span>';
+      var exTitle=(e.code?e.code+': ':'')+e.title;
+      var safeTitle=exTitle.replace(/'/g,'').replace(/"/g,'');
       var statusHtml='';
       if(!sub){
-        statusHtml='<button class="btn bp" style="font-size:9px" onclick="openSubmitModal(''+e.id+'',''+e.code+': '+e.title.replace(/'/g,'')+'')">📤 Nộp bài</button>';
-      } else if(sub.status==='graded'){
-        statusHtml='<span class="bdg bok">✅ Đã chấm: '+(sub.score||'—')+'đ</span>'
-          +(sub.feedback?'<div style="font-size:9px;color:var(--mt);margin-top:3px;font-style:italic">💬 '+sub.feedback+'</div>':'')
-          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(''+e.id+'',''+e.code+': '+e.title.replace(/'/g,'')+'',true)">✏️ Cập nhật</button>';
-      } else if(sub.status==='submitted'){
-        statusHtml='<span class="bdg bwt">📨 Chờ chấm</span>'
-          +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">📝 '+sub.note+'</div>':'')
-          +(sub.img_url?'<div style="margin-top:4px"><img src="'+sub.img_url+'" style="max-height:60px;border-radius:4px;cursor:pointer" onclick="viewImg(''+sub.img_url+'')" onerror="this.style.display='none'"></div>':'')
-          +(sub.drive_url?'<div style="margin-top:3px"><a href="'+sub.drive_url+'" target="_blank" style="font-size:9px;color:#4285f4">📎 Xem file đính kèm</a></div>':'')
-          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(''+e.id+'',''+e.code+': '+e.title.replace(/'/g,'')+'',true)">✏️ Sửa</button>';
-      } else if(sub.status==='cantdo'){
-        statusHtml='<span class="bdg bno">❓ Khó/chưa làm</span>'
-          +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">📝 '+sub.note+'</div>':'')
-          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(''+e.id+'',''+e.code+': '+e.title.replace(/'/g,'')+'',true)">✏️ Cập nhật</button>';
+        statusHtml='<button class="btn bp" style="font-size:9px" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\')">&#128228; N\u1ed9p b\u00e0i</button>';
+      }else if(sub.status==='graded'){
+        statusHtml='<span class="bdg bok">\u2705 \u0110\u00e3 ch\u1ea5m: '+(sub.score||'\u2014')+'\u0111</span>'
+          +(sub.feedback?'<div style="font-size:9px;color:var(--mt);margin-top:3px">\uD83D\uDCAC '+sub.feedback+'</div>':'')
+          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">\u270F\uFE0F C\u1eadp nh\u1eadt</button>';
+      }else if(sub.status==='submitted'){
+        statusHtml='<span class="bdg bwt">\uD83D\uDCE8 Ch\u1edd ch\u1ea5m</span>'
+          +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">\uD83D\uDCDD '+sub.note.substring(0,80)+'</div>':'')
+          +(sub.img_url&&!sub.img_url.startsWith('data:')?'<div style="margin-top:4px"><img src="'+sub.img_url+'" style="max-height:60px;border-radius:4px;cursor:pointer;object-fit:cover" onerror="this.style.display=\'none\'"></div>':'')
+          +(sub.drive_url?'<div style="margin-top:3px"><a href="'+sub.drive_url+'" target="_blank" style="font-size:9px;color:#4285f4">\uD83D\uDCCE Xem file</a></div>':'')
+          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">\u270F\uFE0F S\u1eeda</button>';
+      }else if(sub.status==='cantdo'){
+        statusHtml='<span class="bdg bno">\u2753 Kh\u00f3/ch\u01b0a l\u00e0m</span>'
+          +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">\uD83D\uDCDD '+sub.note.substring(0,80)+'</div>':'')
+          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">\u270F\uFE0F C\u1eadp nh\u1eadt</button>';
       }
-      
       h+='<div class="card" style="margin-bottom:8px">'
         +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'
-        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+catBdg
-        +(e.deadline?'<span style="font-size:9px;color:var(--mt)">⏰ '+e.deadline+'</span>':'')+'</div></div>'
-        +'<b style="font-size:11px;color:var(--bd)">'+(e.code?e.code+': ':'')+e.title+'</b>'
+        +'<div style="display:flex;align-items:center;gap:6px">'+catBdg
+        +(e.deadline?'<span style="font-size:9px;color:var(--mt)">\u23f0 '+e.deadline+'</span>':'')+'</div></div>'
+        +'<b style="font-size:11px;color:var(--bd)">'+exTitle+'</b>'
         +(e.body?'<div style="font-size:10px;color:var(--mt);margin:4px 0;line-height:1.5">'+e.body+'</div>':'')
-        +(e.img_url?'<img src="'+e.img_url+'" style="max-width:100%;border-radius:6px;margin:4px 0;cursor:pointer;max-height:120px;object-fit:cover" onclick="viewImg(''+e.img_url+'')" onerror="this.style.display='none'">':'')
-        +'<div style="margin-top:6px">'+statusHtml+'</div>'
-        +'</div>';
+        +(e.img_url?'<img src="'+e.img_url+'" style="max-width:100%;border-radius:6px;margin:4px 0;max-height:120px;object-fit:cover" onerror="this.style.display=\'none\'">':'')
+        +'<div style="margin-top:6px">'+statusHtml+'</div></div>';
     });
-    
-    if(!ex.length) h+='<p style="color:var(--mt);font-size:11px">Chưa có bài tập nào</p>';
+    if(!ex.length)h+='<p style="color:var(--mt);font-size:11px">Ch\u01b0a c\u00f3 b\u00e0i t\u1eadp n\u00e0o</p>';
     el.innerHTML=h;
   });
 }
+
+function openSubmitModal(exId,exTitle,isUpdate){
+  window._submitExId=exId;
+  var info=g('submit-ex-info');
+  if(info)info.innerHTML='<b>'+(exTitle||'B\u00e0i t\u1eadp #'+exId)+'</b>'+(isUpdate?' \u2014 C\u1eadp nh\u1eadt b\u00e0i n\u1ed9p':'');
+  document.querySelectorAll('input[name="submit-status"]').forEach(function(r){if(r.value==='done')r.checked=true;});
+  ['submit-note','submit-link','submit-img'].forEach(function(id){var el=g(id);if(el)el.value='';});
+  var prev=g('submit-img-preview');if(prev)prev.innerHTML='';
+  var imgEl=g('submit-img');
+  if(imgEl){
+    imgEl.onpaste=function(e){
+      var items=e.clipboardData?.items;
+      if(!items)return;
+      for(var i=0;i<items.length;i++){
+        if(items[i].type.includes('image')){
+          var file=items[i].getAsFile();
+          var reader=new FileReader();
+          reader.onload=function(ev){
+            imgEl.value=ev.target.result;
+            var p=g('submit-img-preview');
+            if(p)p.innerHTML='<img src="'+ev.target.result+'" style="max-height:80px;border-radius:6px;margin-top:4px">';
+          };
+          reader.readAsDataURL(file);
+          e.preventDefault();break;
+        }
+      }
+    };
+  }
+  om('m-submit');
+}
+
+async function confirmSubmit(){
+  var exId=window._submitExId;
+  if(!exId){toast('L\u1ed7i: kh\u00f4ng c\u00f3 b\u00e0i t\u1eadp',true);return;}
+  var statusEl=document.querySelector('input[name="submit-status"]:checked');
+  var status=statusEl?statusEl.value:'done';
+  var note=v('submit-note').trim();
+  var link=v('submit-link').trim();
+  var img=v('submit-img').trim();
+  var sbStatus=status==='cantdo'?'cantdo':'submitted';
+  var noteText=(status==='partial'?'[L\u00e0m m\u1ed9t ph\u1ea7n] ':status==='cantdo'?'[Kh\u00f3/ch\u01b0a l\u00e0m] ':'')+note;
+  var payload={exercise_id:exId,student_id:SB_USER.id,status:sbStatus,submitted_at:new Date().toISOString()};
+  if(note||status!=='done')payload.note=noteText;
+  if(img)payload.img_url=img;
+  if(link)payload.drive_url=link;
+  var r=await sb.from('submissions').upsert(payload,{onConflict:'exercise_id,student_id'});
+  if(r.error){toast('L\u1ed7i: '+r.error.message,true);return;}
+  var msg=status==='done'?'\u2705 N\u1ed9p b\u00e0i th\u00e0nh c\u00f4ng!':status==='partial'?'\u26a0\ufe0f \u0110\u00e3 b\u00e1o l\u00e0m m\u1ed9t ph\u1ea7n':'\u2753 \u0110\u00e3 b\u00e1o kh\u00f3/ch\u01b0a l\u00e0m \u0111\u01b0\u1ee3c';
+  toast(msg,false);cm('m-submit');nav('myhw');
+}
+
 
 function openSubmitModal(exId, exTitle, isUpdate){
   window._submitExId=exId;
@@ -1136,9 +1173,111 @@ async function confirmSubmit(){
 
 function submitHW(exId){toast('Tính năng nộp bài đang phát triển',false);}
 function rMyGrades(){setTB('Kết quả học tập','');g('pg').innerHTML='<p style="color:var(--mt);font-size:11px">Đang tải...</p>';if(!sb)return;sb.from('submissions').select('*,exercises(title,code)').eq('student_id',SB_USER.id).eq('status','graded').then(function(r){var subs=r.data||[];g('pg').innerHTML=subs.length?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px"><tr style="background:var(--br)"><th style="padding:7px 10px;text-align:left">Bài tập</th><th style="padding:7px 10px;text-align:right">Điểm</th></tr>'+subs.map(function(s){var ex=s.exercises||{};return '<tr style="border-bottom:1px solid var(--br)"><td style="padding:7px 10px">'+( ex.code||'')+(ex.code?': ':'')+(ex.title||'')+'</td><td style="padding:7px 10px;text-align:right;font-weight:700;color:var(--bp)">'+(s.score||'—')+'</td></tr>';}).join('')+'</table></div>':'<p style="color:var(--mt);font-size:11px">Chưa có điểm nào</p>';});}
-function rClassQA(){setTB('Q&A lớp học','');g('pg').innerHTML='<p style="color:var(--mt);font-size:11px">Tính năng đang phát triển</p>';}
+function rClassQA(){
+  setTB('Q&A l\u1edbp h\u1ecdc','');
+  var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
+  g('pg').innerHTML='<div style="max-width:640px">'
+    +'<div class="card" style="margin-bottom:12px">'
+    +'<div style="font-size:12px;font-weight:700;color:var(--bd);margin-bottom:8px">\u2753 \u0110\u1eb7t c\u00e2u h\u1ecfi cho gi\u00e1o vi\u00ean</div>'
+    +'<textarea class="fi" id="qa-input" rows="3" placeholder="Nh\u1eadp c\u00e2u h\u1ecfi c\u1ee7a b\u1ea1n..."></textarea>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">'
+    +'<label style="font-size:10px;color:var(--mt);display:flex;align-items:center;gap:4px;cursor:pointer">'
+    +'<input type="checkbox" id="qa-anon"> \u0110\u1eb7t c\u00e2u h\u1ecfi \u1ea9n danh</label>'
+    +'<button class="btn bp" style="font-size:10px" onclick="submitQA()">&#128232; G\u1eedi c\u00e2u h\u1ecfi</button>'
+    +'</div></div>'
+    +'<div id="qa-list"><div class="loading"><div class="spinner"></div></div></div>'
+    +'</div>';
+  if(!sb||!clsId)return;
+  loadQAList(clsId);
+}
+
+async function loadQAList(clsId){
+  var r=await sb.from('questions').select('*').eq('class_id',clsId).order('created_at',{ascending:false}).limit(30);
+  var el=g('qa-list');if(!el)return;
+  var qs=r.data||[];
+  el.innerHTML=qs.length?qs.map(function(q){
+    var name=q.is_anonymous?'\uD83C\uDFAD \u1ea8n danh':(q.student_name||'H\u1ecdc vi\u00ean');
+    var isMe=q.student_id===SB_USER.id;
+    return '<div class="card" style="margin-bottom:8px'+(isMe?';border-left:3px solid var(--r)':'')+'">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
+      +'<span style="font-size:10px;font-weight:600;color:var(--bd)">'+name+'</span>'
+      +'<span style="font-size:9px;color:var(--mt)">'+new Date(q.created_at).toLocaleDateString('vi')+'</span>'
+      +'</div>'
+      +'<div style="font-size:11px;margin-bottom:6px">'+q.question+'</div>'
+      +(q.answer
+        ?'<div style="background:#f0f8f0;border-left:3px solid #2d9e6b;padding:6px 10px;border-radius:0 6px 6px 0;font-size:10px;color:#2d5e3e">'
+          +'<b>\uD83D\uDCAC Ch\u1ecb Ph\u01b0\u01a1ng:</b> '+q.answer+'</div>'
+        :'<span style="font-size:9px;color:var(--mt);font-style:italic">\u23f3 Ch\u01b0a c\u00f3 c\u00e2u tr\u1ea3 l\u1eddi</span>')
+      +'</div>';
+  }).join(''):'<p style="color:var(--mt);font-size:11px">Ch\u01b0a c\u00f3 c\u00e2u h\u1ecfi n\u00e0o. H\u00e3y \u0111\u1eb7t c\u00e2u h\u1ecfi \u0111\u1ea7u ti\u00ean!</p>';
+}
+
+async function submitQA(){
+  var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
+  var q=v('qa-input').trim();
+  if(!q){toast('Vui l\u00f2ng nh\u1eadp c\u00e2u h\u1ecfi',true);return;}
+  var anon=document.getElementById('qa-anon')?.checked;
+  var r=await sb.from('questions').insert({
+    class_id:clsId,student_id:SB_USER.id,
+    student_name:SB_PROFILE?.name||'H\u1ecdc vi\u00ean',
+    question:q,is_anonymous:!!anon
+  });
+  if(r.error){toast('L\u1ed7i: '+r.error.message,true);return;}
+  toast('\u2705 \u0110\u00e3 g\u1edfi c\u00e2u h\u1ecfi!',false);
+  var el=g('qa-input');if(el)el.value='';
+  loadQAList(clsId);
+}
+
+
 function rClassNotif(){setTB('Thông báo','');g('pg').innerHTML='<div id="cn-list"><div class="loading"><div class="spinner"></div></div></div>';if(!sb)return;var cid=SB_PROFILE?SB_PROFILE.class_id:null;var q=sb.from('announcements').select('*').order('created_at',{ascending:false}).limit(20);if(cid)q=q.or('class_id.eq.'+cid+',class_id.is.null');q.then(function(r){var el=g('cn-list');if(!el)return;var anns=r.data||[];el.innerHTML=anns.length?anns.map(function(a){return '<div class="card" style="margin-bottom:8px"><div style="display:flex;justify-content:space-between"><b style="font-size:11px;color:var(--bd)">'+a.title+'</b><span style="font-size:9px;color:var(--mt)">'+(a.created_at||'').substring(0,10)+'</span></div>'+(a.body?'<div style="font-size:10px;color:var(--tx);margin-top:6px">'+a.body+'</div>':'')+'</div>';}).join(''):'<p style="color:var(--mt);font-size:11px">Chưa có thông báo</p>';});}
-function rMySpace(){setTB('Tâm sự','');g('pg').innerHTML='<p style="color:var(--mt);font-size:11px">Tính năng đang phát triển</p>';}
+function rMySpace(){
+  setTB('T\u00e2m s\u1ef1','');
+  var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
+  g('pg').innerHTML='<div style="max-width:600px">'
+    +'<div style="background:linear-gradient(135deg,#667eea0d,#764ba20d);border:1px solid #e8e0f0;border-radius:10px;padding:12px;margin-bottom:12px">'
+    +'<div style="font-size:12px;font-weight:700;color:#5e3a8c;margin-bottom:4px">\uD83D\uDC8C Kho\u1ea3ng kh\u00f4ng gian ri\u00eang</div>'
+    +'<div style="font-size:10px;color:var(--mt)">Chia s\u1ebb c\u1ea3m x\u00fac, kh\u00f3 kh\u0103n trong h\u1ecdc t\u1eadp. Ch\u1ec9 gi\u00e1o vi\u00ean \u0111\u1ecdc \u0111\u01b0\u1ee3c.</div></div>'
+    +'<textarea class="fi" id="tamsu-input" rows="5" placeholder="H\u00f4m nay em c\u1ea3m th\u1ea5y...\nEm \u0111ang g\u1eb7p kh\u00f3 kh\u0103n v\u1edbi...\nEm mu\u1ed1n chia s\u1ebb..."></textarea>'
+    +'<div style="text-align:right;margin-top:8px"><button class="btn bp" onclick="submitTamSu()">&#128140; G\u1eedi t\u00e2m s\u1ef1</button></div>'
+    +'<div id="tamsu-list" style="margin-top:12px"><div class="loading"><div class="spinner"></div></div></div>'
+    +'</div>';
+  if(sb)loadTamSuList();
+}
+
+async function loadTamSuList(){
+  var r=await sb.from('confessions').select('*').eq('student_id',SB_USER.id).order('created_at',{ascending:false}).limit(15);
+  var el=g('tamsu-list');if(!el)return;
+  if(r.error){el.innerHTML='<p style="color:var(--mt);font-size:11px">Ch\u01b0a c\u00f3 t\u00e2m s\u1ef1 n\u00e0o</p>';return;}
+  var ts=r.data||[];
+  el.innerHTML=ts.length
+    ?'<div style="font-size:10px;font-weight:600;color:var(--mt);margin-bottom:8px">T\u00e2m s\u1ef1 c\u1ee7a t\u00f4i ('+ts.length+')</div>'
+      +ts.map(function(t){
+        var content=t.content||t.body||t.message||'';
+        return '<div class="card" style="margin-bottom:6px;background:#fafaf8">'
+          +'<div style="font-size:9px;color:var(--mt)">'+new Date(t.created_at).toLocaleString('vi')+'</div>'
+          +'<div style="font-size:11px;margin-top:4px">'+content+'</div>'
+          +(t.reply?'<div style="background:#f0f8f0;border-left:2px solid #2d9e6b;padding:4px 8px;margin-top:6px;font-size:10px">\uD83D\uDCAC '+t.reply+'</div>':'')
+          +'</div>';
+      }).join('')
+    :'<p style="color:var(--mt);font-size:11px">Ch\u01b0a c\u00f3 t\u00e2m s\u1ef1 n\u00e0o.</p>';
+}
+
+async function submitTamSu(){
+  var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
+  var msg=v('tamsu-input').trim();
+  if(!msg){toast('Vui l\u00f2ng nh\u1eadp n\u1ed9i dung',true);return;}
+  var payload={student_id:SB_USER.id,class_id:clsId,content:msg,created_at:new Date().toISOString()};
+  var r=await sb.from('confessions').insert(payload);
+  if(r.error){
+    var p2={student_id:SB_USER.id,class_id:clsId,body:msg,created_at:new Date().toISOString()};
+    r=await sb.from('confessions').insert(p2);
+  }
+  if(r.error){toast('L\u1ed7i: '+r.error.message,true);return;}
+  toast('\uD83D\uDC8C \u0110\u00e3 g\u1eedi t\u00e2m s\u1ef1!',false);
+  var el=g('tamsu-input');if(el)el.value='';
+  loadTamSuList();
+}
+
 
 function navStu(id){CUR_STU=id;S_PAGE='studentDetail';setAN('classes');destroyCharts();g('pg').innerHTML='<p style="color:var(--mt)">Đang tải...</p>';}
 
