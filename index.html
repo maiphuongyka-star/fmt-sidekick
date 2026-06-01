@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FMT Sidekick v2.7 final 2026-06-01 08:38:18 -->
+<!-- FMT Sidekick v2.8 2026-06-01 08:44:18 -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -964,9 +964,43 @@ async function createAnn(){
 }
 
 // ===== CONFESSIONS =====
-function rConfT(){setTB('Tâm sự & Chia sẻ','');g('pg').innerHTML='<p style="color:var(--mt);font-size:11px">Tính năng đang phát triển</p>';}
+function rConfT(){
+  setTB('T\u00e2m s\u1ef1 & Chia s\u1ebb','');
+  g('pg').innerHTML='<div id="conft-wrap" style="max-width:700px"><div class="loading"><div class="spinner"></div></div></div>';
+  if(!sb)return;
+  sb.from('confessions').select('*,profiles(name)').order('created_at',{ascending:false}).limit(50).then(function(r){
+    var el=g('conft-wrap');if(!el)return;
+    var items=r.data||[];
+    if(!items.length){el.innerHTML='<p style="color:var(--mt)">Ch\u01b0a c\u00f3 t\u00e2m s\u1ef1 n\u00e0o</p>';return;}
+    el.innerHTML='<div style="font-size:11px;color:var(--mt);margin-bottom:10px">'+items.length+' t\u00e2m s\u1ef1 t\u1eeb h\u1ecdc vi\u00ean</div>'
+      +items.map(function(t){
+        var name=t.profiles?t.profiles.name:'H\u1ecdc vi\u00ean';
+        var content=t.content||t.body||t.message||'';
+        return '<div class="card" style="margin-bottom:10px">'
+          +'<div style="display:flex;justify-content:space-between;margin-bottom:6px">'
+          +'<span style="font-size:11px;font-weight:600;color:var(--bd)">'+name+'</span>'
+          +'<span style="font-size:9px;color:var(--mt)">'+new Date(t.created_at).toLocaleString('vi')+'</span></div>'
+          +'<div style="font-size:11px;line-height:1.6;margin-bottom:8px">'+content+'</div>'
+          +(t.reply?'<div style="background:#f0f8f0;border-left:2px solid #2d9e6b;padding:6px 10px;border-radius:0 6px 6px 0;font-size:10px;margin-bottom:8px"><b>\u0110\u00e3 tr\u1ea3 l\u1eddi:</b> '+t.reply+'</div>':'')
+          +'<div style="display:flex;gap:6px;align-items:center">'
+          +'<input class="fi" id="reply-inp-'+t.id+'" placeholder="Tr\u1ea3 l\u1eddi t\u00e2m s\u1ef1..." '+(t.reply?'value="'+t.reply.replace(/"/g,'&quot;')+'"':'')+' style="flex:1;font-size:10px"/>'
+          +'<button class="btn bp" style="font-size:9px;white-space:nowrap" onclick="sendConfReply('+t.id+')">G\u1eedi</button>'
+          +'</div></div>';
+      }).join('');
+  });
+}
 
-// ===== SETTINGS =====
+async function sendConfReply(id){
+  var inp=document.getElementById('reply-inp-'+id);
+  var reply=inp?inp.value.trim():'';
+  if(!reply){toast('Nh\u1eadp n\u1ed9i dung tr\u1ea3 l\u1eddi',true);return;}
+  var r=await sb.from('confessions').update({reply:reply}).eq('id',id);
+  if(r.error){toast('L\u1ed7i: '+r.error.message,true);return;}
+  toast('\u2705 \u0110\u00e3 g\u1eedi tr\u1ea3 l\u1eddi!',false);
+  rConfT();
+}
+
+
 function rSettings(){
   setTB('Cài đặt','');
   g('pg').innerHTML='<div class="card"><div class="st" style="margin-bottom:12px">⚙️ Cài đặt tài khoản</div>'
