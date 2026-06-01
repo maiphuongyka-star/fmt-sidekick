@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FMT Sidekick v2.5 2026-06-01 02:08:49 -->
+<!-- FMT Sidekick v2.6 2026-06-01 02:27:25 -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -371,7 +371,7 @@ function nav(p){
 
 function renderPage(p){
   var pages={dashboard:rDash,classes:rClasses,classDetail:rCD,invites:rInvites,
-    'hw-review':rHWReview,gradecalc:rGC,announce:rAnnounce,confessions:rConfT,settings:rSettings,
+    'hw-review':rHWReview,gradecalc:rGC,announce:rAnnounce,confessions:(SB_PROFILE&&SB_PROFILE.role==='teacher'?rConfT:rMySpace),settings:rSettings,
     myspace:rMySpace,myhw:rMyHW,mygrades:rMyGrades,classqa:rClassQA,classnotif:rClassNotif};
   if(pages[p])pages[p]();else rDash();
 }
@@ -1421,16 +1421,15 @@ function rMySpace(){
   setTB('T\u00e2m s\u1ef1','');
   var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
   g('pg').innerHTML='<div style="max-width:600px">'
-    +'<div style="background:linear-gradient(135deg,#667eea0d,#764ba20d);border:1px solid #e8e0f0;border-radius:10px;padding:12px;margin-bottom:12px">'
+    +'<div style="background:linear-gradient(135deg,#667eea1a,#764ba21a);border:1px solid #e0d8f0;border-radius:12px;padding:12px 14px;margin-bottom:14px">'
     +'<div style="font-size:12px;font-weight:700;color:#5e3a8c;margin-bottom:4px">\uD83D\uDC8C Kho\u1ea3ng kh\u00f4ng gian ri\u00eang</div>'
     +'<div style="font-size:10px;color:var(--mt)">Chia s\u1ebb c\u1ea3m x\u00fac, kh\u00f3 kh\u0103n trong h\u1ecdc t\u1eadp. Ch\u1ec9 gi\u00e1o vi\u00ean \u0111\u1ecdc \u0111\u01b0\u1ee3c.</div></div>'
     +'<textarea class="fi" id="tamsu-input" rows="5" placeholder="H\u00f4m nay em c\u1ea3m th\u1ea5y...\nEm \u0111ang g\u1eb7p kh\u00f3 kh\u0103n v\u1edbi...\nEm mu\u1ed1n chia s\u1ebb..."></textarea>'
-    +'<div style="text-align:right;margin-top:8px"><button class="btn bp" onclick="submitTamSu()">&#128140; G\u1eedi t\u00e2m s\u1ef1</button></div>'
-    +'<div id="tamsu-list" style="margin-top:12px"><div class="loading"><div class="spinner"></div></div></div>'
+    +'<div style="text-align:right;margin-top:8px"><button class="btn bp" onclick="submitTamSu()">\uD83D\uDC8C G\u1eedi t\u00e2m s\u1ef1</button></div>'
+    +'<div id="tamsu-list" style="margin-top:14px"><div class="loading"><div class="spinner"></div></div></div>'
     +'</div>';
   if(sb)loadTamSuList();
 }
-
 async function loadTamSuList(){
   var r=await sb.from('confessions').select('*').eq('student_id',SB_USER.id).order('created_at',{ascending:false}).limit(15);
   var el=g('tamsu-list');if(!el)return;
@@ -1438,33 +1437,25 @@ async function loadTamSuList(){
   var ts=r.data||[];
   el.innerHTML=ts.length
     ?'<div style="font-size:10px;font-weight:600;color:var(--mt);margin-bottom:8px">T\u00e2m s\u1ef1 c\u1ee7a t\u00f4i ('+ts.length+')</div>'
-      +ts.map(function(t){
-        var content=t.content||t.body||t.message||'';
-        return '<div class="card" style="margin-bottom:6px;background:#fafaf8">'
-          +'<div style="font-size:9px;color:var(--mt)">'+new Date(t.created_at).toLocaleString('vi')+'</div>'
-          +'<div style="font-size:11px;margin-top:4px">'+content+'</div>'
-          +(t.reply?'<div style="background:#f0f8f0;border-left:2px solid #2d9e6b;padding:4px 8px;margin-top:6px;font-size:10px">\uD83D\uDCAC '+t.reply+'</div>':'')
-          +'</div>';
+      +ts.map(function(t){var content=t.content||t.body||t.message||'';
+        return '<div class="card" style="margin-bottom:8px;background:linear-gradient(135deg,#fafaf8,#f5f0f8)">'
+          +'<div style="font-size:9px;color:var(--mt);margin-bottom:4px">'+new Date(t.created_at).toLocaleString('vi')+'</div>'
+          +'<div style="font-size:11px;line-height:1.6">'+content+'</div>'
+          +(t.reply?'<div style="background:#f0f8f0;border-left:2px solid #2d9e6b;padding:6px 10px;margin-top:8px;border-radius:0 6px 6px 0;font-size:10px"><b>\uD83D\uDCAC Ch\u1ecb Ph\u01b0\u01a1ng:</b> '+t.reply+'</div>':'')+'</div>';
       }).join('')
-    :'<p style="color:var(--mt);font-size:11px">Ch\u01b0a c\u00f3 t\u00e2m s\u1ef1 n\u00e0o.</p>';
+    :'<div style="text-align:center;padding:20px;color:var(--mt)"><div style="font-size:24px;margin-bottom:8px">\uD83D\uDC8C</div><div style="font-size:11px">Ch\u01b0a c\u00f3 t\u00e2m s\u1ef1 n\u00e0o.</div></div>';
 }
-
 async function submitTamSu(){
   var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
   var msg=v('tamsu-input').trim();
   if(!msg){toast('Vui l\u00f2ng nh\u1eadp n\u1ed9i dung',true);return;}
-  var payload={student_id:SB_USER.id,class_id:clsId,content:msg,created_at:new Date().toISOString()};
-  var r=await sb.from('confessions').insert(payload);
-  if(r.error){
-    var p2={student_id:SB_USER.id,class_id:clsId,body:msg,created_at:new Date().toISOString()};
-    r=await sb.from('confessions').insert(p2);
-  }
+  var r=await sb.from('confessions').insert({student_id:SB_USER.id,class_id:clsId,content:msg,created_at:new Date().toISOString()});
+  if(r.error){r=await sb.from('confessions').insert({student_id:SB_USER.id,class_id:clsId,body:msg,created_at:new Date().toISOString()});}
   if(r.error){toast('L\u1ed7i: '+r.error.message,true);return;}
   toast('\uD83D\uDC8C \u0110\u00e3 g\u1eedi t\u00e2m s\u1ef1!',false);
   var el=g('tamsu-input');if(el)el.value='';
   loadTamSuList();
 }
-
 
 function navStu(id){CUR_STU=id;S_PAGE='studentDetail';setAN('classes');destroyCharts();g('pg').innerHTML='<p style="color:var(--mt)">Đang tải...</p>';}
 
