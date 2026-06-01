@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FMT Sidekick v2.6 ready 2026-06-01 02:54:08 -->
+<!-- FMT Sidekick v2.7 2026-06-01 07:45:44 -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -986,10 +986,9 @@ async function changePwd(){
 
 // ===== STUDENT PAGES =====
 function rMyHW(){
-  setTB('Bài tập của tôi','');
-  g('pg').innerHTML='<div id="myhw-wrap"><div class="loading"><div class="spinner"></div></div></div>';
+  setTB('B\u00e0i t\u1eadp c\u1ee7a t\u00f4i','');
+  g('pg').innerHTML='<div id="myhw-wrap" style="max-width:800px"><div class="loading"><div class="spinner"></div></div></div>';
   if(!sb||!SB_USER)return;
-  // Lấy tất cả lớp học sinh tham gia
   sb.from('profiles').select('class_id,classes(id,name,subject)').eq('id',SB_USER.id).then(async function(pr){
     var myClasses=[];
     if(pr.data&&pr.data.length){pr.data.forEach(function(p){if(p.classes)myClasses.push(p.classes);});}
@@ -997,19 +996,99 @@ function rMyHW(){
       var cr=await sb.from('classes').select('id,name,subject').eq('id',SB_PROFILE.class_id);
       myClasses=cr.data||[];
     }
-    if(!myClasses.length){g('myhw-wrap').innerHTML='<p style="color:var(--mt)">Chưa tham gia lớp nào</p>';return;}
+    if(!myClasses.length){g('myhw-wrap').innerHTML='<p style="color:var(--mt)">Ch\u01b0a tham gia l\u1edbp n\u00e0o</p>';return;}
     window._hwClasses=myClasses;
-    window._hwActiveClass=myClasses[0].id;
+    var activeId=myClasses[0].id;
+    // Tabs: show class name + subject
     var tabsHtml=myClasses.length>1
       ?'<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">'
         +myClasses.map(function(c){
-          return '<button class="btn hw-cls-tab" data-cid="'+c.id+'" onclick="switchHWClass('+c.id+')" style="font-size:10px;padding:5px 14px;border-radius:20px;'+(c.id===myClasses[0].id?'background:var(--r);color:#fff':'background:var(--rp);color:var(--r)')+'">'+c.name+'</button>';
+          var label=c.name+(c.subject?'<br><span style="font-size:8px;opacity:0.8">'+c.subject+'</span>':'');
+          return '<button class="btn hw-cls-tab" data-cid="'+c.id+'" onclick="switchHWClass('+c.id+')" '
+            +'style="font-size:10px;padding:6px 14px;border-radius:10px;line-height:1.4;text-align:center;'
+            +(c.id===activeId?'background:var(--r);color:#fff':'background:var(--rp);color:var(--r)')+'">'+label+'</button>';
         }).join('')+'</div>'
       :'';
     g('myhw-wrap').innerHTML=tabsHtml+'<div id="hw-class-content"></div>';
-    loadHWClass(myClasses[0].id);
+    loadHWClass(activeId);
   });
 }
+
+function switchHWClass(cid){
+  window._hwActiveClass=cid;
+  document.querySelectorAll('.hw-cls-tab').forEach(function(b){
+    var active=parseInt(b.dataset.cid)===cid;
+    b.style.background=active?'var(--r)':'var(--rp)';
+    b.style.color=active?'#fff':'var(--r)';
+  });
+  loadHWClass(cid);
+}
+
+async function loadHWClass(clsId){
+  var el=g('hw-class-content');if(!el)return;
+  el.innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  var cls=(window._hwClasses||[]).find(function(c){return c.id===clsId;})||{name:'L\u1edbp',id:clsId};
+  var sR=await sb.from('sessions').select('id').eq('class_id',clsId);
+  var sessIds=(sR.data||[]).map(function(s){return s.id;});
+  if(!sessIds.length){el.innerHTML='<p style="color:var(--mt);font-size:11px">L\u1edbp '+cls.name+' ch\u01b0a c\u00f3 bu\u1ed5i h\u1ecdc n\u00e0o</p>';return;}
+  var exR=await sb.from('exercises').select('*').in('session_id',sessIds).order('id');
+  var ex=exR.data||[];
+  var subR=ex.length?await sb.from('submissions').select('*').in('exercise_id',ex.map(function(e){return e.id;})).eq('student_id',SB_USER.id):null;
+  var subs=subR?subR.data||[]:[];
+  var subMap={};subs.forEach(function(s){subMap[s.exercise_id]=s;});
+  var total=ex.length,done=subs.filter(function(s){return s.status==='submitted'||s.status==='graded';}).length;
+  var graded=subs.filter(function(s){return s.status==='graded';}).length;
+  var cantdo=subs.filter(function(s){return s.status==='cantdo';}).length;
+  // Header: class info + stats
+  var clsLabel=cls.name+(cls.subject?' \u2014 '+cls.subject:'');
+  var h='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    +'<div style="font-size:12px;font-weight:700;color:var(--bd)">'+clsLabel+'</div>'
+    +'<div style="font-size:9px;color:var(--mt)">'+total+' b\u00e0i t\u1eadp</div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">'
+    +'<div class="sc"><div class="sv">'+total+'</div><div class="sl">T\u1ed5ng</div></div>'
+    +'<div class="sc"><div class="sv" style="color:#2d9e6b">'+done+'</div><div class="sl">\u0110\u00e3 n\u1ed9p</div></div>'
+    +'<div class="sc"><div class="sv" style="color:var(--gold)">'+graded+'</div><div class="sl">C\u00f3 \u0111i\u1ec3m</div></div>'
+    +'<div class="sc"><div class="sv" style="color:var(--r)">'+(total-done-cantdo)+'</div><div class="sl">Ch\u01b0a n\u1ed9p</div></div>'
+    +'</div>';
+  ex.forEach(function(e){
+    var sub=subMap[e.id];
+    var catBdg=e.category==='key'
+      ?'<span style="background:#fce8e8;color:#c0392b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">\uD83D\uDD11 Key</span>'
+      :'<span style="background:#e8f5e9;color:#2d9e6b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">\u2795 Additional</span>';
+    var exTitle=(e.code?e.code+': ':'')+e.title;
+    var safeTitle=exTitle.replace(/'/g,'').replace(/"/g,'').replace(/\\/g,'');
+    var statusHtml='';
+    if(!sub){
+      statusHtml='<button class="btn bp" style="font-size:9px" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\')">&#128228; N\u1ed9p b\u00e0i</button>';
+    }else if(sub.status==='graded'){
+      statusHtml='<span class="bdg bok">\u2705 \u0110\u00e3 ch\u1ea5m: '+(sub.score||'\u2014')+'\u0111</span>'
+        +(sub.feedback?'<div style="font-size:9px;color:var(--mt);margin-top:3px">\uD83D\uDCAC '+sub.feedback+'</div>':'')
+        +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">\u270F\uFE0F C\u1eadp nh\u1eadt</button>';
+    }else if(sub.status==='submitted'){
+      var stLabel=sub.note&&sub.note.startsWith('[L\u00e0m m\u1ed9t ph\u1ea7n]')?'\u26a0\uFE0F M\u1ed9t ph\u1ea7n':sub.note&&sub.note.startsWith('[Kh\u00f3')?'\u2753 Kh\u00f3':'\uD83D\uDCE8 \u0110\u00e3 n\u1ed9p';
+      statusHtml='<span class="bdg bwt">'+stLabel+' \u2014 Ch\u1edd ch\u1ea5m</span>'
+        +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">\uD83D\uDCDD '+sub.note.replace(/\[.*?\]\s*/,'').substring(0,80)+'</div>':'')
+        +(sub.drive_url?'<div style="margin-top:3px"><a href="'+sub.drive_url+'" target="_blank" style="font-size:9px;color:#4285f4">\uD83D\uDCCE Xem file</a></div>':'')
+        +(sub.img_url&&!sub.img_url.startsWith('data:')?'<div style="margin-top:4px"><img src="'+sub.img_url+'" style="max-height:60px;border-radius:4px" onerror="this.style.display=\'none\'"></div>':'')
+        +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">\u270F\uFE0F S\u1eeda</button>';
+    }else if(sub.status==='cantdo'){
+      statusHtml='<span class="bdg bno">\u2753 Kh\u00f3/ch\u01b0a l\u00e0m</span>'
+        +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">\uD83D\uDCDD '+sub.note.replace(/\[.*?\]\s*/,'').substring(0,80)+'</div>':'')
+        +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">\u270F\uFE0F C\u1eadp nh\u1eadt</button>';
+    }
+    h+='<div class="card" style="margin-bottom:8px">'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'+catBdg
+      +(e.deadline?'<span style="font-size:9px;color:var(--mt)">\u23f0 '+e.deadline+'</span>':'')+'</div>'
+      +'<b style="font-size:11px;color:var(--bd)">'+exTitle+'</b>'
+      +(e.body?'<div style="font-size:10px;color:var(--mt);margin:4px 0;line-height:1.5">'+e.body+'</div>':'')
+      +(e.img_url?'<img src="'+e.img_url+'" style="max-width:100%;border-radius:6px;margin:4px 0;max-height:120px;object-fit:cover" onerror="this.style.display=\'none\'">':'')
+      +'<div style="margin-top:6px">'+statusHtml+'</div></div>';
+  });
+  if(!ex.length)h+='<p style="color:var(--mt);font-size:11px">L\u1edbp '+cls.name+' ch\u01b0a c\u00f3 b\u00e0i t\u1eadp n\u00e0o</p>';
+  el.innerHTML=h;
+}
+
 
 function switchHWClass(cid){
   window._hwActiveClass=cid;
@@ -1216,50 +1295,158 @@ function submitHW(exId,exTitle){openSubmitModal(exId,exTitle||('Bài tập #'+ex
 function rMyGrades(){setTB('Kết quả học tập','');g('pg').innerHTML='<p style="color:var(--mt);font-size:11px">Đang tải...</p>';if(!sb)return;sb.from('submissions').select('*,exercises(title,code)').eq('student_id',SB_USER.id).eq('status','graded').then(function(r){var subs=r.data||[];g('pg').innerHTML=subs.length?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px"><tr style="background:var(--br)"><th style="padding:7px 10px;text-align:left">Bài tập</th><th style="padding:7px 10px;text-align:right">Điểm</th></tr>'+subs.map(function(s){var ex=s.exercises||{};return '<tr style="border-bottom:1px solid var(--br)"><td style="padding:7px 10px">'+( ex.code||'')+(ex.code?': ':'')+(ex.title||'')+'</td><td style="padding:7px 10px;text-align:right;font-weight:700;color:var(--bp)">'+(s.score||'—')+'</td></tr>';}).join('')+'</table></div>':'<p style="color:var(--mt);font-size:11px">Chưa có điểm nào</p>';});}
 function rClassQA(){
   setTB('Q&A l\u1edbp h\u1ecdc','');
-  // L\u1ea5y t\u1ea5t c\u1ea3 l\u1edbp h\u1ecdc sinh tham gia (c\u00f3 th\u1ec3 nhi\u1ec1u l\u1edbp)
   if(!sb||!SB_USER){g('pg').innerHTML='<p>Ch\u01b0a \u0111\u0103ng nh\u1eadp</p>';return;}
-  g('pg').innerHTML='<div id="qa-wrap"><div class="loading"><div class="spinner"></div></div></div>';
-  
-  // L\u1ea5y t\u1ea5t c\u1ea3 l\u1edbp m\u00e0 h\u1ecdc sinh \u0111\u00e3 tham gia
+  g('pg').innerHTML='<div id="qa-wrap" style="max-width:700px"><div class="loading"><div class="spinner"></div></div></div>';
   sb.from('profiles').select('class_id,classes(id,name,subject)').eq('id',SB_USER.id).then(async function(pr){
     var myClasses=[];
-    if(pr.data&&pr.data.length){
-      pr.data.forEach(function(p){
-        if(p.classes)myClasses.push(p.classes);
-      });
-    }
-    // Fallback: n\u1ebfu ch\u1ec9 c\u00f3 1 class_id trong profile
+    if(pr.data&&pr.data.length){pr.data.forEach(function(p){if(p.classes)myClasses.push(p.classes);});}
     if(!myClasses.length&&SB_PROFILE&&SB_PROFILE.class_id){
       var cr=await sb.from('classes').select('id,name,subject').eq('id',SB_PROFILE.class_id);
       myClasses=cr.data||[];
     }
-    if(!myClasses.length){
-      g('qa-wrap').innerHTML='<p style="color:var(--mt)">Ch\u01b0a tham gia l\u1edbp n\u00e0o</p>';
-      return;
-    }
-    
-    var activeClass=myClasses[0].id;
-    var wrap=g('qa-wrap');
-    
-    // Build tabs cho t\u1eebng l\u1edbp
+    if(!myClasses.length){g('qa-wrap').innerHTML='<p style="color:var(--mt)">Ch\u01b0a tham gia l\u1edbp n\u00e0o</p>';return;}
+    window._qaClasses=myClasses;
+    var activeId=myClasses[0].id;
     var tabsHtml=myClasses.length>1
-      ?'<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">'
+      ?'<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">'
         +myClasses.map(function(c){
-          return '<button class="btn qa-cls-tab" data-cid="'+c.id+'" onclick="switchQAClass('+c.id+')" '
-            +'style="font-size:10px;padding:5px 12px;border-radius:20px;'
-            +(c.id===activeClass?'background:var(--r);color:#fff':'background:var(--rp);color:var(--r)')
-            +'">'+c.name+'</button>';
+          var label=c.name+(c.subject?' \u2022 '+c.subject:'');
+          return '<button class="btn qa-cls-tab" data-cid="'+c.id+'" onclick="switchQAClass('+c.id+')" style="font-size:10px;padding:5px 14px;border-radius:20px;'+(c.id===activeId?'background:var(--r);color:#fff':'background:var(--rp);color:var(--r)')+'">'+label+'</button>';
         }).join('')+'</div>'
       :'';
-    
-    wrap.innerHTML=tabsHtml
-      +'<div id="qa-class-content"></div>';
-    
-    window._qaClasses=myClasses;
-    window._qaActiveClass=activeClass;
-    loadQAClass(activeClass);
+    g('qa-wrap').innerHTML=tabsHtml+'<div id="qa-class-content"></div>';
+    loadQAClass(activeId);
   });
 }
+
+function switchQAClass(cid){
+  document.querySelectorAll('.qa-cls-tab').forEach(function(b){
+    var active=parseInt(b.dataset.cid)===cid;
+    b.style.background=active?'var(--r)':'var(--rp)';
+    b.style.color=active?'#fff':'var(--r)';
+  });
+  loadQAClass(cid);
+}
+
+async function loadQAClass(clsId){
+  var el=g('qa-class-content');if(!el)return;
+  var cls=(window._qaClasses||[]).find(function(c){return c.id===clsId;})||{name:'L\u1edbp',id:clsId};
+  var label=cls.name+(cls.subject?' \u2022 '+cls.subject:'');
+  el.innerHTML='<div class="card" style="margin-bottom:12px">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--bd);margin-bottom:8px">\u2753 \u0110\u1eb7t c\u00e2u h\u1ecfi \u2014 '+label+'</div>'
+    +'<textarea class="fi" id="qa-input-'+clsId+'" rows="3" placeholder="Nh\u1eadp c\u00e2u h\u1ecfi c\u1ee7a b\u1ea1n..."></textarea>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">'
+    +'<label style="font-size:10px;color:var(--mt);display:flex;align-items:center;gap:4px;cursor:pointer">'
+    +'<input type="checkbox" id="qa-anon-'+clsId+'"> \uD83C\uDFAD \u1ea8n danh</label>'
+    +'<button class="btn bp" style="font-size:10px" onclick="submitQA('+clsId+')">\uD83D\uDCE8 G\u1eedi c\u00e2u h\u1ecfi</button>'
+    +'</div></div>'
+    +'<div id="qa-list-'+clsId+'"><div class="loading"><div class="spinner"></div></div></div>';
+  var r=await sb.from('questions').select('*').eq('class_id',clsId).order('created_at',{ascending:false}).limit(50);
+  var listEl=g('qa-list-'+clsId);if(!listEl)return;
+  var qs=r.data||[];
+  if(!qs.length){listEl.innerHTML='<p style="color:var(--mt);font-size:11px">\uD83D\uDCA1 Ch\u01b0a c\u00f3 c\u00e2u h\u1ecfi n\u00e0o. H\u00e3y \u0111\u1eb7t c\u00e2u h\u1ecfi \u0111\u1ea7u ti\u00ean!</p>';return;}
+  listEl.innerHTML=qs.map(function(q){
+    var name=q.is_anonymous?'\uD83C\uDFAD \u1ea8n danh':(q.student_name||'H\u1ecdc vi\u00ean');
+    var isMe=q.student_id===SB_USER.id;
+    var likes=q.likes||0;
+    var myLike=(q.liked_by||[]).includes(SB_USER.id);
+    var commCnt=q.comments_count||0;
+    var dt=new Date(q.created_at);
+    var dtStr=dt.toLocaleDateString('vi')+' '+dt.toLocaleTimeString('vi',{hour:'2-digit',minute:'2-digit'});
+    return '<div class="card qa-item" id="qa-'+q.id+'" style="margin-bottom:10px'+(isMe?';border-left:3px solid var(--r)':'')+'\">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<div style="width:32px;height:32px;border-radius:50%;background:var(--rp);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--r);flex-shrink:0">'
+        +(q.is_anonymous?'?':name.charAt(0).toUpperCase())+'</div>'
+      +'<div><div style="font-size:10px;font-weight:600;color:var(--bd)">'+name+(isMe?'<span style="color:var(--r);font-size:9px;margin-left:4px">(B\u1ea1n)</span>':'')+'</div>'
+      +'<div style="font-size:8px;color:var(--mt)">'+dtStr+'</div></div></div>'
+      +(q.answer?'<span style="background:#e8f5e9;color:#2d9e6b;font-size:8px;padding:2px 8px;border-radius:10px;font-weight:600">\u2705 \u0110\u00e3 tr\u1ea3 l\u1eddi</span>'
+        :'<span style="background:#fff3e0;color:#e8a020;font-size:8px;padding:2px 8px;border-radius:10px">\u23f3 Ch\u1edd tr\u1ea3 l\u1eddi</span>')
+      +'</div>'
+      +'<div style="font-size:11px;line-height:1.6;margin-bottom:8px;color:var(--bd)">'+q.question+'</div>'
+      +(q.answer?'<div style="background:#f0f8f0;border-left:3px solid #2d9e6b;padding:8px 12px;border-radius:0 8px 8px 0;margin-bottom:8px">'
+        +'<div style="font-size:9px;font-weight:600;color:#2d9e6b;margin-bottom:3px">\uD83D\uDCAC Ch\u1ecb Ph\u01b0\u01a1ng'+(q.answered_at?' \u2022 '+new Date(q.answered_at).toLocaleDateString('vi'):'')+'</div>'
+        +'<div style="font-size:10px;color:#2d5e3e;line-height:1.5">'+q.answer+'</div></div>':'')
+      +'<div style="display:flex;align-items:center;gap:6px;padding-top:6px;border-top:1px solid var(--br);flex-wrap:wrap">'
+      +'<button onclick="likeQA('+q.id+','+clsId+')" style="background:'+(myLike?'var(--rp)':'none')+';border:1px solid '+(myLike?'var(--r)':'var(--br)')+';border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:3px;font-size:10px;color:'+(myLike?'var(--r)':'var(--mt)')+';padding:3px 8px">'
+        +(myLike?'\u2665\uFE0F':'\uD83E\uDD0D')+' '+(likes>0?likes+' th\u00edch':'Th\u00edch')+'</button>'
+      +'<button onclick="toggleReply(\'reply-'+q.id+'\','+clsId+')" style="background:none;border:1px solid var(--br);border-radius:6px;cursor:pointer;font-size:10px;color:var(--mt);padding:3px 8px">'
+        +'\uD83D\uDCAC B\u00ecnh lu\u1eadn'+(commCnt>0?' ('+commCnt+')':'')+'</button>'
+      +(isMe&&!q.answer?'<button onclick="deleteQA('+q.id+','+clsId+')" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--mt);padding:3px 8px;margin-left:auto">\uD83D\uDDD1 X\u00f3a</button>':'')
+      +'</div>'
+      +'<div id="reply-'+q.id+'" style="display:none;margin-top:8px;padding-top:8px;border-top:1px dashed var(--br)">'
+      +'<div id="comments-'+q.id+'" style="margin-bottom:8px"></div>'
+      +'<div style="display:flex;gap:6px"><input class="fi" id="comment-input-'+q.id+'" placeholder="Vi\u1ebft b\u00ecnh lu\u1eadn..." style="flex:1;font-size:10px;padding:6px 10px"/>'
+      +'<button class="btn bp" style="font-size:9px;padding:4px 10px;white-space:nowrap" onclick="submitComment('+q.id+','+clsId+')">G\u1eedi</button></div></div>'
+      +'</div>';
+  }).join('');
+}
+
+async function toggleReply(id,clsId){
+  var el=g(id);if(!el)return;
+  var isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'block';
+  if(!isOpen){
+    var qid=parseInt(id.replace('reply-',''));
+    var r=await sb.from('questions').select('comments').eq('id',qid).limit(1);
+    var comments=(r.data&&r.data[0]&&r.data[0].comments)||[];
+    var cel=g('comments-'+qid);
+    if(cel)cel.innerHTML=comments.length
+      ?comments.map(function(c){return '<div style="background:var(--bg);border-radius:6px;padding:6px 10px;margin-bottom:4px">'
+        +'<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:10px;font-weight:600;color:var(--bd)">'+(c.name||'H\u1ecdc vi\u00ean')+'</span>'
+        +'<span style="font-size:8px;color:var(--mt)">'+new Date(c.at||0).toLocaleTimeString('vi',{hour:'2-digit',minute:'2-digit'})+'</span></div>'
+        +'<div style="font-size:10px">'+c.text+'</div></div>';}).join('')
+      :'<p style="font-size:9px;color:var(--mt);margin:0 0 6px">Ch\u01b0a c\u00f3 b\u00ecnh lu\u1eadn</p>';
+  }
+}
+
+async function submitComment(qid,clsId){
+  var inp=g('comment-input-'+qid);
+  if(!inp||!inp.value.trim()){toast('Nh\u1eadp b\u00ecnh lu\u1eadn',true);return;}
+  var r=await sb.from('questions').select('comments,comments_count').eq('id',qid).limit(1);
+  var existing=(r.data&&r.data[0]&&r.data[0].comments)||[];
+  if(!Array.isArray(existing))existing=[];
+  existing.push({uid:SB_USER.id,name:SB_PROFILE?.name||'H\u1ecdc vi\u00ean',text:inp.value.trim(),at:new Date().toISOString()});
+  var r2=await sb.from('questions').update({comments:existing,comments_count:existing.length}).eq('id',qid);
+  if(r2.error){toast('L\u1ed7i: '+r2.error.message,true);return;}
+  inp.value='';toast('\uD83D\uDCAC \u0110\u00e3 b\u00ecnh lu\u1eadn!',false);
+  g('reply-'+qid).style.display='none';
+  setTimeout(function(){toggleReply('reply-'+qid,clsId);},200);
+}
+
+async function likeQA(qid,clsId){
+  var r=await sb.from('questions').select('likes,liked_by').eq('id',qid).limit(1);
+  if(!r.data||!r.data.length)return;
+  var likes=r.data[0].likes||0,likedBy=r.data[0].liked_by||[];
+  var myIdx=likedBy.indexOf(SB_USER.id);
+  if(myIdx>-1){likedBy.splice(myIdx,1);likes=Math.max(0,likes-1);}else{likedBy.push(SB_USER.id);likes++;}
+  await sb.from('questions').update({likes:likes,liked_by:likedBy}).eq('id',qid);
+  loadQAClass(clsId);
+}
+
+async function deleteQA(qid,clsId){
+  if(!confirm('X\u00f3a c\u00e2u h\u1ecfi n\u00e0y?'))return;
+  await sb.from('questions').delete().eq('id',qid).eq('student_id',SB_USER.id);
+  loadQAClass(clsId);
+}
+
+async function submitQA(clsId){
+  var inp=g('qa-input-'+clsId);
+  var q=inp?inp.value.trim():'';
+  if(!q){toast('Vui l\u00f2ng nh\u1eadp c\u00e2u h\u1ecfi',true);return;}
+  var anon=document.getElementById('qa-anon-'+clsId)?.checked;
+  var r=await sb.from('questions').insert({
+    class_id:clsId,student_id:SB_USER.id,
+    student_name:SB_PROFILE?.name||'H\u1ecdc vi\u00ean',
+    question:q,is_anonymous:!!anon,
+    likes:0,liked_by:[],comments:[],comments_count:0
+  });
+  if(r.error){toast('L\u1ed7i: '+r.error.message,true);return;}
+  toast('\u2705 \u0110\u00e3 g\u1eedi c\u00e2u h\u1ecfi!',false);
+  if(inp)inp.value='';
+  loadQAClass(clsId);
+}
+
 
 function switchQAClass(cid){
   window._qaActiveClass=cid;
