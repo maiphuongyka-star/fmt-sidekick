@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FMT Sidekick v2.3 2026-06-01 01:56:32 -->
+<!-- FMT Sidekick v2.4 2026-06-01 02:07:00 -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -982,66 +982,103 @@ async function changePwd(){
 
 // ===== STUDENT PAGES =====
 function rMyHW(){
-  setTB('B\u00e0i t\u1eadp c\u1ee7a t\u00f4i','');
-  g('pg').innerHTML='<div id="myhw-list"><div class="loading"><div class="spinner"></div></div></div>';
-  if(!sb)return;
-  var clsId=SB_PROFILE?SB_PROFILE.class_id:null;
-  if(!clsId){var el=g('myhw-list');if(el)el.innerHTML='<p style="color:var(--mt)">Ch\u01b0a v\u00e0o l\u1edbp n\u00e0o</p>';return;}
-  sb.from('sessions').select('id').eq('class_id',clsId).then(async function(sR){
-    var sessIds=(sR.data||[]).map(function(s){return s.id;});
-    if(!sessIds.length){var el2=g('myhw-list');if(el2)el2.innerHTML='<p style="color:var(--mt);font-size:11px">Ch\u01b0a c\u00f3 bu\u1ed5i h\u1ecdc</p>';return;}
-    var exR=await sb.from('exercises').select('*').in('session_id',sessIds).order('id');
-    var ex=exR.data||[];
-    var subR=ex.length?await sb.from('submissions').select('*').in('exercise_id',ex.map(function(e){return e.id;})).eq('student_id',SB_USER.id):null;
-    var subs=subR?subR.data||[]:[];
-    var subMap={};subs.forEach(function(s){subMap[s.exercise_id]=s;});
-    var el=g('myhw-list');if(!el)return;
-    var total=ex.length,done=subs.filter(function(s){return s.status==='submitted'||s.status==='graded';}).length;
-    var graded=subs.filter(function(s){return s.status==='graded';}).length;
-    var h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">'
-      +'<div class="sc"><div class="sv">'+total+'</div><div class="sl">T\u1ed5ng b\u00e0i</div></div>'
-      +'<div class="sc"><div class="sv" style="color:#2d9e6b">'+done+'</div><div class="sl">\u0110\u00e3 n\u1ed9p</div></div>'
-      +'<div class="sc"><div class="sv" style="color:var(--gold)">'+graded+'</div><div class="sl">C\u00f3 \u0111i\u1ec3m</div></div>'
-      +'<div class="sc"><div class="sv" style="color:var(--r)">'+(total-done)+'</div><div class="sl">Ch\u01b0a n\u1ed9p</div></div>'
-      +'</div>';
-    ex.forEach(function(e){
-      var sub=subMap[e.id];
-      var catBdg=e.category==='key'
-        ?'<span style="background:#fce8e8;color:#c0392b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">\uD83D\uDD11 Key</span>'
-        :'<span style="background:#e8f5e9;color:#2d9e6b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">\u2795 Additional</span>';
-      var exTitle=(e.code?e.code+': ':'')+e.title;
-      var safeTitle=exTitle.replace(/'/g,'').replace(/"/g,'');
-      var statusHtml='';
-      if(!sub){
-        statusHtml='<button class="btn bp" style="font-size:9px" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\')">&#128228; N\u1ed9p b\u00e0i</button>';
-      }else if(sub.status==='graded'){
-        statusHtml='<span class="bdg bok">\u2705 \u0110\u00e3 ch\u1ea5m: '+(sub.score||'\u2014')+'\u0111</span>'
-          +(sub.feedback?'<div style="font-size:9px;color:var(--mt);margin-top:3px">\uD83D\uDCAC '+sub.feedback+'</div>':'')
-          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">\u270F\uFE0F C\u1eadp nh\u1eadt</button>';
-      }else if(sub.status==='submitted'){
-        statusHtml='<span class="bdg bwt">\uD83D\uDCE8 Ch\u1edd ch\u1ea5m</span>'
-          +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">\uD83D\uDCDD '+sub.note.substring(0,80)+'</div>':'')
-          +(sub.img_url&&!sub.img_url.startsWith('data:')?'<div style="margin-top:4px"><img src="'+sub.img_url+'" style="max-height:60px;border-radius:4px;cursor:pointer;object-fit:cover" onerror="this.style.display=\'none\'"></div>':'')
-          +(sub.drive_url?'<div style="margin-top:3px"><a href="'+sub.drive_url+'" target="_blank" style="font-size:9px;color:#4285f4">\uD83D\uDCCE Xem file</a></div>':'')
-          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">\u270F\uFE0F S\u1eeda</button>';
-      }else if(sub.status==='cantdo'){
-        statusHtml='<span class="bdg bno">\u2753 Kh\u00f3/ch\u01b0a l\u00e0m</span>'
-          +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">\uD83D\uDCDD '+sub.note.substring(0,80)+'</div>':'')
-          +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">\u270F\uFE0F C\u1eadp nh\u1eadt</button>';
-      }
-      h+='<div class="card" style="margin-bottom:8px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'
-        +'<div style="display:flex;align-items:center;gap:6px">'+catBdg
-        +(e.deadline?'<span style="font-size:9px;color:var(--mt)">\u23f0 '+e.deadline+'</span>':'')+'</div></div>'
-        +'<b style="font-size:11px;color:var(--bd)">'+exTitle+'</b>'
-        +(e.body?'<div style="font-size:10px;color:var(--mt);margin:4px 0;line-height:1.5">'+e.body+'</div>':'')
-        +(e.img_url?'<img src="'+e.img_url+'" style="max-width:100%;border-radius:6px;margin:4px 0;max-height:120px;object-fit:cover" onerror="this.style.display=\'none\'">':'')
-        +'<div style="margin-top:6px">'+statusHtml+'</div></div>';
-    });
-    if(!ex.length)h+='<p style="color:var(--mt);font-size:11px">Ch\u01b0a c\u00f3 b\u00e0i t\u1eadp n\u00e0o</p>';
-    el.innerHTML=h;
+  setTB('Bài tập của tôi','');
+  g('pg').innerHTML='<div id="myhw-wrap"><div class="loading"><div class="spinner"></div></div></div>';
+  if(!sb||!SB_USER)return;
+  // Lấy tất cả lớp học sinh tham gia
+  sb.from('profiles').select('class_id,classes(id,name,subject)').eq('id',SB_USER.id).then(async function(pr){
+    var myClasses=[];
+    if(pr.data&&pr.data.length){pr.data.forEach(function(p){if(p.classes)myClasses.push(p.classes);});}
+    if(!myClasses.length&&SB_PROFILE&&SB_PROFILE.class_id){
+      var cr=await sb.from('classes').select('id,name,subject').eq('id',SB_PROFILE.class_id);
+      myClasses=cr.data||[];
+    }
+    if(!myClasses.length){g('myhw-wrap').innerHTML='<p style="color:var(--mt)">Chưa tham gia lớp nào</p>';return;}
+    window._hwClasses=myClasses;
+    window._hwActiveClass=myClasses[0].id;
+    var tabsHtml=myClasses.length>1
+      ?'<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">'
+        +myClasses.map(function(c){
+          return '<button class="btn hw-cls-tab" data-cid="'+c.id+'" onclick="switchHWClass('+c.id+')" style="font-size:10px;padding:5px 14px;border-radius:20px;'+(c.id===myClasses[0].id?'background:var(--r);color:#fff':'background:var(--rp);color:var(--r)')+'">'+c.name+'</button>';
+        }).join('')+'</div>'
+      :'';
+    g('myhw-wrap').innerHTML=tabsHtml+'<div id="hw-class-content"></div>';
+    loadHWClass(myClasses[0].id);
   });
 }
+
+function switchHWClass(cid){
+  window._hwActiveClass=cid;
+  document.querySelectorAll('.hw-cls-tab').forEach(function(b){
+    var active=parseInt(b.dataset.cid)===cid;
+    b.style.background=active?'var(--r)':'var(--rp)';
+    b.style.color=active?'#fff':'var(--r)';
+  });
+  loadHWClass(cid);
+}
+
+async function loadHWClass(clsId){
+  var el=g('hw-class-content');if(!el)return;
+  el.innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  var cls=(window._hwClasses||[]).find(function(c){return c.id===clsId;})||{name:'Lớp'};
+  var sR=await sb.from('sessions').select('id').eq('class_id',clsId);
+  var sessIds=(sR.data||[]).map(function(s){return s.id;});
+  if(!sessIds.length){el.innerHTML='<p style="color:var(--mt);font-size:11px">Chưa có buổi học trong lớp '+cls.name+'</p>';return;}
+  var exR=await sb.from('exercises').select('*').in('session_id',sessIds).order('id');
+  var ex=exR.data||[];
+  var subR=ex.length?await sb.from('submissions').select('*').in('exercise_id',ex.map(function(e){return e.id;})).eq('student_id',SB_USER.id):null;
+  var subs=subR?subR.data||[]:[];
+  var subMap={};subs.forEach(function(s){subMap[s.exercise_id]=s;});
+  var total=ex.length,done=subs.filter(function(s){return s.status==='submitted'||s.status==='graded';}).length;
+  var graded=subs.filter(function(s){return s.status==='graded';}).length;
+  var cantdo=subs.filter(function(s){return s.status==='cantdo';}).length;
+  var h='';
+  // Stats
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">'
+    +'<div class="sc"><div class="sv">'+total+'</div><div class="sl">Tổng bài</div></div>'
+    +'<div class="sc"><div class="sv" style="color:#2d9e6b">'+done+'</div><div class="sl">Đã nộp</div></div>'
+    +'<div class="sc"><div class="sv" style="color:var(--gold)">'+graded+'</div><div class="sl">Có điểm</div></div>'
+    +'<div class="sc"><div class="sv" style="color:var(--r)">'+(total-done-cantdo)+'</div><div class="sl">Chưa nộp</div></div>'
+    +'</div>';
+  ex.forEach(function(e){
+    var sub=subMap[e.id];
+    var catBdg=e.category==='key'
+      ?'<span style="background:#fce8e8;color:#c0392b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">🔑 Key</span>'
+      :'<span style="background:#e8f5e9;color:#2d9e6b;font-size:8px;padding:1px 6px;border-radius:10px;font-weight:600">➕ Additional</span>';
+    var exTitle=(e.code?e.code+': ':'')+e.title;
+    var safeTitle=exTitle.replace(/'/g,'').replace(/"/g,'');
+    var statusHtml='';
+    if(!sub){
+      statusHtml='<button class="btn bp" style="font-size:9px" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\')">📤 Nộp bài</button>';
+    }else if(sub.status==='graded'){
+      statusHtml='<span class="bdg bok">✅ Đã chấm: '+(sub.score||'—')+'đ</span>'
+        +(sub.feedback?'<div style="font-size:9px;color:var(--mt);margin-top:3px">💬 '+sub.feedback+'</div>':'')
+        +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">✏️ Cập nhật</button>';
+    }else if(sub.status==='submitted'){
+      var statusLabel=sub.note&&sub.note.startsWith('[Làm một phần]')?'⚠️ Làm một phần':sub.note&&sub.note.startsWith('[Khó')?'❓ Khó/chưa làm':'📨 Đã nộp';
+      statusHtml='<span class="bdg bwt">'+statusLabel+' — Chờ chấm</span>'
+        +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">📝 '+sub.note.replace(/\[.*?\]\s*/,'').substring(0,80)+'</div>':'')
+        +(sub.drive_url?'<div style="margin-top:3px"><a href="'+sub.drive_url+'" target="_blank" style="font-size:9px;color:#4285f4">📎 Xem file</a></div>':'')
+        +(sub.img_url&&!sub.img_url.startsWith('data:')?'<div style="margin-top:4px"><img src="'+sub.img_url+'" style="max-height:60px;border-radius:4px;cursor:pointer" onerror="this.style.display=\'none\'"></div>':'')
+        +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">✏️ Sửa</button>';
+    }else if(sub.status==='cantdo'){
+      statusHtml='<span class="bdg bno">❓ Khó/chưa làm</span>'
+        +(sub.note?'<div style="font-size:9px;color:var(--mt);margin-top:3px">📝 '+sub.note.replace(/\[.*?\]\s*/,'').substring(0,80)+'</div>':'')
+        +'<button class="btn" style="font-size:8px;padding:1px 6px;margin-left:4px;background:#f5f0eb" onclick="openSubmitModal(\''+e.id+'\',\''+safeTitle+'\',true)">✏️ Cập nhật</button>';
+    }
+    h+='<div class="card" style="margin-bottom:8px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'
+      +'<div style="display:flex;align-items:center;gap:6px">'+catBdg
+      +(e.deadline?'<span style="font-size:9px;color:var(--mt)">⏰ '+e.deadline+'</span>':'')+'</div></div>'
+      +'<b style="font-size:11px;color:var(--bd)">'+exTitle+'</b>'
+      +(e.body?'<div style="font-size:10px;color:var(--mt);margin:4px 0;line-height:1.5">'+e.body+'</div>':'')
+      +(e.img_url?'<img src="'+e.img_url+'" style="max-width:100%;border-radius:6px;margin:4px 0;max-height:120px;object-fit:cover" onerror="this.style.display=\'none\'">':'')
+      +'<div style="margin-top:6px">'+statusHtml+'</div></div>';
+  });
+  if(!ex.length)h+='<p style="color:var(--mt);font-size:11px">Lớp '+cls.name+' chưa có bài tập nào</p>';
+  el.innerHTML=h;
+}
+
 
 function openSubmitModal(exId,exTitle,isUpdate){
   window._submitExId=exId;
@@ -1171,7 +1208,7 @@ async function confirmSubmit(){
 }
 
 
-function submitHW(exId){toast('Tính năng nộp bài đang phát triển',false);}
+function submitHW(exId,exTitle){openSubmitModal(exId,exTitle||('Bài tập #'+exId));}
 function rMyGrades(){setTB('Kết quả học tập','');g('pg').innerHTML='<p style="color:var(--mt);font-size:11px">Đang tải...</p>';if(!sb)return;sb.from('submissions').select('*,exercises(title,code)').eq('student_id',SB_USER.id).eq('status','graded').then(function(r){var subs=r.data||[];g('pg').innerHTML=subs.length?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px"><tr style="background:var(--br)"><th style="padding:7px 10px;text-align:left">Bài tập</th><th style="padding:7px 10px;text-align:right">Điểm</th></tr>'+subs.map(function(s){var ex=s.exercises||{};return '<tr style="border-bottom:1px solid var(--br)"><td style="padding:7px 10px">'+( ex.code||'')+(ex.code?': ':'')+(ex.title||'')+'</td><td style="padding:7px 10px;text-align:right;font-weight:700;color:var(--bp)">'+(s.score||'—')+'</td></tr>';}).join('')+'</table></div>':'<p style="color:var(--mt);font-size:11px">Chưa có điểm nào</p>';});}
 function rClassQA(){
   setTB('Q&A l\u1edbp h\u1ecdc','');
@@ -1572,6 +1609,8 @@ async function removeStudent(id){
   if(r.error)toast('Lỗi: '+r.error.message,true);
   else{toast('Đã xóa học viên',false);rTab('students');}
 }
+
+setInterval(rotateDashImg,8000);
 </script>
 
 <div class="mo" id="m-submit"><div class="md" style="max-width:500px">
