@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FMT Sidekick v2.8 2026-06-01 08:44:18 -->
+<!-- FMT Sidekick v2.9 2026-06-01 08:53:07 -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -778,28 +778,70 @@ async function createInvite(){
 
 // ===== HW REVIEW =====
 function rHWReview(){
-  setTB('Duyệt bài tập','');
-  g('pg').innerHTML='<div id="hw-list"><div class="loading"><div class="spinner"></div></div></div>';
+  setTB('Duy\u1ec7t b\u00e0i t\u1eadp','');
+  g('pg').innerHTML='<div id="hwr-wrap" style="max-width:900px"><div class="loading"><div class="spinner"></div></div></div>';
   if(!sb)return;
-  sb.from('submissions').select('*,exercises(title,code,session_id),profiles(name,email)').eq('status','submitted').order('submitted_at',{ascending:false}).then(function(r){
-    var subs=r.data||[];
-    var el=g('hw-list');if(!el)return;
-    el.innerHTML=subs.length?subs.map(function(s){
-      var ex=s.exercises||{},stu=s.profiles||{};
-      return '<div class="card" style="margin-bottom:10px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
-        +'<div><div style="font-size:12px;font-weight:600;color:var(--bd)">'+(ex.code||'')+(ex.code?': ':'')+(ex.title||'Bài tập')+'</div>'
-        +'<div style="font-size:10px;color:var(--mt);margin-top:2px">👤 '+stu.name+' · '+stu.email+'</div>'
-        +(s.content?'<div style="font-size:10px;color:var(--mt);margin-top:4px;line-height:1.5">'+s.content+'</div>':'')
-        +(s.img_url?'<img src="'+s.img_url+'" style="max-height:150px;margin-top:6px;border-radius:6px;cursor:pointer" onclick="viewImg(\''+s.img_url+'\')" onerror="this.style.display=\'none\'">':'')
-        +'</div>'
-        +'<button class="btn bp" style="font-size:9px;flex-shrink:0" onclick="openGrade(\''+s.exercise_id+'\',\''+s.student_id+'\')">✅ Chấm</button>'
-        +'</div></div>';
-    }).join(''):'<p style="color:var(--mt);font-size:11px">Không có bài nào chờ chấm</p>';
+  Promise.all([
+    sb.from('submissions').select('*,exercises(id,title,code,session_id)').in('status',['submitted','cantdo']).order('submitted_at',{ascending:false}),
+    sb.from('profiles').select('id,name').eq('role','student'),
+    sb.from('sessions').select('id,class_id,classes(name,subject)')
+  ]).then(function(results){
+    var subR=results[0],profR=results[1],sessR=results[2];
+    var el=g('hwr-wrap');if(!el)return;
+    var subs=subR.data||[];
+    var profMap={};(profR.data||[]).forEach(function(p){profMap[p.id]=p;});
+    var sessMap={};(sessR.data||[]).forEach(function(s){sessMap[s.id]=s;});
+    if(!subs.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--mt)"><div style="font-size:32px">\u2705</div><div style="margin-top:8px">Kh\u00f4ng c\u00f3 b\u00e0i n\u00e0o ch\u1edd ch\u1ea5m</div></div>';return;}
+    var byClass={};
+    subs.forEach(function(s){
+      var sess=sessMap[s.exercises?.session_id];
+      var cn=(sess?.classes?.name||'?')+(sess?.classes?.subject?' \u2014 '+sess.classes.subject:'');
+      if(!byClass[cn])byClass[cn]=[];
+      byClass[cn].push(s);
+    });
+    var html='<div style="font-size:11px;color:var(--mt);margin-bottom:12px">'+subs.length+' b\u00e0i ch\u1edd duy\u1ec7t</div>';
+    Object.keys(byClass).sort().forEach(function(cls){
+      var items=byClass[cls];
+      html+='<div style="margin-bottom:20px"><div style="font-size:12px;font-weight:700;color:var(--bd);margin-bottom:8px;padding:8px 12px;background:var(--rp);border-radius:8px;border-left:3px solid var(--r)">\uD83D\uDCDA '+cls+' ('+items.length+' b\u00e0i)</div>';
+      items.forEach(function(s){
+        var stu=profMap[s.student_id];
+        var stuName=stu?stu.name:'H\u1ecdc vi\u00ean';
+        var exTitle=(s.exercises?.code?s.exercises.code+': ':'')+( s.exercises?.title||'B\u00e0i t\u1eadp');
+        var isPartial=s.note?.startsWith('[L\u00e0m m\u1ed9t ph\u1ea7n]');
+        var isCantdo=s.status==='cantdo';
+        var slabel=isCantdo?'\u2753 Kh\u00f3':isPartial?'\u26a0\uFE0F M\u1ed9t ph\u1ea7n':'\uD83D\uDCE8 \u0110\u00e3 n\u1ed9p';
+        var scolor=isCantdo?'#c0392b':isPartial?'#e8a020':'#2d9e6b';
+        var dt=s.submitted_at?new Date(s.submitted_at).toLocaleString('vi'):'\u2014';
+        var note=(s.note||'').replace(/\[.*?\]\s*/,'');
+        html+='<div class="card" style="margin-bottom:10px">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+          +'<div><div style="font-size:12px;font-weight:700;color:var(--bd)">'+stuName+'</div><div style="font-size:10px;color:var(--mt)">'+exTitle+'</div></div>'
+          +'<div style="text-align:right"><span style="background:'+scolor+'20;color:'+scolor+';font-size:9px;padding:2px 8px;border-radius:10px;font-weight:600">'+slabel+'</span><div style="font-size:8px;color:var(--mt);margin-top:2px">'+dt+'</div></div></div>'
+          +(note?'<div style="font-size:10px;background:var(--bg);padding:6px 10px;border-radius:6px;margin-bottom:6px">\uD83D\uDCDD '+note+'</div>':'')
+          +(s.drive_url?'<div style="margin-bottom:6px"><a href="'+s.drive_url+'" target="_blank" style="font-size:10px;color:#4285f4">\uD83D\uDCCE Xem file \u2192</a></div>':'')
+          +(s.img_url&&!s.img_url.startsWith('data:')?'<img src="'+s.img_url+'" style="max-height:80px;border-radius:6px;margin-bottom:6px" onerror="this.style.display=\'none\'">':'')
+          +'<div style="display:grid;grid-template-columns:80px 1fr auto;gap:8px;align-items:center;padding-top:8px;border-top:1px solid var(--br)">'
+          +'<input class="fi" id="sc-'+s.id+'" type="number" placeholder="\u0110i\u1ec3m" style="font-size:10px;text-align:center" min="0" max="10" step="0.5">'
+          +'<input class="fi" id="fb2-'+s.id+'" placeholder="Nh\u1eadn x\u00e9t..." style="font-size:10px">'
+          +'<button class="btn bp" style="font-size:9px;padding:5px 12px;white-space:nowrap" onclick="gradeOK(\''+s.id+'\')">\u2705 Ch\u1ea5m</button>'
+          +'</div></div>';
+      });
+      html+='</div>';
+    });
+    el.innerHTML=html;
   });
 }
 
-// ===== GRADE =====
+async function gradeOK(sid){
+  var score=parseFloat(document.getElementById('sc-'+sid)?.value);
+  var fb=document.getElementById('fb2-'+sid)?.value.trim()||'';
+  if(isNaN(score)){toast('Nh\u1eadp \u0111i\u1ec3m',true);return;}
+  var r=await sb.from('submissions').update({status:'graded',score:score,feedback:fb}).eq('id',sid);
+  if(r.error){toast('L\u1ed7i: '+r.error.message,true);return;}
+  toast('\u2705 \u0110\u00e3 ch\u1ea5m \u0111i\u1ec3m!',false);rHWReview();
+}
+
+
 function openGrade(exId,stuId){
   _gradeEx=exId;_gradeStu=stuId;
   var info=g('grade-info');if(info)info.textContent='Bài: '+exId+' | Học viên: '+stuId;
@@ -1326,7 +1368,41 @@ async function confirmSubmit(){
 
 
 function submitHW(exId,exTitle){openSubmitModal(exId,exTitle||('Bài tập #'+exId));}
-function rMyGrades(){setTB('Kết quả học tập','');g('pg').innerHTML='<p style="color:var(--mt);font-size:11px">Đang tải...</p>';if(!sb)return;sb.from('submissions').select('*,exercises(title,code)').eq('student_id',SB_USER.id).eq('status','graded').then(function(r){var subs=r.data||[];g('pg').innerHTML=subs.length?'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px"><tr style="background:var(--br)"><th style="padding:7px 10px;text-align:left">Bài tập</th><th style="padding:7px 10px;text-align:right">Điểm</th></tr>'+subs.map(function(s){var ex=s.exercises||{};return '<tr style="border-bottom:1px solid var(--br)"><td style="padding:7px 10px">'+( ex.code||'')+(ex.code?': ':'')+(ex.title||'')+'</td><td style="padding:7px 10px;text-align:right;font-weight:700;color:var(--bp)">'+(s.score||'—')+'</td></tr>';}).join('')+'</table></div>':'<p style="color:var(--mt);font-size:11px">Chưa có điểm nào</p>';});}
+function rMyGrades(){
+  setTB('K\u1ebft qu\u1ea3 h\u1ecdc t\u1eadp','');
+  g('pg').innerHTML='<div id="grades-wrap" style="max-width:700px"><div class="loading"><div class="spinner"></div></div></div>';
+  if(!sb||!SB_USER)return;
+  sb.from('submissions').select('*,exercises(title,code,session_id)').eq('student_id',SB_USER.id).eq('status','graded').order('submitted_at',{ascending:false}).then(function(r){
+    var el=g('grades-wrap');if(!el)return;
+    var subs=r.data||[];
+    if(!subs.length){
+      el.innerHTML='<div style="text-align:center;padding:30px;color:var(--mt)"><div style="font-size:32px;margin-bottom:8px">\uD83D\uDCCA</div><div style="font-size:11px">Ch\u01b0a c\u00f3 \u0111i\u1ec3m n\u00e0o. N\u1ed9p b\u00e0i v\u00e0 ch\u1edd gi\u00e1o vi\u00ean ch\u1ea5m!</div></div>';
+      return;
+    }
+    var total=subs.reduce(function(a,s){return a+(s.score||0);},0);
+    var avg=(total/subs.length).toFixed(1);
+    var html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'
+      +'<div class="sc"><div class="sv" style="color:#2d9e6b">'+subs.length+'</div><div class="sl">B\u00e0i \u0111\u00e3 ch\u1ea5m</div></div>'
+      +'<div class="sc"><div class="sv" style="color:var(--gold)">'+avg+'</div><div class="sl">\u0110i\u1ec3m TB</div></div>'
+      +'</div>';
+    subs.forEach(function(s){
+      var exTitle=(s.exercises?.code?s.exercises.code+': ':('' ))+(s.exercises?.title||'B\u00e0i t\u1eadp');
+      var sc=s.score||0;
+      var sc2=typeof sc==='number'?sc:parseFloat(sc);
+      var scColor=sc2>=8?'#2d9e6b':sc2>=6?'#e8a020':'#c0392b';
+      html+='<div class="card" style="margin-bottom:8px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+        +'<div style="font-size:11px;font-weight:600;color:var(--bd)">'+exTitle+'</div>'
+        +'<div style="font-size:22px;font-weight:700;color:'+scColor+'">'+sc2+'\u0111</div></div>'
+        +(s.feedback?'<div style="font-size:10px;background:#f0f8f0;border-left:3px solid #2d9e6b;padding:6px 10px;border-radius:0 6px 6px 0;color:#2d5e3e">\uD83D\uDCAC '+s.feedback+'</div>':'')
+        +'<div style="font-size:9px;color:var(--mt);margin-top:4px">\u23f0 '+new Date(s.submitted_at).toLocaleDateString('vi')+'</div>'
+        +'</div>';
+    });
+    el.innerHTML=html;
+  });
+}
+
+
 function rClassQA(){
   setTB('Q&A l\u1edbp h\u1ecdc','');
   if(!sb||!SB_USER){g('pg').innerHTML='<p>Ch\u01b0a \u0111\u0103ng nh\u1eadp</p>';return;}
