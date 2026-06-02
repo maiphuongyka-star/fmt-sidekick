@@ -326,7 +326,7 @@ var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 var sb = null, currentUser = null, currentProfile = null;
 
 var sbScript = document.createElement('script');
-sbScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.38.4/umd/supabase.min.js';
+sbScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
 sbScript.onload = function(){ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); checkSession(); };
 sbScript.onerror = function(){ showDemoMode(); };
 document.head.appendChild(sbScript);
