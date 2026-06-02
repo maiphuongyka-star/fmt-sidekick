@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FMT Sidekick v3.1 2026-06-02 02:32:30 -->
+<!-- FMT Sidekick v3.1 final 2026-06-02 02:33:36 -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -989,13 +989,146 @@ function viewImg(url){
 // ===== GRADE CALCULATOR =====
 function rGC(){
   setTB('Grade Calculator','');
-  g('pg').innerHTML='<div class="card"><div class="st" style="margin-bottom:12px">📊 Grade Calculator</div>'
-    +'<div style="font-size:11px;color:var(--mt);margin-bottom:12px">Nhập điểm từng phần để tính GPA tổng hợp</div>'
-    +'<div class="fg"><label class="fl">Midterm (trọng số %)</label><div style="display:flex;gap:8px"><input class="fi" id="gc-mt" type="number" placeholder="Điểm (0-10)" min="0" max="10" step="0.1"/><input class="fi" id="gc-mtw" type="number" placeholder="Trọng số %" value="40" min="0" max="100"/></div></div>'
-    +'<div class="fg"><label class="fl">Final (trọng số %)</label><div style="display:flex;gap:8px"><input class="fi" id="gc-fn" type="number" placeholder="Điểm (0-10)" min="0" max="10" step="0.1"/><input class="fi" id="gc-fnw" type="number" placeholder="Trọng số %" value="60" min="0" max="100"/></div></div>'
-    +'<button class="btn bp" style="width:100%" onclick="calcGrade()">Tính điểm</button>'
-    +'<div id="gc-result" style="margin-top:14px"></div></div>';
+  var wrap=document.createElement('div');
+  wrap.style.maxWidth='640px';
+  wrap.innerHTML=`
+<div class="card" style="margin-bottom:14px">
+  <div style="font-size:14px;font-weight:700;color:var(--bd);margin-bottom:4px">\uD83D\uDCCA Grade Calculator</div>
+  <div style="font-size:10px;color:var(--mt)">Nh\u1eadp \u0111i\u1ec3m v\u00e0 tr\u1ecdng s\u1ed1 theo c\u1ea5u tr\u00fac m\u00f4n h\u1ecdc. \u0110\u1ec3 tr\u1ed1ng nh\u1eefng ph\u1ea7n kh\u00f4ng c\u00f3.</div>
+</div>
+
+<div class="card" style="margin-bottom:12px">
+  <div style="font-size:12px;font-weight:700;color:var(--bd);margin-bottom:12px">\u2696\uFE0F C\u1ea5u tr\u00fac \u0111i\u1ec3m</div>
+  
+  <div id="grade-components">
+    <!-- Participation -->
+    <div class="grade-row" style="display:grid;grid-template-columns:1fr 80px 100px;gap:8px;align-items:center;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:600;color:var(--bd)">\uD83D\uDC4B Participation / Ch\u01b0\u01a1ng tr\u00ecnh</div>
+      <input class="fi" id="gc-pt-score" type="number" placeholder="\u0110i\u1ec3m" min="0" max="10" step="0.1" oninput="calcGrade()" style="font-size:11px;text-align:center">
+      <div style="display:flex;align-items:center;gap:4px"><input class="fi" id="gc-pt-w" type="number" placeholder="Tr\u1ecdng s\u1ed1%" min="0" max="100" step="5" oninput="calcGrade()" style="font-size:11px;text-align:center"><span style="font-size:10px;color:var(--mt)">%</span></div>
+    </div>
+    
+    <!-- Progress Test 1 -->
+    <div class="grade-row" style="display:grid;grid-template-columns:1fr 80px 100px;gap:8px;align-items:center;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:600;color:var(--bd)">\uD83D\uDCDD Progress Test 1</div>
+      <input class="fi" id="gc-pt1-score" type="number" placeholder="\u0110i\u1ec3m" min="0" max="10" step="0.1" oninput="calcGrade()" style="font-size:11px;text-align:center">
+      <div style="display:flex;align-items:center;gap:4px"><input class="fi" id="gc-pt1-w" type="number" placeholder="Tr\u1ecdng s\u1ed1%" min="0" max="100" step="5" oninput="calcGrade()" style="font-size:11px;text-align:center"><span style="font-size:10px;color:var(--mt)">%</span></div>
+    </div>
+    
+    <!-- Progress Test 2 -->
+    <div class="grade-row" style="display:grid;grid-template-columns:1fr 80px 100px;gap:8px;align-items:center;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:600;color:var(--bd)">\uD83D\uDCDD Progress Test 2</div>
+      <input class="fi" id="gc-pt2-score" type="number" placeholder="\u0110i\u1ec3m" min="0" max="10" step="0.1" oninput="calcGrade()" style="font-size:11px;text-align:center">
+      <div style="display:flex;align-items:center;gap:4px"><input class="fi" id="gc-pt2-w" type="number" placeholder="Tr\u1ecdng s\u1ed1%" min="0" max="100" step="5" oninput="calcGrade()" style="font-size:11px;text-align:center"><span style="font-size:10px;color:var(--mt)">%</span></div>
+    </div>
+    
+    <!-- Project/Assignment -->
+    <div class="grade-row" style="display:grid;grid-template-columns:1fr 80px 100px;gap:8px;align-items:center;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:600;color:var(--bd)">\uD83D\uDCC1 Project / Assignment</div>
+      <input class="fi" id="gc-proj-score" type="number" placeholder="\u0110i\u1ec3m" min="0" max="10" step="0.1" oninput="calcGrade()" style="font-size:11px;text-align:center">
+      <div style="display:flex;align-items:center;gap:4px"><input class="fi" id="gc-proj-w" type="number" placeholder="Tr\u1ecdng s\u1ed1%" min="0" max="100" step="5" oninput="calcGrade()" style="font-size:11px;text-align:center"><span style="font-size:10px;color:var(--mt)">%</span></div>
+    </div>
+    
+    <!-- Final -->
+    <div class="grade-row" style="display:grid;grid-template-columns:1fr 80px 100px;gap:8px;align-items:center;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:600;color:var(--bd)">\uD83C\uDFC6 Final Exam</div>
+      <input class="fi" id="gc-final-score" type="number" placeholder="\u0110i\u1ec3m" min="0" max="10" step="0.1" oninput="calcGrade()" style="font-size:11px;text-align:center">
+      <div style="display:flex;align-items:center;gap:4px"><input class="fi" id="gc-final-w" type="number" placeholder="Tr\u1ecdng s\u1ed1%" min="0" max="100" step="5" oninput="calcGrade()" style="font-size:11px;text-align:center"><span style="font-size:10px;color:var(--mt)">%</span></div>
+    </div>
+    
+    <!-- Custom component -->
+    <div class="grade-row" style="display:grid;grid-template-columns:1fr 80px 100px;gap:8px;align-items:center;margin-bottom:8px">
+      <div><input class="fi" id="gc-custom-name" placeholder="Th\u00e0nh ph\u1ea7n kh\u00e1c..." style="font-size:10px"/></div>
+      <input class="fi" id="gc-custom-score" type="number" placeholder="\u0110i\u1ec3m" min="0" max="10" step="0.1" oninput="calcGrade()" style="font-size:11px;text-align:center">
+      <div style="display:flex;align-items:center;gap:4px"><input class="fi" id="gc-custom-w" type="number" placeholder="Tr\u1ecdng s\u1ed1%" min="0" max="100" step="5" oninput="calcGrade()" style="font-size:11px;text-align:center"><span style="font-size:10px;color:var(--mt)">%</span></div>
+    </div>
+  </div>
+  
+  <!-- Headers -->
+  <div style="display:grid;grid-template-columns:1fr 80px 100px;gap:8px;font-size:9px;color:var(--mt);text-align:center;margin-bottom:4px;border-top:1px solid var(--br);padding-top:8px">
+    <div style="text-align:left">Th\u00e0nh ph\u1ea7n</div><div>\u0110i\u1ec3m (/10)</div><div>Tr\u1ecdng s\u1ed1</div>
+  </div>
+</div>
+
+<!-- Result -->
+<div class="card" id="gc-result" style="background:linear-gradient(135deg,var(--rp),#fff8f0);border:2px solid var(--br);text-align:center;padding:20px">
+  <div style="font-size:12px;color:var(--mt);margin-bottom:8px">Nh\u1eadp \u0111i\u1ec3m v\u00e0 tr\u1ecdng s\u1ed1 \u0111\u1ec3 t\u00ednh \u2192</div>
+  <div style="font-size:36px;font-weight:700;color:var(--bd)" id="gc-final-display">\u2014</div>
+  <div style="font-size:11px;color:var(--mt);margin-top:4px" id="gc-grade-label"></div>
+  <div style="font-size:9px;color:var(--mt);margin-top:8px" id="gc-weight-total"></div>
+</div>
+
+<!-- Quick presets -->
+<div class="card" style="margin-top:12px">
+  <div style="font-size:11px;font-weight:600;color:var(--bd);margin-bottom:8px">\u26a1 C\u1ea5u tr\u00fac m\u1eabu nhanh</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <button class="btn" style="font-size:9px;background:var(--rp);color:var(--r)" onclick="setPreset('cf')">CF: 10+20+20+50</button>
+    <button class="btn" style="font-size:9px;background:var(--rp);color:var(--r)" onclick="setPreset('fma')">FMA: 10+20+30+40</button>
+    <button class="btn" style="font-size:9px;background:var(--rp);color:var(--r)" onclick="setPreset('audit')">Audit: 10+20+20+50</button>
+    <button class="btn bo" style="font-size:9px" onclick="clearGC()">X\u00f3a t\u1ea5t c\u1ea3</button>
+  </div>
+</div>`;
+  g('pg').innerHTML='';g('pg').appendChild(wrap);
 }
+
+function calcGrade(){
+  var fields=[
+    {s:'gc-pt-score',w:'gc-pt-w'},
+    {s:'gc-pt1-score',w:'gc-pt1-w'},
+    {s:'gc-pt2-score',w:'gc-pt2-w'},
+    {s:'gc-proj-score',w:'gc-proj-w'},
+    {s:'gc-final-score',w:'gc-final-w'},
+    {s:'gc-custom-score',w:'gc-custom-w'},
+  ];
+  var totalW=0,totalScore=0,hasData=false;
+  fields.forEach(function(f){
+    var s=parseFloat(document.getElementById(f.s)?.value);
+    var w=parseFloat(document.getElementById(f.w)?.value);
+    if(!isNaN(s)&&!isNaN(w)&&w>0){
+      totalW+=w;totalScore+=s*w;hasData=true;
+    }
+  });
+  var display=document.getElementById('gc-final-display');
+  var label=document.getElementById('gc-grade-label');
+  var wtotal=document.getElementById('gc-weight-total');
+  if(!hasData){if(display)display.textContent='\u2014';if(label)label.textContent='';if(wtotal)wtotal.textContent='';return;}
+  var grade=totalW>0?(totalScore/totalW):0;
+  var rounded=Math.round(grade*10)/10;
+  if(display){
+    display.textContent=rounded.toFixed(1);
+    display.style.color=rounded>=8?'#2d9e6b':rounded>=6.5?'#e8a020':rounded>=5?'#e67e22':'#c0392b';
+  }
+  var gradeLabel=rounded>=8.5?'\u2605 Xu\u1ea5t s\u1eafc':rounded>=8?'\u2605 Gi\u1ecfi':rounded>=6.5?'\u25cf Kh\u00e1':rounded>=5?'\u25cb Trung b\u00ecnh':'\u25a1 Y\u1ebfu';
+  if(label){label.textContent=gradeLabel;label.style.color=display.style.color;}
+  if(wtotal){
+    var warnColor=Math.abs(totalW-100)>1?'#e8a020':'#2d9e6b';
+    wtotal.textContent='T\u1ed5ng tr\u1ecdng s\u1ed1: '+totalW+'%'+(Math.abs(totalW-100)>1?' \u26a0\uFE0F (c\u1ea7n \u0111\u1ee7 100%)':'  \u2705');
+    wtotal.style.color=warnColor;
+  }
+}
+
+function setPreset(type){
+  var presets={
+    cf:{pt:10,pt1:20,pt2:20,proj:0,final:50},
+    fma:{pt:10,pt1:20,pt2:30,proj:0,final:40},
+    audit:{pt:10,pt1:20,pt2:20,proj:0,final:50}
+  };
+  var p=presets[type];if(!p)return;
+  document.getElementById('gc-pt-w').value=p.pt||'';
+  document.getElementById('gc-pt1-w').value=p.pt1||'';
+  document.getElementById('gc-pt2-w').value=p.pt2||'';
+  document.getElementById('gc-proj-w').value=p.proj||'';
+  document.getElementById('gc-final-w').value=p.final||'';
+}
+
+function clearGC(){
+  ['gc-pt-score','gc-pt-w','gc-pt1-score','gc-pt1-w','gc-pt2-score','gc-pt2-w',
+   'gc-proj-score','gc-proj-w','gc-final-score','gc-final-w','gc-custom-score','gc-custom-w'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  calcGrade();
+}
+
 
 function calcGrade(){
   var mt=parseFloat(v('gc-mt'));var mtw=parseFloat(v('gc-mtw'))/100;
