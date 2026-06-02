@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FMT Sidekick v3.0 2026-06-02 02:15:48 -->
+<!-- FMT Sidekick v3.1 2026-06-02 02:32:30 -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -779,35 +779,53 @@ async function createInvite(){
 // ===== HW REVIEW =====
 function rHWReview(){
   setTB('Duy\u1ec7t b\u00e0i t\u1eadp','');
-  g('pg').innerHTML='<div id="hwr-wrap" style="max-width:900px"><div class="loading"><div class="spinner"></div></div></div>';
+  g('pg').innerHTML='<div id="hwr-wrap" style="max-width:960px"><div class="loading"><div class="spinner"></div></div></div>';
   if(!sb)return;
   Promise.all([
     sb.from('submissions').select('*,exercises(id,title,code,session_id)').in('status',['submitted','cantdo']).order('submitted_at',{ascending:false}),
     sb.from('profiles').select('id,name').eq('role','student'),
-    sb.from('sessions').select('id,class_id,classes(name,subject)')
-  ]).then(function(results){
-    var subR=results[0],profR=results[1],sessR=results[2];
+    sb.from('sessions').select('id,class_id,classes(name,subject)'),
+    sb.from('exercises').select('id,title,code,session_id,category'),
+    sb.from('profiles').select('id').eq('role','student')
+  ]).then(async function(results){
     var el=g('hwr-wrap');if(!el)return;
-    var subs=subR.data||[];
-    var profMap={};(profR.data||[]).forEach(function(p){profMap[p.id]=p;});
-    var sessMap={};(sessR.data||[]).forEach(function(s){sessMap[s.id]=s;});
+    var subs=results[0].data||[];
+    var profs=results[1].data||[];
+    var sessions=results[2].data||[];
+    var profMap={};profs.forEach(function(p){profMap[p.id]=p;});
+    var sessMap={};sessions.forEach(function(s){sessMap[s.id]=s;});
+    
     if(!subs.length){
-      el.innerHTML='<div style="text-align:center;padding:40px;color:var(--mt)"><div style="font-size:36px">\u2705</div><div style="margin-top:8px;font-size:12px">Kh\u00f4ng c\u00f3 b\u00e0i n\u00e0o ch\u1edd ch\u1ea5m</div></div>';
+      el.innerHTML='<div style="text-align:center;padding:50px;color:var(--mt)"><div style="font-size:40px">\u2705</div><div style="font-size:13px;margin-top:10px;font-weight:600">T\u1ea5t c\u1ea3 b\u00e0i \u0111\u00e3 \u0111\u01b0\u1ee3c ch\u1ea5m!</div></div>';
       return;
     }
+    
+    // Group by class
     var byClass={};
     subs.forEach(function(s){
       var sess=sessMap[s.exercises&&s.exercises.session_id];
-      var cn=(sess&&sess.classes&&sess.classes.name)||'Kh\u00f4ng r\u00f5 l\u1edbp';
-      if(sess&&sess.classes&&sess.classes.subject)cn+=(' \u2014 '+sess.classes.subject);
-      if(!byClass[cn])byClass[cn]=[];
-      byClass[cn].push(s);
+      var clsName=sess&&sess.classes?sess.classes.name:'Kh\u00f4ng r\u00f5 l\u1edbp';
+      var clsSubj=sess&&sess.classes&&sess.classes.subject?sess.classes.subject:'';
+      var key=clsName+(clsSubj?' \u2014 '+clsSubj:'');
+      if(!byClass[key])byClass[key]=[];
+      byClass[key].push(s);
     });
-    var html='<div style="font-size:11px;color:var(--mt);margin-bottom:12px">'+subs.length+' b\u00e0i ch\u1edd duy\u1ec7t</div>';
+    
+    var html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+      +'<div style="font-size:14px;font-weight:700;color:var(--bd)">\uD83D\uDCCB Duy\u1ec7t b\u00e0i t\u1eadp</div>'
+      +'<div style="font-size:11px;color:var(--mt);background:var(--rp);padding:4px 12px;border-radius:20px;color:var(--r);font-weight:600">'+subs.length+' b\u00e0i ch\u1edd ch\u1ea5m</div>'
+      +'</div>';
+    
     Object.keys(byClass).sort().forEach(function(cls){
       var items=byClass[cls];
+      // Stats for this class
+      var done_pct=0;
       html+='<div style="margin-bottom:24px">'
-        +'<div style="font-size:12px;font-weight:700;color:var(--bd);margin-bottom:10px;padding:8px 14px;background:var(--rp);border-radius:8px;border-left:3px solid var(--r)">\uD83D\uDCDA '+cls+' \u2014 '+items.length+' b\u00e0i</div>';
+        +'<div style="font-size:13px;font-weight:700;color:var(--bd);padding:10px 14px;background:linear-gradient(135deg,var(--rp),#f5f0fe);border-radius:10px;border-left:4px solid var(--r);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">'
+        +'<span>\uD83D\uDCDA '+cls+'</span>'
+        +'<span style="font-size:11px;color:var(--r);background:#fff;padding:2px 10px;border-radius:20px">'+items.length+' b\u00e0i</span>'
+        +'</div>';
+      
       items.forEach(function(s){
         var stu=profMap[s.student_id];
         var stuName=stu?stu.name:'H\u1ecdc vi\u00ean';
@@ -816,22 +834,30 @@ function rHWReview(){
         var isCantdo=s.status==='cantdo';
         var slabel=isCantdo?'\u2753 Kh\u00f3/ch\u01b0a l\u00e0m':isPartial?'\u26a0\uFE0F L\u00e0m m\u1ed9t ph\u1ea7n':'\uD83D\uDCE8 \u0110\u00e3 n\u1ed9p';
         var scolor=isCantdo?'#c0392b':isPartial?'#e8a020':'#2d9e6b';
+        var scolor_bg=isCantdo?'#fce4ec':isPartial?'#fff3e0':'#e8f5e9';
         var dt=s.submitted_at?new Date(s.submitted_at).toLocaleString('vi'):'\u2014';
         var note=(s.note||'').replace(/\[.*?\]\s*/,'').trim();
+        
         html+='<div class="card" style="margin-bottom:10px">'
           +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+          +'<div style="flex:1">'
+          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+          +'<div style="width:34px;height:34px;border-radius:50%;background:var(--rp);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--r);font-size:13px;flex-shrink:0">'+stuName.charAt(0)+'</div>'
           +'<div><div style="font-size:12px;font-weight:700;color:var(--bd)">'+stuName+'</div>'
-          +'<div style="font-size:10px;color:var(--mt);margin-top:2px">'+exTitle+'</div></div>'
-          +'<div style="text-align:right">'
-          +'<span style="background:'+scolor+'20;color:'+scolor+';font-size:9px;padding:2px 8px;border-radius:10px;font-weight:600">'+slabel+'</span>'
-          +'<div style="font-size:8px;color:var(--mt);margin-top:3px">'+dt+'</div></div></div>'
-          +(note?'<div style="font-size:10px;background:var(--bg);padding:7px 10px;border-radius:6px;margin-bottom:8px;border:1px solid var(--br)">\uD83D\uDCDD '+note+'</div>':'')
-          +(s.drive_url?'<div style="margin-bottom:8px"><a href="'+s.drive_url+'" target="_blank" style="font-size:10px;color:#4285f4;text-decoration:none">\uD83D\uDCCE Xem file \u0111\u00ednh k\u00e8m \u2192</a></div>':'')
-          +(s.img_url&&s.img_url.indexOf('data:')!==0?'<img src="'+s.img_url+'" style="max-height:100px;border-radius:6px;margin-bottom:8px" onerror="this.style.display=\'none\'">':'')
-          +'<div style="display:grid;grid-template-columns:90px 1fr auto;gap:8px;align-items:center;padding-top:8px;border-top:1px solid var(--br)">'
-          +'<input class="fi" id="sc-'+s.id+'" type="number" placeholder="\u0110i\u1ec3m 0-10" style="font-size:10px;text-align:center" min="0" max="10" step="0.5">'
-          +'<input class="fi" id="fb2-'+s.id+'" placeholder="Nh\u1eadn x\u00e9t cho h\u1ecdc sinh..." style="font-size:10px">'
-          +'<button class="btn bp" style="font-size:9px;padding:6px 14px;white-space:nowrap" onclick="gradeOK(\''+s.id+'\')">\u2705 Ch\u1ea5m</button>'
+          +'<div style="font-size:10px;color:var(--mt)">'+exTitle+'</div>'
+          +'</div></div></div>'
+          +'<div style="text-align:right;flex-shrink:0">'
+          +'<span style="background:'+scolor_bg+';color:'+scolor+';font-size:9px;padding:3px 10px;border-radius:20px;font-weight:600;display:block;margin-bottom:3px">'+slabel+'</span>'
+          +'<div style="font-size:8px;color:var(--mt)">'+dt+'</div>'
+          +'</div></div>'
+          +(note?'<div style="font-size:10px;background:var(--bg);border:1px solid var(--br);padding:7px 10px;border-radius:6px;margin-bottom:8px;color:var(--bd);">\uD83D\uDCDD <i>'+note+'</i></div>':'')
+          +(s.drive_url?'<div style="margin-bottom:8px"><a href="'+s.drive_url+'" target="_blank" style="font-size:10px;color:#4285f4;text-decoration:none;display:inline-flex;align-items:center;gap:4px">\uD83D\uDCCE Xem file \u0111\u00ednh k\u00e8m \u2192</a></div>':'')
+          +(s.img_url&&s.img_url.indexOf('data:')!==0?'<img src="'+s.img_url+'" style="max-height:100px;border-radius:6px;margin-bottom:8px;border:1px solid var(--br)" onerror="this.style.display=\'none\'">':'')
+          +'<div style="display:grid;grid-template-columns:100px 1fr auto;gap:8px;align-items:center;padding-top:8px;border-top:1px solid var(--br)">'
+          +'<div style="position:relative"><input class="fi" id="sc-'+s.id+'" type="number" placeholder="\u0110i\u1ec3m" style="font-size:11px;text-align:center;padding-right:20px" min="0" max="10" step="0.5">'
+          +'<span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--mt)">/10</span></div>'
+          +'<input class="fi" id="fb2-'+s.id+'" placeholder="Nh\u1eadn x\u00e9t, g\u1ee3i \u00fd cho h\u1ecdc sinh..." style="font-size:10px">'
+          +'<button class="btn bp" style="font-size:10px;padding:7px 16px;white-space:nowrap" onclick="gradeOK(\''+s.id+'\')">\u2705 Ch\u1ea5m</button>'
           +'</div></div>';
       });
       html+='</div>';
@@ -839,15 +865,19 @@ function rHWReview(){
     el.innerHTML=html;
   });
 }
+
 async function gradeOK(sid){
-  var score=parseFloat(document.getElementById('sc-'+sid)&&document.getElementById('sc-'+sid).value);
-  var fb=(document.getElementById('fb2-'+sid)&&document.getElementById('fb2-'+sid).value.trim())||'';
-  if(isNaN(score)){toast('Nh\u1eadp \u0111i\u1ec3m tr\u01b0\u1edbc',true);return;}
+  var scEl=document.getElementById('sc-'+sid);
+  var fbEl=document.getElementById('fb2-'+sid);
+  var score=parseFloat(scEl&&scEl.value);
+  var fb=(fbEl&&fbEl.value.trim())||'';
+  if(isNaN(score)||score<0||score>10){toast('Nh\u1eadp \u0111i\u1ec3m t\u1eeb 0-10',true);return;}
   var r=await sb.from('submissions').update({status:'graded',score:score,feedback:fb}).eq('id',sid);
   if(r.error){toast('L\u1ed7i: '+r.error.message,true);return;}
-  toast('\u2705 \u0110\u00e3 ch\u1ea5m \u0111i\u1ec3m!',false);
+  toast('\u2705 \u0110\u00e3 ch\u1ea5m \u0111i\u1ec3m '+score+'!',false);
   rHWReview();
 }
+
 
 function openGrade(exId,stuId){
   _gradeEx=exId;_gradeStu=stuId;
@@ -1377,13 +1407,14 @@ async function confirmSubmit(){
 function submitHW(exId,exTitle){openSubmitModal(exId,exTitle||('Bài tập #'+exId));}
 function rMyGrades(){
   setTB('K\u1ebft qu\u1ea3 h\u1ecdc t\u1eadp','');
-  g('pg').innerHTML='<div id="grades-wrap" style="max-width:700px"><div class="loading"><div class="spinner"></div></div></div>';
+  var wrap=document.createElement('div');wrap.style.maxWidth='700px';
+  wrap.innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  g('pg').innerHTML='';g('pg').appendChild(wrap);
   if(!sb||!SB_USER)return;
-  sb.from('submissions').select('*,exercises(title,code,session_id)').eq('student_id',SB_USER.id).eq('status','graded').order('submitted_at',{ascending:false}).then(function(r){
-    var el=g('grades-wrap');if(!el)return;
+  sb.from('submissions').select('*,exercises(title,code)').eq('student_id',SB_USER.id).eq('status','graded').order('submitted_at',{ascending:false}).then(function(r){
     var subs=r.data||[];
     if(!subs.length){
-      el.innerHTML='<div style="text-align:center;padding:40px;color:var(--mt)"><div style="font-size:36px">\uD83D\uDCCA</div><div style="font-size:12px;margin-top:8px">Ch\u01b0a c\u00f3 \u0111i\u1ec3m n\u00e0o.<br>N\u1ed9p b\u00e0i v\u00e0 ch\u1edd gi\u00e1o vi\u00ean ch\u1ea5m!</div></div>';
+      wrap.innerHTML='<div style="text-align:center;padding:40px;color:var(--mt)"><div style="font-size:36px">\uD83D\uDCCA</div><div style="font-size:12px;margin-top:10px">Ch\u01b0a c\u00f3 \u0111i\u1ec3m n\u00e0o.<br>N\u1ed9p b\u00e0i v\u00e0 ch\u1edd gi\u00e1o vi\u00ean ch\u1ea5m!</div></div>';
       return;
     }
     var total=subs.reduce(function(a,s){return a+(parseFloat(s.score)||0);},0);
@@ -1391,7 +1422,7 @@ function rMyGrades(){
     var best=Math.max.apply(null,subs.map(function(s){return parseFloat(s.score)||0;}));
     var html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">'
       +'<div class="sc"><div class="sv" style="color:#2d9e6b">'+subs.length+'</div><div class="sl">B\u00e0i \u0111\u00e3 ch\u1ea5m</div></div>'
-      +'<div class="sc"><div class="sv" style="color:var(--gold)">'+avg+'</div><div class="sl">\u0110i\u1ec3m trung b\u00ecnh</div></div>'
+      +'<div class="sc"><div class="sv" style="color:var(--gold)">'+avg+'</div><div class="sl">\u0110i\u1ec3m TB</div></div>'
       +'<div class="sc"><div class="sv" style="color:var(--r)">'+best+'</div><div class="sl">Cao nh\u1ea5t</div></div>'
       +'</div>';
     subs.forEach(function(s){
@@ -1400,17 +1431,17 @@ function rMyGrades(){
       var scColor=sc>=8?'#2d9e6b':sc>=6?'#e8a020':'#c0392b';
       var scBg=sc>=8?'#e8f5e9':sc>=6?'#fff3e0':'#fce4ec';
       html+='<div class="card" style="margin-bottom:10px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+        +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">'
+        +'<div style="background:'+scBg+';color:'+scColor+';font-size:22px;font-weight:700;padding:8px 16px;border-radius:10px;min-width:65px;text-align:center">'+sc+'</div>'
         +'<div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--bd)">'+exTitle+'</div>'
-        +'<div style="font-size:9px;color:var(--mt);margin-top:2px">\u23f0 '+new Date(s.submitted_at).toLocaleDateString('vi')+'</div></div>'
-        +'<div style="background:'+scBg+';color:'+scColor+';font-size:22px;font-weight:700;padding:6px 14px;border-radius:10px;min-width:60px;text-align:center">'+sc+'\u0111</div>'
-        +'</div>'
+        +'<div style="font-size:9px;color:var(--mt);margin-top:2px">\u23f0 '+new Date(s.submitted_at).toLocaleDateString('vi')+'</div></div></div>'
         +(s.feedback?'<div style="font-size:10px;background:#f0f8f0;border-left:3px solid #2d9e6b;padding:8px 12px;border-radius:0 8px 8px 0;color:#2d5e3e;line-height:1.5">\uD83D\uDCAC <b>Ch\u1ecb Ph\u01b0\u01a1ng:</b> '+s.feedback+'</div>':'')
         +'</div>';
     });
-    el.innerHTML=html;
+    wrap.innerHTML=html;
   });
 }
+
 
 function rClassQA(){
   setTB('Q&A l\u1edbp h\u1ecdc','');
@@ -1772,27 +1803,56 @@ function navStu(id){CUR_STU=id;S_PAGE='studentDetail';setAN('classes');destroyCh
 // ===== AUTH =====
 function renderLogin(){
   g('sb').style.display='none';g('topbar').style.display='none';g('main').style.marginLeft='0';
-  g('pg').innerHTML='<div class="auth-wrap"><div class="auth-box">'
-    +'<div class="auth-logo"><h1>✦ FMT Sidekick</h1><p>Study with chị Phương</p></div>'
-    +'<div class="auth-tabs"><button class="auth-tab active" id="at-login" onclick="switchAuth(\'login\')">Đăng nhập</button><button class="auth-tab" id="at-reg" onclick="switchAuth(\'register\')">Đăng ký</button></div>'
-    +'<div id="auth-msg" class="auth-msg"></div>'
-    +'<div id="auth-login-form">'
-    +'<div class="fg"><label class="fl">Email</label><input class="fi" id="auth-email" type="email" placeholder="email@example.com"/></div>'
-    +'<div class="fg"><label class="fl">Mật khẩu</label><input class="fi" id="auth-pwd" type="password" placeholder="••••••••" onkeydown="if(event.key===\'Enter\')doLogin()"/></div>'
-    +'<button class="btn bp" style="width:100%" onclick="doLogin()">Đăng nhập</button>'
-    +'</div>'
-    +'<div id="auth-reg-form" style="display:none">'
-    +'<div style="background:#fff8f0;border:1px solid #f0d8c0;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:10px;color:var(--mt)">'
-    +'📋 Học viên chỉ cần <b>Mã lớp</b> và <b>Tên</b> đúng với danh sách giáo viên đã tạo. Không cần email xác nhận!'
-    +'</div>'
-    +'<div class="fg"><label class="fl">Mã lớp *</label><input class="fi" id="reg-code" placeholder="VD: AFS2026DEMO" style="text-transform:uppercase"/></div>'
-    +'<div class="fg"><label class="fl">Họ tên *</label><input class="fi" id="reg-name" placeholder="Đúng với danh sách lớp"/></div>'
-    +'<div class="fg"><label class="fl">Email (tùy chọn)</label><input class="fi" id="reg-email" type="email" placeholder="Để trống nếu không có"/></div>'
-    +'<div class="fg"><label class="fl">Tạo mật khẩu *</label><input class="fi" id="reg-pwd" type="password" placeholder="Ít nhất 6 ký tự"/></div>'
-    +'<button class="btn bp" style="width:100%;margin-top:4px" onclick="doRegister()">Vào lớp học →</button>'
-    +'</div>'
-    +'</div></div>';
+  var pg=g('pg');
+  pg.innerHTML='';
+  var wrap=document.createElement('div');
+  wrap.className='auth-wrap';
+  wrap.innerHTML=`
+<div class="auth-box">
+  <div class="auth-logo"><h1>\u2736 FMT Sidekick</h1><p>Study with ch\u1ecb Ph\u01b0\u01a1ng</p></div>
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">&#128682; \u0110\u0103ng nh\u1eadp</button>
+    <button class="auth-tab" id="tab-reg" onclick="switchAuthTab('reg')">&#9997;&#65039; \u0110\u0103ng k\u00fd</button>
+  </div>
+  <div id="auth-msg" style="font-size:11px;margin-bottom:8px;min-height:16px;text-align:center"></div>
+  
+  <!-- LOGIN FORM -->
+  <div id="auth-login-form">
+    <div class="fg"><label class="fl">Email</label>
+    <input class="fi" id="auth-email" type="email" placeholder="email@example.com" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <div class="fg"><label class="fl">M\u1eadt kh\u1ea9u</label>
+    <input class="fi" id="auth-pwd" type="password" placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="btn bp" style="width:100%;margin-top:8px" onclick="doLogin()">\u0110\u0103ng nh\u1eadp</button>
+  </div>
+  
+  <!-- REGISTER FORM -->
+  <div id="auth-reg-form" style="display:none">
+    <div class="fg"><label class="fl">&#128273; M\u00e3 l\u1edbp <span style="color:var(--r)">*</span></label>
+    <input class="fi" id="reg-code" placeholder="VD: AFS2026DEMO" style="text-transform:uppercase;font-weight:600;letter-spacing:1px"/></div>
+    <div class="fg"><label class="fl">&#128100; H\u1ecd v\u00e0 t\u00ean <span style="color:var(--r)">*</span></label>
+    <input class="fi" id="reg-name" placeholder="\u0110\u00fang v\u1edbi danh s\u00e1ch l\u1edbp"/></div>
+    <div class="fg"><label class="fl">&#128274; M\u1eadt kh\u1ea9u <span style="color:var(--r)">*</span></label>
+    <input class="fi" id="reg-pwd2" type="password" placeholder="T\u1ed1i thi\u1ec3u 6 k\u00fd t\u1ef1" onkeydown="if(event.key==='Enter')doRegister()"/></div>
+    <div class="fg" style="font-size:9px;color:var(--mt);background:var(--bg);padding:6px 10px;border-radius:6px">&#128161; Kh\u00f4ng c\u1ea7n email. T\u00e0i kho\u1ea3n t\u1ef1 kh\u1edfi t\u1ea1o v\u00e0 v\u00e0o l\u1edbp ngay!</div>
+    <button class="btn bp" style="width:100%;margin-top:8px" onclick="doRegister()">V\u00e0o l\u1edbp h\u1ecdc \u2192</button>
+  </div>
+</div>`;
+  pg.appendChild(wrap);
 }
+
+function switchAuthTab(tab){
+  document.getElementById('tab-login').className='auth-tab'+(tab==='login'?' active':'');
+  document.getElementById('tab-reg').className='auth-tab'+(tab==='reg'?' active':'');
+  document.getElementById('auth-login-form').style.display=tab==='login'?'':'none';
+  document.getElementById('auth-reg-form').style.display=tab==='reg'?'':'none';
+  document.getElementById('auth-msg').textContent='';
+}
+
+function setAuthMsg(msg,isErr){
+  var el=document.getElementById('auth-msg');
+  if(el){el.textContent=msg;el.style.color=isErr?'var(--r)':'#2d9e6b';}
+}
+
 
 function switchAuth(tab){
   g('at-login').classList.toggle('active',tab==='login');
@@ -1823,56 +1883,38 @@ async function doLogin(){
 }
 
 async function doRegister(){
-  var code=v('reg-code').toUpperCase().trim();
-  var name=v('reg-name').trim();
-  var pass=v('reg-pwd');
+  var code=(document.getElementById('reg-code')?.value||'').toUpperCase().trim();
+  var name=(document.getElementById('reg-name')?.value||'').trim();
+  var pass=document.getElementById('reg-pwd2')?.value||'';
   if(!code||!name||!pass){setAuthMsg('Vui l\u00f2ng \u0111i\u1ec1n M\u00e3 l\u1edbp, H\u1ecd t\u00ean v\u00e0 M\u1eadt kh\u1ea9u',true);return;}
   if(pass.length<6){setAuthMsg('M\u1eadt kh\u1ea9u t\u1ed1i thi\u1ec3u 6 k\u00fd t\u1ef1',true);return;}
-  setAuthMsg('Kh\u1edfi t\u1ea1o t\u00e0i kho\u1ea3n...','');
-
-  // 1. Check invite code
+  setAuthMsg('Ki\u1ec3m tra m\u00e3 l\u1edbp...');
   var ic=await sb.from('invite_codes').select('*').eq('code',code).limit(1);
-  if(!ic.data||!ic.data.length){setAuthMsg('M\u00e3 l\u1edbp kh\u00f4ng t\u1ed3n t\u1ea1i',true);return;}
+  if(!ic.data||!ic.data.length){setAuthMsg('M\u00e3 l\u1edbp kh\u00f4ng t\u1ed3n t\u1ea1i. Ki\u1ec3m tra l\u1ea1i!',true);return;}
   var inv=ic.data[0];
-
-  // 2. Auto-generate email from name
-  var emailInput=v('reg-email')||'';
-  var email=emailInput.trim();
-  if(!email){
-    var ts=Date.now().toString().slice(-4);
-    email=name.toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .replace(/\u0111/g,'d').replace(/\s+/g,'.')
-      .replace(/[^a-z0-9.]/g,'')+ts+'@fmt.local';
-  }
-
-  // 3. Sign up
-  setAuthMsg('T\u1ea1o t\u00e0i kho\u1ea3n...','');
-  var reg=await sb.auth.signUp({email:email,password:pass});
+  setAuthMsg('T\u1ea1o t\u00e0i kho\u1ea3n...');
+  var ts=Date.now().toString().slice(-4);
+  var email=name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\u0111/g,'d').replace(/\s+/g,'.').replace(/[^a-z0-9.]/g,'')+ts+'@fmt.local';
+  var reg=await sb.auth.signUp({email,password:pass});
   if(reg.error){
-    // Already exists? try login
-    if(reg.error.message.includes('already')){
-      var lg=await sb.auth.signInWithPassword({email:email,password:pass});
-      if(lg.error){setAuthMsg('Email \u0111\u00e3 t\u1ed3n t\u1ea1i. Th\u1eed \u0111\u0103ng nh\u1eadp ho\u1eb7c d\u00f9ng email kh\u00e1c',true);return;}
-      reg={data:lg.data};
+    if(reg.error.message.toLowerCase().includes('already')){
+      var lg0=await sb.auth.signInWithPassword({email,password:pass});
+      if(lg0.error){setAuthMsg('T\u00ean n\u00e0y \u0111\u00e3 \u0111\u01b0\u1ee3c d\u00f9ng. Th\u1eed t\u00ean kh\u00e1c ho\u1eb7c \u0110\u0103ng nh\u1eadp.',true);return;}
+      reg={data:lg0.data};
     } else {setAuthMsg('L\u1ed7i: '+reg.error.message,true);return;}
   }
   var uid=reg.data.user.id;
-
-  // 4. Create/update profile
-  var pr=await sb.from('profiles').upsert({id:uid,name:name,email:email,role:'student',class_id:inv.class_id},{onConflict:'id'});
-  if(pr.error){setAuthMsg('L\u1ed7i t\u1ea1o profile: '+pr.error.message,true);return;}
-
-  // 5. Login immediately
-  setAuthMsg('\u0110\u0103ng nh\u1eadp...','');
-  var lg2=await sb.auth.signInWithPassword({email:email,password:pass});
-  if(lg2.error){setAuthMsg('T\u00e0i kho\u1ea3n t\u1ea1o xong! H\u00e3y \u0111\u0103ng nh\u1eadp v\u1edbi email: '+email,false);return;}
-
-  SB_USER=lg2.data.user;
+  setAuthMsg('C\u1eadp nh\u1eadt th\u00f4ng tin...');
+  await sb.from('profiles').upsert({id:uid,name,email,role:'student',class_id:inv.class_id},{onConflict:'id'});
+  setAuthMsg('\u0110\u0103ng nh\u1eadp...');
+  var lg=await sb.auth.signInWithPassword({email,password:pass});
+  if(lg.error){setAuthMsg('\u0110\u00e3 t\u1ea1o! H\u00e3y \u0111\u0103ng nh\u1eadp v\u1edbi email: '+email,false);return;}
+  SB_USER=lg.data.user;
   var pf=await sb.from('profiles').select('*').eq('id',uid).limit(1);
   SB_PROFILE=pf.data&&pf.data[0];
   initApp();
 }
+
 
 async function saveStudentDirect(){
   var name=v('stu-add-name').trim();
