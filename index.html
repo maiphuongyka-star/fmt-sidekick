@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FMT Sidekick v3.1 final 2026-06-02 02:33:36 -->
+<!-- FMT Sidekick v3.2 2026-06-02 02:55:22 -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -779,92 +779,197 @@ async function createInvite(){
 // ===== HW REVIEW =====
 function rHWReview(){
   setTB('Duy\u1ec7t b\u00e0i t\u1eadp','');
-  g('pg').innerHTML='<div id="hwr-wrap" style="max-width:960px"><div class="loading"><div class="spinner"></div></div></div>';
+  var wrap=document.createElement('div');
+  wrap.style.maxWidth='960px';
+  wrap.innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  g('pg').innerHTML=''; g('pg').appendChild(wrap);
   if(!sb)return;
+
   Promise.all([
-    sb.from('submissions').select('*,exercises(id,title,code,session_id)').in('status',['submitted','cantdo']).order('submitted_at',{ascending:false}),
-    sb.from('profiles').select('id,name').eq('role','student'),
-    sb.from('sessions').select('id,class_id,classes(name,subject)'),
-    sb.from('exercises').select('id,title,code,session_id,category'),
-    sb.from('profiles').select('id').eq('role','student')
+    sb.from('submissions').select('*,exercises(id,title,code,session_id,category)').order('submitted_at',{ascending:false}),
+    sb.from('profiles').select('id,name,class_id').eq('role','student'),
+    sb.from('sessions').select('id,class_id,classes(id,name,subject)'),
+    sb.from('exercises').select('id,title,code,session_id,category')
   ]).then(async function(results){
-    var el=g('hwr-wrap');if(!el)return;
-    var subs=results[0].data||[];
+    var allSubs=results[0].data||[];
     var profs=results[1].data||[];
     var sessions=results[2].data||[];
+    var exercises=results[3].data||[];
     var profMap={};profs.forEach(function(p){profMap[p.id]=p;});
     var sessMap={};sessions.forEach(function(s){sessMap[s.id]=s;});
+    var exMap={};exercises.forEach(function(e){exMap[e.id]=e;});
+    var subMap={};allSubs.forEach(function(s){subMap[s.exercise_id+'_'+s.student_id]=s;});
     
-    if(!subs.length){
-      el.innerHTML='<div style="text-align:center;padding:50px;color:var(--mt)"><div style="font-size:40px">\u2705</div><div style="font-size:13px;margin-top:10px;font-weight:600">T\u1ea5t c\u1ea3 b\u00e0i \u0111\u00e3 \u0111\u01b0\u1ee3c ch\u1ea5m!</div></div>';
-      return;
-    }
-    
-    // Group by class
-    var byClass={};
-    subs.forEach(function(s){
-      var sess=sessMap[s.exercises&&s.exercises.session_id];
-      var clsName=sess&&sess.classes?sess.classes.name:'Kh\u00f4ng r\u00f5 l\u1edbp';
-      var clsSubj=sess&&sess.classes&&sess.classes.subject?sess.classes.subject:'';
-      var key=clsName+(clsSubj?' \u2014 '+clsSubj:'');
-      if(!byClass[key])byClass[key]=[];
-      byClass[key].push(s);
+    // Group sessions by class
+    var classSessions={};
+    sessions.forEach(function(s){
+      var clsId=s.class_id;
+      if(!classSessions[clsId])classSessions[clsId]={cls:s.classes,sessions:[]};
+      classSessions[clsId].sessions.push(s.id);
     });
+
+    // Pending subs
+    var pendingSubs=allSubs.filter(function(s){return s.status==='submitted'||s.status==='cantdo';});
     
-    var html='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-      +'<div style="font-size:14px;font-weight:700;color:var(--bd)">\uD83D\uDCCB Duy\u1ec7t b\u00e0i t\u1eadp</div>'
-      +'<div style="font-size:11px;color:var(--mt);background:var(--rp);padding:4px 12px;border-radius:20px;color:var(--r);font-weight:600">'+subs.length+' b\u00e0i ch\u1edd ch\u1ea5m</div>'
-      +'</div>';
-    
-    Object.keys(byClass).sort().forEach(function(cls){
-      var items=byClass[cls];
-      // Stats for this class
-      var done_pct=0;
-      html+='<div style="margin-bottom:24px">'
-        +'<div style="font-size:13px;font-weight:700;color:var(--bd);padding:10px 14px;background:linear-gradient(135deg,var(--rp),#f5f0fe);border-radius:10px;border-left:4px solid var(--r);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">'
-        +'<span>\uD83D\uDCDA '+cls+'</span>'
-        +'<span style="font-size:11px;color:var(--r);background:#fff;padding:2px 10px;border-radius:20px">'+items.length+' b\u00e0i</span>'
-        +'</div>';
-      
-      items.forEach(function(s){
-        var stu=profMap[s.student_id];
-        var stuName=stu?stu.name:'H\u1ecdc vi\u00ean';
-        var exTitle=(s.exercises&&s.exercises.code?s.exercises.code+': ':'')+((s.exercises&&s.exercises.title)||'B\u00e0i t\u1eadp');
-        var isPartial=s.note&&s.note.indexOf('[L\u00e0m m\u1ed9t ph\u1ea7n]')===0;
-        var isCantdo=s.status==='cantdo';
-        var slabel=isCantdo?'\u2753 Kh\u00f3/ch\u01b0a l\u00e0m':isPartial?'\u26a0\uFE0F L\u00e0m m\u1ed9t ph\u1ea7n':'\uD83D\uDCE8 \u0110\u00e3 n\u1ed9p';
-        var scolor=isCantdo?'#c0392b':isPartial?'#e8a020':'#2d9e6b';
-        var scolor_bg=isCantdo?'#fce4ec':isPartial?'#fff3e0':'#e8f5e9';
-        var dt=s.submitted_at?new Date(s.submitted_at).toLocaleString('vi'):'\u2014';
-        var note=(s.note||'').replace(/\[.*?\]\s*/,'').trim();
-        
-        html+='<div class="card" style="margin-bottom:10px">'
-          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
-          +'<div style="flex:1">'
-          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
-          +'<div style="width:34px;height:34px;border-radius:50%;background:var(--rp);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--r);font-size:13px;flex-shrink:0">'+stuName.charAt(0)+'</div>'
-          +'<div><div style="font-size:12px;font-weight:700;color:var(--bd)">'+stuName+'</div>'
-          +'<div style="font-size:10px;color:var(--mt)">'+exTitle+'</div>'
-          +'</div></div></div>'
-          +'<div style="text-align:right;flex-shrink:0">'
-          +'<span style="background:'+scolor_bg+';color:'+scolor+';font-size:9px;padding:3px 10px;border-radius:20px;font-weight:600;display:block;margin-bottom:3px">'+slabel+'</span>'
-          +'<div style="font-size:8px;color:var(--mt)">'+dt+'</div>'
-          +'</div></div>'
-          +(note?'<div style="font-size:10px;background:var(--bg);border:1px solid var(--br);padding:7px 10px;border-radius:6px;margin-bottom:8px;color:var(--bd);">\uD83D\uDCDD <i>'+note+'</i></div>':'')
-          +(s.drive_url?'<div style="margin-bottom:8px"><a href="'+s.drive_url+'" target="_blank" style="font-size:10px;color:#4285f4;text-decoration:none;display:inline-flex;align-items:center;gap:4px">\uD83D\uDCCE Xem file \u0111\u00ednh k\u00e8m \u2192</a></div>':'')
-          +(s.img_url&&s.img_url.indexOf('data:')!==0?'<img src="'+s.img_url+'" style="max-height:100px;border-radius:6px;margin-bottom:8px;border:1px solid var(--br)" onerror="this.style.display=\'none\'">':'')
-          +'<div style="display:grid;grid-template-columns:100px 1fr auto;gap:8px;align-items:center;padding-top:8px;border-top:1px solid var(--br)">'
-          +'<div style="position:relative"><input class="fi" id="sc-'+s.id+'" type="number" placeholder="\u0110i\u1ec3m" style="font-size:11px;text-align:center;padding-right:20px" min="0" max="10" step="0.5">'
-          +'<span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--mt)">/10</span></div>'
-          +'<input class="fi" id="fb2-'+s.id+'" placeholder="Nh\u1eadn x\u00e9t, g\u1ee3i \u00fd cho h\u1ecdc sinh..." style="font-size:10px">'
-          +'<button class="btn bp" style="font-size:10px;padding:7px 16px;white-space:nowrap" onclick="gradeOK(\''+s.id+'\')">\u2705 Ch\u1ea5m</button>'
-          +'</div></div>';
-      });
-      html+='</div>';
-    });
-    el.innerHTML=html;
+    // HTML: 2 tabs - Tổng quan + Duyệt bài
+    wrap.innerHTML=`
+<div style="display:flex;gap:8px;margin-bottom:16px">
+  <button id="hwr-tab-overview" class="btn" onclick="hwrTab('overview')" style="font-size:11px;padding:6px 16px;border-radius:20px;background:var(--r);color:#fff">\uD83D\uDCCA T\u1ed5ng quan</button>
+  <button id="hwr-tab-pending" class="btn" onclick="hwrTab('pending')" style="font-size:11px;padding:6px 16px;border-radius:20px;background:var(--rp);color:var(--r)">\u2705 Duy\u1ec7t b\u00e0i <span style="background:var(--r);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px">${pendingSubs.length}</span></button>
+</div>
+<div id="hwr-content-overview"></div>
+<div id="hwr-content-pending" style="display:none"></div>`;
+
+    window._hwrData={allSubs,profs,profMap,sessMap,exMap,classSessions,pendingSubs,exercises};
+    hwrRenderOverview();
+    hwrRenderPending();
   });
 }
+
+function hwrTab(tab){
+  document.getElementById('hwr-tab-overview').style.background=tab==='overview'?'var(--r)':'var(--rp)';
+  document.getElementById('hwr-tab-overview').style.color=tab==='overview'?'#fff':'var(--r)';
+  document.getElementById('hwr-tab-pending').style.background=tab==='pending'?'var(--r)':'var(--rp)';
+  document.getElementById('hwr-tab-pending').style.color=tab==='pending'?'#fff':'var(--r)';
+  document.getElementById('hwr-content-overview').style.display=tab==='overview'?'':'none';
+  document.getElementById('hwr-content-pending').style.display=tab==='pending'?'':'none';
+}
+
+function hwrRenderOverview(){
+  var d=window._hwrData; if(!d)return;
+  var el=document.getElementById('hwr-content-overview'); if(!el)return;
+  
+  var html='';
+  Object.keys(d.classSessions).forEach(function(clsId){
+    var cls=d.classSessions[clsId];
+    var clsName=cls.cls?cls.cls.name:'L\u1edbp';
+    var clsSubj=cls.cls&&cls.cls.subject?cls.cls.subject:'';
+    var sessIds=cls.sessions;
+    
+    // Students in this class
+    var students=d.profs.filter(function(p){return p.class_id==clsId;});
+    // Exercises in this class
+    var exInClass=d.exercises.filter(function(e){return sessIds.includes(e.session_id);});
+    
+    if(!students.length||!exInClass.length)return;
+    
+    html+='<div style="margin-bottom:24px">'
+      +'<div style="font-size:13px;font-weight:700;color:var(--bd);padding:10px 14px;background:linear-gradient(135deg,var(--rp),#f5f0fe);border-radius:10px;border-left:4px solid var(--r);margin-bottom:12px">'
+      +'\uD83D\uDCDA '+clsName+(clsSubj?' \u2014 '+clsSubj:'')
+      +'<span style="float:right;font-size:10px;font-weight:400;color:var(--mt)">'+students.length+' h\u1ecdc vi\u00ean \u2022 '+exInClass.length+' b\u00e0i</span>'
+      +'</div>'
+      // Stats bar
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">';
+    
+    var totalSlots=students.length*exInClass.length;
+    var doneCount=0,pendingCount=0,cantdoCount=0,gradedCount=0;
+    students.forEach(function(s){
+      exInClass.forEach(function(e){
+        var sub=d.subMap[e.id+'_'+s.id];
+        if(!sub)return;
+        if(sub.status==='graded')gradedCount++;
+        else if(sub.status==='submitted')pendingCount++;
+        else if(sub.status==='cantdo')cantdoCount++;
+        doneCount++;
+      });
+    });
+    var notDone=totalSlots-doneCount;
+    
+    html+='<div class="sc"><div class="sv" style="color:#2d9e6b">'+gradedCount+'</div><div class="sl">\u0110\u00e3 ch\u1ea5m</div></div>'
+      +'<div class="sc"><div class="sv" style="color:#4285f4">'+pendingCount+'</div><div class="sl">Ch\u1edd ch\u1ea5m</div></div>'
+      +'<div class="sc"><div class="sv" style="color:#c0392b">'+cantdoCount+'</div><div class="sl">Kh\u00f3/ch\u01b0a l\u00e0m</div></div>'
+      +'<div class="sc"><div class="sv" style="color:var(--mt)">'+notDone+'</div><div class="sl">Ch\u01b0a n\u1ed9p</div></div>'
+      +'</div>';
+    
+    // Table: rows = students, cols = exercises
+    html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:10px">'
+      +'<thead><tr><th style="text-align:left;padding:6px 10px;background:var(--bg);border:1px solid var(--br);min-width:120px">H\u1ecdc vi\u00ean</th>'
+      +exInClass.slice(0,8).map(function(e){
+        return '<th style="padding:4px 6px;background:var(--bg);border:1px solid var(--br);text-align:center;max-width:80px;overflow:hidden">'
+          +'<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px" title="'+(e.code?e.code+': ':'')+e.title+'">'+(e.code||e.title.substring(0,8))+'</div></th>';
+      }).join('')+'</tr></thead><tbody>'
+      +students.map(function(stu){
+        return '<tr><td style="padding:6px 10px;border:1px solid var(--br);font-weight:600">'+stu.name+'</td>'
+          +exInClass.slice(0,8).map(function(e){
+            var sub=d.subMap[e.id+'_'+stu.id];
+            var icon,bg,title;
+            if(!sub){icon='\u2014';bg='';title='Ch\u01b0a n\u1ed9p';}
+            else if(sub.status==='graded'){icon='\u2705';bg='#e8f5e9';title='\u0110\u00e3 ch\u1ea5m: '+(sub.score||'?')+'\u0111';}
+            else if(sub.status==='cantdo'){icon='\u2753';bg='#fce4ec';title='Kh\u00f3/ch\u01b0a l\u00e0m';}
+            else{icon='\uD83D\uDCE8';bg='#e8f0fe';title='Ch\u1edd ch\u1ea5m';}
+            return '<td style="text-align:center;padding:4px;border:1px solid var(--br);background:'+bg+'" title="'+title+'">'+icon+'</td>';
+          }).join('')+'</tr>';
+      }).join('')+'</tbody></table></div>';
+    
+    if(exInClass.length>8)html+='<div style="font-size:9px;color:var(--mt);margin-top:4px">... v\u00e0 '+(exInClass.length-8)+' b\u00e0i kh\u00e1c</div>';
+    html+='</div>';
+  });
+  
+  el.innerHTML=html||'<p style="color:var(--mt)">Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u</p>';
+}
+
+function hwrRenderPending(){
+  var d=window._hwrData; if(!d)return;
+  var el=document.getElementById('hwr-content-pending'); if(!el)return;
+  var subs=d.pendingSubs;
+  
+  if(!subs.length){
+    el.innerHTML='<div style="text-align:center;padding:50px;color:var(--mt)"><div style="font-size:40px">\u2705</div><div style="font-size:13px;margin-top:10px;font-weight:600">T\u1ea5t c\u1ea3 b\u00e0i \u0111\u00e3 \u0111\u01b0\u1ee3c ch\u1ea5m!</div></div>';
+    return;
+  }
+  
+  var byClass={};
+  subs.forEach(function(s){
+    var exId=s.exercise_id;
+    var ex=d.exMap[exId]||{};
+    var sess=d.sessMap[ex.session_id];
+    var clsName=sess&&sess.classes?sess.classes.name:'?';
+    var clsSubj=sess&&sess.classes&&sess.classes.subject?sess.classes.subject:'';
+    var key=clsName+(clsSubj?' \u2014 '+clsSubj:'');
+    if(!byClass[key])byClass[key]=[];
+    byClass[key].push(s);
+  });
+  
+  var html='<div style="font-size:11px;color:var(--mt);margin-bottom:12px">'+subs.length+' b\u00e0i ch\u1edd duy\u1ec7t</div>';
+  Object.keys(byClass).sort().forEach(function(cls){
+    var items=byClass[cls];
+    html+='<div style="margin-bottom:24px">'
+      +'<div style="font-size:13px;font-weight:700;color:var(--bd);padding:10px 14px;background:linear-gradient(135deg,var(--rp),#f5f0fe);border-radius:10px;border-left:4px solid var(--r);margin-bottom:10px;display:flex;justify-content:space-between">'
+      +'<span>\uD83D\uDCDA '+cls+'</span><span style="font-size:10px;font-weight:400;background:var(--r);color:#fff;padding:2px 10px;border-radius:20px">'+items.length+' b\u00e0i</span></div>';
+    items.forEach(function(s){
+      var stu=d.profMap[s.student_id];
+      var stuName=stu?stu.name:'H\u1ecdc vi\u00ean';
+      var ex=d.exMap[s.exercise_id]||{};
+      var exTitle=(ex.code?ex.code+': ':'')+(ex.title||'B\u00e0i t\u1eadp');
+      var isPartial=s.note&&s.note.indexOf('[L\u00e0m m\u1ed9t ph\u1ea7n]')===0;
+      var isCantdo=s.status==='cantdo';
+      var slabel=isCantdo?'\u2753 Kh\u00f3':isPartial?'\u26a0\uFE0F M\u1ed9t ph\u1ea7n':'\uD83D\uDCE8 \u0110\u00e3 n\u1ed9p';
+      var scolor=isCantdo?'#c0392b':isPartial?'#e8a020':'#2d9e6b';
+      var scolor_bg=isCantdo?'#fce4ec':isPartial?'#fff3e0':'#e8f5e9';
+      var note=(s.note||'').replace(/\[.*?\]\s*/,'').trim();
+      var dt=s.submitted_at?new Date(s.submitted_at).toLocaleString('vi'):'\u2014';
+      html+='<div class="card" style="margin-bottom:10px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<div style="width:36px;height:36px;border-radius:50%;background:var(--rp);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--r);font-size:14px;flex-shrink:0">'+stuName.charAt(0)+'</div>'
+        +'<div><div style="font-size:12px;font-weight:700;color:var(--bd)">'+stuName+'</div><div style="font-size:10px;color:var(--mt)">'+exTitle+'</div></div></div>'
+        +'<div style="text-align:right">'
+        +'<span style="background:'+scolor_bg+';color:'+scolor+';font-size:9px;padding:3px 10px;border-radius:20px;font-weight:600;display:block">'+slabel+'</span>'
+        +'<div style="font-size:8px;color:var(--mt);margin-top:3px">'+dt+'</div></div></div>'
+        +(note?'<div style="font-size:10px;background:var(--bg);border:1px solid var(--br);padding:7px 10px;border-radius:6px;margin-bottom:8px">\uD83D\uDCDD '+note+'</div>':'')
+        +(s.drive_url?'<div style="margin-bottom:8px"><a href="'+s.drive_url+'" target="_blank" style="font-size:10px;color:#4285f4">\uD83D\uDCCE Xem file \u2192</a></div>':'')
+        +'<div style="display:grid;grid-template-columns:100px 1fr auto;gap:8px;align-items:center;padding-top:8px;border-top:1px solid var(--br)">'
+        +'<div style="position:relative"><input class="fi" id="sc-'+s.id+'" type="number" placeholder="0-10" style="font-size:11px;text-align:center" min="0" max="10" step="0.5">'
+        +'<span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--mt)">/10</span></div>'
+        +'<input class="fi" id="fb2-'+s.id+'" placeholder="Nh\u1eadn x\u00e9t..." style="font-size:10px">'
+        +'<button class="btn bp" style="font-size:10px;padding:7px 16px;white-space:nowrap" onclick="gradeOK(\''+s.id+'\')">\u2705 Ch\u1ea5m</button>'
+        +'</div></div>';
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
 
 async function gradeOK(sid){
   var scEl=document.getElementById('sc-'+sid);
