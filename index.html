@@ -82,8 +82,7 @@ body { font-family: 'Segoe UI', sans-serif; background:var(--beige); color:var(-
   border-right:1px solid rgba(212,165,116,0.15);
 }
 .sidebar-header { padding:1.5rem 1.25rem; border-bottom:1px solid rgba(212,165,116,0.15); }
-.sidebar-logo { font-size:1.3rem; font-weight:800; color:white; display:flex; align-items:center; gap:.4rem; }
-.logo-icon { font-size:1.6rem; background:linear-gradient(135deg,#FFD700,#FF6B35); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 6px rgba(255,180,50,.6)); }
+.sidebar-logo { font-size:1.3rem; font-weight:800; background:linear-gradient(135deg,#FFFDF9,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 .sidebar-user { font-size:.73rem; color:rgba(212,165,116,0.7); margin-top:.3rem; }
 .sidebar-nav { flex:1; padding:1rem 0; overflow-y:auto; }
 .nav-section { padding:.5rem 1.25rem; font-size:.62rem; font-weight:700; color:rgba(212,165,116,0.4); text-transform:uppercase; letter-spacing:.12em; margin-top:.5rem; }
@@ -297,7 +296,7 @@ tr:hover td { background:var(--accent-light); }
   <div class="app-layout">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo"><span class="logo-icon">✦</span> FMT Sidekick</div>
+        <div class="sidebar-logo">✨ FMT Sidekick</div>
         <div class="sidebar-user" id="sidebar-user-info">Đang tải...</div>
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
@@ -327,22 +326,17 @@ var SUPABASE_URL = 'https://whydwksaxcxrtfoyuppm.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoeWR3a3NheGN4cnRmb3l1cHBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjkwMDIsImV4cCI6MjA2MjU0NTAwMn0.dNSHJdNCSi-IG6MVEa-HYTqJP1mBTYnBT0xeGkHi_UQ';
 var sb = null, currentUser = null, currentProfile = null;
 
-var _cdnList=['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js','https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.38.4/umd/supabase.min.js'];
-var _cdnIdx=0;
+var _cdns=['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js','https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.38.4/umd/supabase.min.js'];
+var _ci=0;
 function _loadSb(){
-  if(_cdnIdx>=_cdnList.length){showDemoMode();return;}
+  if(_ci>=_cdns.length){showDemoMode();return;}
   var s=document.createElement('script');
-  s.src=_cdnList[_cdnIdx];
-  s.onload=function(){
-    sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-    checkSession();
-    if(window._pendingLogin){window._pendingLogin();window._pendingLogin=null;}
-  };
-  s.onerror=function(){_cdnIdx++;_loadSb();};
+  s.src=_cdns[_ci];
+  s.onload=function(){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);checkSession();if(window._pl){window._pl();window._pl=null;}};
+  s.onerror=function(){_ci++;_loadSb();};
   document.head.appendChild(s);
 }
-_loadSb();};document.head.appendChild(s);}
-loadSupabase();
+_loadSb();
 
 // ── UTILS ──
 function g(id){ return document.getElementById(id); }
@@ -419,8 +413,8 @@ function switchAuth(tab){
 }
 async function checkSession(){ if(!sb)return; var s=await sb.auth.getSession(); if(s.data&&s.data.session){ currentUser=s.data.session.user; await loadProfile(); } }
 async function loadProfile(){ if(!currentUser||!sb)return; var r=await sb.from('profiles').select('*').eq('id',currentUser.id).single(); if(r.data){ currentProfile=r.data; showApp(); } }
-async function doLogin(){ var email=v('login-email'),pwd=v('login-pwd'); if(!email||!pwd){setAuthMsg('login-msg','Vui lòng điền đầy đủ',true);return;} if(!sb){ setAuthMsg('login-msg','Đang kết nối...', false); var tries=0; var wait=setInterval(function(){ tries++; if(sb){ clearInterval(wait); doLogin(); } else if(tries>20){ clearInterval(wait); setAuthMsg('login-msg','Không kết nối được. Thử tải lại trang.',true); }},500); return;} setAuthMsg('login-msg','Đang đăng nhập...',false); var r=await sb.auth.signInWithPassword({email:email,password:pwd}); if(r.error){setAuthMsg('login-msg',r.error.message,true);return;} currentUser=r.data.user; await loadProfile(); }
-async function doRegister(){ var code=v('reg-code').toUpperCase(),name=v('reg-name'),email=v('reg-email'),pwd=v('reg-pwd'); if(!code||!name||!email||!pwd){setAuthMsg('reg-msg','Vui lòng điền đầy đủ',true);return;} if(pwd.length<6){setAuthMsg('reg-msg','Mật khẩu ít nhất 6 ký tự',true);return;} if(!sb){setAuthMsg('reg-msg','⏳ Đang kết nối...',false);window._pendingLogin=doRegister;return;} setAuthMsg('reg-msg','Đang kiểm tra mã lớp...',false); var ic=await sb.from('invite_codes').select('*').eq('code',code).limit(1); if(!ic.data||!ic.data.length){setAuthMsg('reg-msg','Mã lớp không đúng',true);return;} var inv=ic.data[0]; setAuthMsg('reg-msg','Đang tạo tài khoản...',false); var reg=await sb.auth.signUp({email:email,password:pwd}); if(reg.error){setAuthMsg('reg-msg',reg.error.message,true);return;} await sb.from('profiles').upsert({id:reg.data.user.id,name:name,email:email,role:'student',class_id:inv.class_id}); setAuthMsg('reg-msg','✅ Đăng ký thành công! Vào lớp: '+(inv.class_name||code),false); setTimeout(function(){ switchAuth('login'); g('login-email').value=email; },2000); }
+async function doLogin(){ var email=v('login-email'),pwd=v('login-pwd'); if(!email||!pwd){setAuthMsg('login-msg','Vui lòng điền đầy đủ',true);return;} if(!sb){setAuthMsg('login-msg','⏳ Đang kết nối, nhấn lại sau 2 giây...',false);window._pl=doLogin;return;} setAuthMsg('login-msg','Đang đăng nhập...',false); var r=await sb.auth.signInWithPassword({email:email,password:pwd}); if(r.error){setAuthMsg('login-msg',r.error.message,true);return;} currentUser=r.data.user; await loadProfile(); }
+async function doRegister(){ var code=v('reg-code').toUpperCase(),name=v('reg-name'),email=v('reg-email'),pwd=v('reg-pwd'); if(!code||!name||!email||!pwd){setAuthMsg('reg-msg','Vui lòng điền đầy đủ',true);return;} if(pwd.length<6){setAuthMsg('reg-msg','Mật khẩu ít nhất 6 ký tự',true);return;} if(!sb){setAuthMsg('reg-msg','⏳ Đang kết nối...',false);window._pl=doRegister;return;} setAuthMsg('reg-msg','Đang kiểm tra mã lớp...',false); var ic=await sb.from('invite_codes').select('*').eq('code',code).limit(1); if(!ic.data||!ic.data.length){setAuthMsg('reg-msg','Mã lớp không đúng',true);return;} var inv=ic.data[0]; setAuthMsg('reg-msg','Đang tạo tài khoản...',false); var reg=await sb.auth.signUp({email:email,password:pwd}); if(reg.error){setAuthMsg('reg-msg',reg.error.message,true);return;} await sb.from('profiles').upsert({id:reg.data.user.id,name:name,email:email,role:'student',class_id:inv.class_id}); setAuthMsg('reg-msg','✅ Đăng ký thành công! Vào lớp: '+(inv.class_name||code),false); setTimeout(function(){ switchAuth('login'); g('login-email').value=email; },2000); }
 async function doLogout(){ if(sb)await sb.auth.signOut(); currentUser=null; currentProfile=null; g('app').style.display='none'; g('auth-screen').style.display='flex'; }
 function showDemoMode(){ currentProfile={id:'demo',name:'Giáo viên Demo',role:'teacher',class_id:1}; showApp(); }
 </script>
