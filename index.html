@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FMT Sidekick</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
   --primary: #C0392B;
@@ -29,9 +30,9 @@
   --radius-sm: 8px;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: 'Segoe UI', sans-serif; background:var(--beige); color:var(--dark); }
+body { font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif; background:var(--beige); color:var(--dark); }
 
-/* ââ AUTH ââ */
+/* Ã¢ÂÂÃ¢ÂÂ AUTH Ã¢ÂÂÃ¢ÂÂ */
 #auth-screen {
   min-height:100vh; display:flex; align-items:center; justify-content:center;
   background: linear-gradient(135deg, #2C1810 0%, #C0392B 50%, #D4A574 100%);
@@ -70,7 +71,7 @@ body { font-family: 'Segoe UI', sans-serif; background:var(--beige); color:var(-
 .auth-msg.error { background:#FDECEA; color:var(--danger); display:block; }
 .auth-msg.info { background:var(--accent-light); color:var(--accent-dark); display:block; }
 
-/* ââ APP ââ */
+/* Ã¢ÂÂÃ¢ÂÂ APP Ã¢ÂÂÃ¢ÂÂ */
 #app { display:none; }
 .app-layout { display:flex; min-height:100vh; }
 
@@ -262,45 +263,45 @@ tr:hover td { background:var(--accent-light); }
 </head>
 <body>
 
-<!-- ââ AUTH ââ -->
+<!-- Ã¢ÂÂÃ¢ÂÂ AUTH Ã¢ÂÂÃ¢ÂÂ -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">
-      <h1>â¨ FMT Sidekick</h1>
-      <p>Ná»n táº£ng há»c táº­p thÃ´ng minh</p>
+      <h1>Ã¢ÂÂ¨ FMT Sidekick</h1>
+      <p>NÃ¡Â»Ân tÃ¡ÂºÂ£ng hÃ¡Â»Âc tÃ¡ÂºÂ­p thÃÂ´ng minh</p>
     </div>
     <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuth('login')">ÄÄng nháº­p</button>
-      <button class="auth-tab" onclick="switchAuth('register')">ÄÄng kÃ½</button>
+      <button class="auth-tab active" onclick="switchAuth('login')">ÃÂÃÂng nhÃ¡ÂºÂ­p</button>
+      <button class="auth-tab" onclick="switchAuth('register')">ÃÂÃÂng kÃÂ½</button>
     </div>
     <div id="form-login" class="auth-form active">
       <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="email@example.com"></div>
-      <div class="form-group"><label>Máº­t kháº©u</label><input type="password" id="login-pwd" placeholder="â¢â¢â¢â¢â¢â¢â¢â¢" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="btn-primary" onclick="doLogin()">ð ÄÄng nháº­p</button>
+      <div class="form-group"><label>MÃ¡ÂºÂ­t khÃ¡ÂºÂ©u</label><input type="password" id="login-pwd" placeholder="Ã¢ÂÂ¢Ã¢ÂÂ¢Ã¢ÂÂ¢Ã¢ÂÂ¢Ã¢ÂÂ¢Ã¢ÂÂ¢Ã¢ÂÂ¢Ã¢ÂÂ¢" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-primary" onclick="doLogin()">Ã°ÂÂÂ ÃÂÃÂng nhÃ¡ÂºÂ­p</button>
       <div id="login-msg" class="auth-msg"></div>
     </div>
     <div id="form-register" class="auth-form">
-      <div class="form-group"><label>MÃ£ lá»p (giÃ¡o viÃªn cáº¥p)</label><input type="text" id="reg-code" placeholder="VD: FMT2024A" style="text-transform:uppercase"></div>
-      <div class="form-group"><label>Há» vÃ  tÃªn</label><input type="text" id="reg-name" placeholder="Nguyá»n VÄn A"></div>
+      <div class="form-group"><label>MÃÂ£ lÃ¡Â»Âp (giÃÂ¡o viÃÂªn cÃ¡ÂºÂ¥p)</label><input type="text" id="reg-code" placeholder="VD: FMT2024A" style="text-transform:uppercase"></div>
+      <div class="form-group"><label>HÃ¡Â»Â vÃÂ  tÃÂªn</label><input type="text" id="reg-name" placeholder="NguyÃ¡Â»Ân VÃÂn A"></div>
       <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="email@example.com"></div>
-      <div class="form-group"><label>Máº­t kháº©u</label><input type="password" id="reg-pwd" placeholder="Tá»i thiá»u 6 kÃ½ tá»±" onkeydown="if(event.key==='Enter')doRegister()"></div>
-      <button class="btn-primary" onclick="doRegister()">â ÄÄng kÃ½</button>
+      <div class="form-group"><label>MÃ¡ÂºÂ­t khÃ¡ÂºÂ©u</label><input type="password" id="reg-pwd" placeholder="TÃ¡Â»Âi thiÃ¡Â»Âu 6 kÃÂ½ tÃ¡Â»Â±" onkeydown="if(event.key==='Enter')doRegister()"></div>
+      <button class="btn-primary" onclick="doRegister()">Ã¢ÂÂ ÃÂÃÂng kÃÂ½</button>
       <div id="reg-msg" class="auth-msg"></div>
     </div>
   </div>
 </div>
 
-<!-- ââ APP ââ -->
+<!-- Ã¢ÂÂÃ¢ÂÂ APP Ã¢ÂÂÃ¢ÂÂ -->
 <div id="app">
   <div class="app-layout">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo">â¨ FMT Sidekick</div>
-        <div class="sidebar-user" id="sidebar-user-info">Äang táº£i...</div>
+        <div class="sidebar-logo">Ã¢ÂÂ¨ FMT Sidekick</div>
+        <div class="sidebar-user" id="sidebar-user-info">ÃÂang tÃ¡ÂºÂ£i...</div>
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
       <div class="sidebar-footer">
-        <button class="btn-logout" onclick="doLogout()">ðª ÄÄng xuáº¥t</button>
+        <button class="btn-logout" onclick="doLogout()">Ã°ÂÂÂª ÃÂÃÂng xuÃ¡ÂºÂ¥t</button>
       </div>
     </aside>
     <main class="main" id="main-content"></main>
@@ -310,17 +311,17 @@ tr:hover td { background:var(--accent-light); }
 <div id="toast"></div>
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
-    <h3 id="confirm-title">XÃ¡c nháº­n</h3>
-    <p id="confirm-msg">Báº¡n cÃ³ cháº¯c khÃ´ng?</p>
+    <h3 id="confirm-title">XÃÂ¡c nhÃ¡ÂºÂ­n</h3>
+    <p id="confirm-msg">BÃ¡ÂºÂ¡n cÃÂ³ chÃ¡ÂºÂ¯c khÃÂ´ng?</p>
     <div class="btns">
-      <button class="btn btn-outline" onclick="closeConfirm()">Huá»·</button>
-      <button class="btn btn-red" id="confirm-ok">XoÃ¡</button>
+      <button class="btn btn-outline" onclick="closeConfirm()">HuÃ¡Â»Â·</button>
+      <button class="btn btn-red" id="confirm-ok">XoÃÂ¡</button>
     </div>
   </div>
 </div>
 
 <script>
-// ââ SUPABASE ââ
+// Ã¢ÂÂÃ¢ÂÂ SUPABASE Ã¢ÂÂÃ¢ÂÂ
 var SUPABASE_URL = 'https://whydwksaxcxrtfoyuppm.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoeWR3a3NheGN4cnRmb3l1cHBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MjQ5NjcsImV4cCI6MjA5NTQwMDk2N30.wK5ZDUAYxqnHuWzmFpFRRZltLEV5t1pzEhEkYwh6I-s';
 var sb = null, currentUser = null, currentProfile = null;
@@ -331,7 +332,7 @@ sbScript.onload = function(){ sb = window.supabase.createClient(SUPABASE_URL, SU
 sbScript.onerror = function(){ showDemoMode(); };
 document.head.appendChild(sbScript);
 
-// ââ UTILS ââ
+// Ã¢ÂÂÃ¢ÂÂ UTILS Ã¢ÂÂÃ¢ÂÂ
 function g(id){ return document.getElementById(id); }
 function v(id){ var el=g(id); return el?el.value.trim():''; }
 function toast(msg,type){ var t=g('toast'); t.textContent=msg; t.className='show '+(type||''); setTimeout(function(){ t.className=''; },3000); }
@@ -339,11 +340,11 @@ function showConfirm(title,msg,onOk){ g('confirm-title').textContent=title; g('c
 function closeConfirm(){ g('confirm-overlay').classList.remove('open'); }
 function openModal(id){ g(id)&&g(id).classList.add('open'); }
 function closeModal(id){ g(id)&&g(id).classList.remove('open'); }
-function fmtDate(d){ if(!d)return'â'; return new Date(d).toLocaleDateString('vi-VN'); }
-function timeAgo(d){ var diff=(Date.now()-new Date(d))/1000; if(diff<60)return'vá»«a xong'; if(diff<3600)return Math.floor(diff/60)+' phÃºt trÆ°á»c'; if(diff<86400)return Math.floor(diff/3600)+' giá» trÆ°á»c'; return Math.floor(diff/86400)+' ngÃ y trÆ°á»c'; }
+function fmtDate(d){ if(!d)return'Ã¢ÂÂ'; return new Date(d).toLocaleDateString('vi-VN'); }
+function timeAgo(d){ var diff=(Date.now()-new Date(d))/1000; if(diff<60)return'vÃ¡Â»Â«a xong'; if(diff<3600)return Math.floor(diff/60)+' phÃÂºt trÃÂ°Ã¡Â»Âc'; if(diff<86400)return Math.floor(diff/3600)+' giÃ¡Â»Â trÃÂ°Ã¡Â»Âc'; return Math.floor(diff/86400)+' ngÃÂ y trÃÂ°Ã¡Â»Âc'; }
 function setAuthMsg(id,msg,isError){ var el=g(id); if(!el)return; el.textContent=msg; el.className='auth-msg '+(isError?'error':'info'); }
 
-// ââ QUOTES ââ
+// Ã¢ÂÂÃ¢ÂÂ QUOTES Ã¢ÂÂÃ¢ÂÂ
 var quotes = [
   {text:"The secret of getting ahead is getting started.", author:"Mark Twain"},
   {text:"It always seems impossible until it's done.", author:"Nelson Mandela"},
@@ -359,9 +360,9 @@ var quotes = [
   {text:"Hard work beats talent when talent doesn't work hard.", author:"Tim Notke"},
 ];
 var quoteIdx = Math.floor(Math.random()*quotes.length);
-function nextQuote(){ quoteIdx=(quoteIdx+1)%quotes.length; var q=quotes[quoteIdx]; var el=g('hero-quote'); var au=g('hero-quote-author'); if(el)el.textContent='"'+q.text+'"'; if(au)au.textContent='â '+q.author; }
+function nextQuote(){ quoteIdx=(quoteIdx+1)%quotes.length; var q=quotes[quoteIdx]; var el=g('hero-quote'); var au=g('hero-quote-author'); if(el)el.textContent='"'+q.text+'"'; if(au)au.textContent='Ã¢ÂÂ '+q.author; }
 
-// ââ HERO BACKGROUNDS ââ
+// Ã¢ÂÂÃ¢ÂÂ HERO BACKGROUNDS Ã¢ÂÂÃ¢ÂÂ
 var heroBgs = [
   'https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=1200&q=80',
   'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1200&q=80',
@@ -373,7 +374,7 @@ var heroBgs = [
 var bgIdx = 0;
 function nextBg(){ bgIdx=(bgIdx+1)%heroBgs.length; var el=g('hero-banner'); if(el) el.style.backgroundImage='url('+heroBgs[bgIdx]+')'; }
 
-// ââ CLOCK ââ
+// Ã¢ÂÂÃ¢ÂÂ CLOCK Ã¢ÂÂÃ¢ÂÂ
 function startClock(){
   var el=g('clock-display'); if(!el)return;
   // Set initial bg & quote
@@ -382,7 +383,7 @@ function startClock(){
   var q=quotes[quoteIdx];
   var qel=g('hero-quote'); var au=g('hero-quote-author');
   if(qel) qel.textContent='"'+q.text+'"';
-  if(au) au.textContent='â '+q.author;
+  if(au) au.textContent='Ã¢ÂÂ '+q.author;
 
   function tick(){
     var now=new Date();
@@ -391,7 +392,7 @@ function startClock(){
     var s=now.getSeconds().toString().padStart(2,'0');
     el.textContent=h+':'+m+':'+s;
     var de=g('hero-date-display');
-    if(de){ var days=['Chá»§ nháº­t','Thá»© hai','Thá»© ba','Thá»© tÆ°','Thá»© nÄm','Thá»© sÃ¡u','Thá»© báº£y']; de.textContent=days[now.getDay()]+', '+now.toLocaleDateString('vi-VN'); }
+    if(de){ var days=['ChÃ¡Â»Â§ nhÃ¡ÂºÂ­t','ThÃ¡Â»Â© hai','ThÃ¡Â»Â© ba','ThÃ¡Â»Â© tÃÂ°','ThÃ¡Â»Â© nÃÂm','ThÃ¡Â»Â© sÃÂ¡u','ThÃ¡Â»Â© bÃ¡ÂºÂ£y']; de.textContent=days[now.getDay()]+', '+now.toLocaleDateString('vi-VN'); }
   }
   tick(); setInterval(tick,1000);
   // Change quote every 30s, bg every 60s
@@ -399,31 +400,31 @@ function startClock(){
   setInterval(nextBg, 60000);
 }
 
-// ââ AUTH ââ
+// Ã¢ÂÂÃ¢ÂÂ AUTH Ã¢ÂÂÃ¢ÂÂ
 function switchAuth(tab){
   ['login','register'].forEach(function(t){ g('form-'+t).classList.toggle('active',t===tab); });
   document.querySelectorAll('.auth-tab').forEach(function(btn,i){ btn.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')); });
 }
 async function checkSession(){ if(!sb)return; var s=await sb.auth.getSession(); if(s.data&&s.data.session){ currentUser=s.data.session.user; await loadProfile(); } }
 async function loadProfile(){ if(!currentUser||!sb)return; var r=await sb.from('profiles').select('*').eq('id',currentUser.id).single(); if(r.data){ currentProfile=r.data; showApp(); } }
-async function doLogin(){ var email=v('login-email'),pwd=v('login-pwd'); if(!email||!pwd){setAuthMsg('login-msg','Vui lÃ²ng Äiá»n Äáº§y Äá»§',true);return;} if(!sb){setAuthMsg('login-msg','KhÃ´ng káº¿t ná»i Supabase',true);return;} setAuthMsg('login-msg','Äang ÄÄng nháº­p...',false); var r=await sb.auth.signInWithPassword({email:email,password:pwd}); if(r.error){setAuthMsg('login-msg',r.error.message,true);return;} currentUser=r.data.user; await loadProfile(); }
-async function doRegister(){ var code=v('reg-code').toUpperCase(),name=v('reg-name'),email=v('reg-email'),pwd=v('reg-pwd'); if(!code||!name||!email||!pwd){setAuthMsg('reg-msg','Vui lÃ²ng Äiá»n Äáº§y Äá»§',true);return;} if(pwd.length<6){setAuthMsg('reg-msg','Máº­t kháº©u Ã­t nháº¥t 6 kÃ½ tá»±',true);return;} if(!sb){setAuthMsg('reg-msg','KhÃ´ng káº¿t ná»i Supabase',true);return;} setAuthMsg('reg-msg','Äang kiá»m tra mÃ£ lá»p...',false); var ic=await sb.from('invite_codes').select('*').eq('code',code).limit(1); if(!ic.data||!ic.data.length){setAuthMsg('reg-msg','MÃ£ lá»p khÃ´ng ÄÃºng',true);return;} var inv=ic.data[0]; setAuthMsg('reg-msg','Äang táº¡o tÃ i khoáº£n...',false); var reg=await sb.auth.signUp({email:email,password:pwd}); if(reg.error){setAuthMsg('reg-msg',reg.error.message,true);return;} await sb.from('profiles').upsert({id:reg.data.user.id,name:name,email:email,role:'student',class_id:inv.class_id}); setAuthMsg('reg-msg','â ÄÄng kÃ½ thÃ nh cÃ´ng! VÃ o lá»p: '+(inv.class_name||code),false); setTimeout(function(){ switchAuth('login'); g('login-email').value=email; },2000); }
+async function doLogin(){ var email=v('login-email'),pwd=v('login-pwd'); if(!email||!pwd){setAuthMsg('login-msg','Vui lÃÂ²ng ÃÂiÃ¡Â»Ân ÃÂÃ¡ÂºÂ§y ÃÂÃ¡Â»Â§',true);return;} if(!sb){setAuthMsg('login-msg','KhÃÂ´ng kÃ¡ÂºÂ¿t nÃ¡Â»Âi Supabase',true);return;} setAuthMsg('login-msg','ÃÂang ÃÂÃÂng nhÃ¡ÂºÂ­p...',false); var r=await sb.auth.signInWithPassword({email:email,password:pwd}); if(r.error){setAuthMsg('login-msg',r.error.message,true);return;} currentUser=r.data.user; await loadProfile(); }
+async function doRegister(){ var code=v('reg-code').toUpperCase(),name=v('reg-name'),email=v('reg-email'),pwd=v('reg-pwd'); if(!code||!name||!email||!pwd){setAuthMsg('reg-msg','Vui lÃÂ²ng ÃÂiÃ¡Â»Ân ÃÂÃ¡ÂºÂ§y ÃÂÃ¡Â»Â§',true);return;} if(pwd.length<6){setAuthMsg('reg-msg','MÃ¡ÂºÂ­t khÃ¡ÂºÂ©u ÃÂ­t nhÃ¡ÂºÂ¥t 6 kÃÂ½ tÃ¡Â»Â±',true);return;} if(!sb){setAuthMsg('reg-msg','KhÃÂ´ng kÃ¡ÂºÂ¿t nÃ¡Â»Âi Supabase',true);return;} setAuthMsg('reg-msg','ÃÂang kiÃ¡Â»Âm tra mÃÂ£ lÃ¡Â»Âp...',false); var ic=await sb.from('invite_codes').select('*').eq('code',code).limit(1); if(!ic.data||!ic.data.length){setAuthMsg('reg-msg','MÃÂ£ lÃ¡Â»Âp khÃÂ´ng ÃÂÃÂºng',true);return;} var inv=ic.data[0]; setAuthMsg('reg-msg','ÃÂang tÃ¡ÂºÂ¡o tÃÂ i khoÃ¡ÂºÂ£n...',false); var reg=await sb.auth.signUp({email:email,password:pwd}); if(reg.error){setAuthMsg('reg-msg',reg.error.message,true);return;} await sb.from('profiles').upsert({id:reg.data.user.id,name:name,email:email,role:'student',class_id:inv.class_id}); setAuthMsg('reg-msg','Ã¢ÂÂ ÃÂÃÂng kÃÂ½ thÃÂ nh cÃÂ´ng! VÃÂ o lÃ¡Â»Âp: '+(inv.class_name||code),false); setTimeout(function(){ switchAuth('login'); g('login-email').value=email; },2000); }
 async function doLogout(){ if(sb)await sb.auth.signOut(); currentUser=null; currentProfile=null; g('app').style.display='none'; g('auth-screen').style.display='flex'; }
-function showDemoMode(){ currentProfile={id:'demo',name:'GiÃ¡o viÃªn Demo',role:'teacher',class_id:1}; showApp(); }
+function showDemoMode(){ currentProfile={id:'demo',name:'GiÃÂ¡o viÃÂªn Demo',role:'teacher',class_id:1}; showApp(); }
 </script>
 
 <script>
-// ââ NAV ââ
+// Ã¢ÂÂÃ¢ÂÂ NAV Ã¢ÂÂÃ¢ÂÂ
 var teacherNav=[
-  {section:'Tá»ng quan'},{id:'dashboard',icon:'ð',label:'Dashboard'},{id:'schedule',icon:'ð',label:'Lá»ch há»c & Thi'},
-  {section:'Lá»p há»c'},{id:'classes',icon:'ð«',label:'Quáº£n lÃ½ lá»p'},
-  {section:'Ná»i dung'},{id:'students',icon:'ð¥',label:'Há»c sinh'},{id:'sessions',icon:'ð¹',label:'Buá»i há»c & Recording'},{id:'exercises',icon:'ð',label:'BÃ i táº­p'},
-  {section:'TÆ°Æ¡ng tÃ¡c'},{id:'qa',icon:'â',label:'Q&A'},{id:'confessions',icon:'ð',label:'TÃ¢m sá»±'},{id:'notifications',icon:'ð',label:'ThÃ´ng bÃ¡o'},
-  {section:'BÃ¡o cÃ¡o'},{id:'reports',icon:'ð',label:'BÃ¡o cÃ¡o'},
+  {section:'TÃ¡Â»Âng quan'},{id:'dashboard',icon:'Ã°ÂÂÂ',label:'Dashboard'},{id:'schedule',icon:'Ã°ÂÂÂ',label:'LÃ¡Â»Âch hÃ¡Â»Âc & Thi'},
+  {section:'LÃ¡Â»Âp hÃ¡Â»Âc'},{id:'classes',icon:'Ã°ÂÂÂ«',label:'QuÃ¡ÂºÂ£n lÃÂ½ lÃ¡Â»Âp'},
+  {section:'NÃ¡Â»Âi dung'},{id:'students',icon:'Ã°ÂÂÂ¥',label:'HÃ¡Â»Âc sinh'},{id:'sessions',icon:'Ã°ÂÂÂ¹',label:'BuÃ¡Â»Âi hÃ¡Â»Âc & Recording'},{id:'exercises',icon:'Ã°ÂÂÂ',label:'BÃÂ i tÃ¡ÂºÂ­p'},
+  {section:'TÃÂ°ÃÂ¡ng tÃÂ¡c'},{id:'qa',icon:'Ã¢ÂÂ',label:'Q&A'},{id:'confessions',icon:'Ã°ÂÂÂ',label:'TÃÂ¢m sÃ¡Â»Â±'},{id:'notifications',icon:'Ã°ÂÂÂ',label:'ThÃÂ´ng bÃÂ¡o'},
+  {section:'BÃÂ¡o cÃÂ¡o'},{id:'reports',icon:'Ã°ÂÂÂ',label:'BÃÂ¡o cÃÂ¡o'},
 ];
 var studentNav=[
-  {section:'Há»c táº­p'},{id:'s-dashboard',icon:'ð ',label:'Dashboard'},{id:'s-sessions',icon:'ð¹',label:'Buá»i há»c'},{id:'s-exercises',icon:'ð',label:'BÃ i táº­p'},{id:'s-results',icon:'ð',label:'Káº¿t quáº£'},
-  {section:'Cá»ng Äá»ng'},{id:'s-qa',icon:'â',label:'Q&A'},{id:'s-confessions',icon:'ð',label:'TÃ¢m sá»±'},{id:'s-notifications',icon:'ð',label:'ThÃ´ng bÃ¡o'},
+  {section:'HÃ¡Â»Âc tÃ¡ÂºÂ­p'},{id:'s-dashboard',icon:'Ã°ÂÂÂ ',label:'Dashboard'},{id:'s-sessions',icon:'Ã°ÂÂÂ¹',label:'BuÃ¡Â»Âi hÃ¡Â»Âc'},{id:'s-exercises',icon:'Ã°ÂÂÂ',label:'BÃÂ i tÃ¡ÂºÂ­p'},{id:'s-results',icon:'Ã°ÂÂÂ',label:'KÃ¡ÂºÂ¿t quÃ¡ÂºÂ£'},
+  {section:'CÃ¡Â»Âng ÃÂÃ¡Â»Âng'},{id:'s-qa',icon:'Ã¢ÂÂ',label:'Q&A'},{id:'s-confessions',icon:'Ã°ÂÂÂ',label:'TÃÂ¢m sÃ¡Â»Â±'},{id:'s-notifications',icon:'Ã°ÂÂÂ',label:'ThÃÂ´ng bÃÂ¡o'},
 ];
 
 function buildNav(items){ var nav=g('sidebar-nav'); nav.innerHTML=''; items.forEach(function(item){ if(item.section){ nav.innerHTML+='<div class="nav-section">'+item.section+'</div>'; } else { nav.innerHTML+='<div class="nav-item" id="nav-'+item.id+'" onclick="showPage(\''+item.id+'\')"><span class="icon">'+item.icon+'</span>'+item.label+'</div>'; } }); }
@@ -448,7 +449,7 @@ function showPage(id){
 function showApp(){
   g('auth-screen').style.display='none'; g('app').style.display='block';
   var isT=currentProfile&&currentProfile.role==='teacher';
-  g('sidebar-user-info').textContent=(currentProfile?currentProfile.name:'')+' Â· '+(isT?'ð¨âð« GiÃ¡o viÃªn':'ð Há»c sinh');
+  g('sidebar-user-info').textContent=(currentProfile?currentProfile.name:'')+' ÃÂ· '+(isT?'Ã°ÂÂÂ¨Ã¢ÂÂÃ°ÂÂÂ« GiÃÂ¡o viÃÂªn':'Ã°ÂÂÂ HÃ¡Â»Âc sinh');
   buildNav(isT?teacherNav:studentNav);
   g('main-content').innerHTML=isT?teacherPages():studentPages();
   showPage(isT?'dashboard':'s-dashboard');
@@ -467,7 +468,7 @@ function switchTab(group,value,btn){
 </script>
 
 <script>
-// ââ TEACHER PAGES ââ
+// Ã¢ÂÂÃ¢ÂÂ TEACHER PAGES Ã¢ÂÂÃ¢ÂÂ
 function teacherPages(){
   return `
 <!-- DASHBOARD -->
@@ -479,152 +480,152 @@ function teacherPages(){
       <div class="hero-quote" id="hero-quote">Loading...</div>
       <div class="hero-quote-author" id="hero-quote-author"></div>
       <div style="margin-top:.75rem;display:flex;gap:.5rem">
-        <button onclick="nextQuote()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:.25rem .75rem;font-size:.75rem;cursor:pointer">ð¬ Quote khÃ¡c</button>
-        <button onclick="nextBg()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:.25rem .75rem;font-size:.75rem;cursor:pointer">ð¼ áº¢nh khÃ¡c</button>
+        <button onclick="nextQuote()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:.25rem .75rem;font-size:.75rem;cursor:pointer">Ã°ÂÂÂ¬ Quote khÃÂ¡c</button>
+        <button onclick="nextBg()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:.25rem .75rem;font-size:.75rem;cursor:pointer">Ã°ÂÂÂ¼ Ã¡ÂºÂ¢nh khÃÂ¡c</button>
       </div>
     </div>
   </div>
-  <div class="page-header"><h2>ð Dashboard</h2></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ Dashboard</h2></div>
   <div class="stats-grid" id="teacher-stats">
-    <div class="stat-card red"><div class="stat-icon">ð¥</div><div class="stat-num" id="stat-students">â</div><div class="stat-label">Há»c sinh</div></div>
-    <div class="stat-card amber"><div class="stat-icon">ð</div><div class="stat-num" id="stat-pending">â</div><div class="stat-label">BÃ i chÆ°a cháº¥m</div></div>
-    <div class="stat-card green"><div class="stat-icon">â</div><div class="stat-num" id="stat-qa">â</div><div class="stat-label">Q&A chÆ°a tráº£ lá»i</div></div>
-    <div class="stat-card brown"><div class="stat-icon">ð¹</div><div class="stat-num" id="stat-sessions">â</div><div class="stat-label">Buá»i há»c</div></div>
+    <div class="stat-card red"><div class="stat-icon">Ã°ÂÂÂ¥</div><div class="stat-num" id="stat-students">Ã¢ÂÂ</div><div class="stat-label">HÃ¡Â»Âc sinh</div></div>
+    <div class="stat-card amber"><div class="stat-icon">Ã°ÂÂÂ</div><div class="stat-num" id="stat-pending">Ã¢ÂÂ</div><div class="stat-label">BÃÂ i chÃÂ°a chÃ¡ÂºÂ¥m</div></div>
+    <div class="stat-card green"><div class="stat-icon">Ã¢ÂÂ</div><div class="stat-num" id="stat-qa">Ã¢ÂÂ</div><div class="stat-label">Q&A chÃÂ°a trÃ¡ÂºÂ£ lÃ¡Â»Âi</div></div>
+    <div class="stat-card brown"><div class="stat-icon">Ã°ÂÂÂ¹</div><div class="stat-num" id="stat-sessions">Ã¢ÂÂ</div><div class="stat-label">BuÃ¡Â»Âi hÃ¡Â»Âc</div></div>
   </div>
   <div class="grid-2">
-    <div class="card"><div class="card-title">ð Tiáº¿n Äá» ná»p bÃ i</div><canvas id="chart-submissions" height="200"></canvas></div>
-    <div class="card"><div class="card-title">ð PhÃ¢n bá» Äiá»m</div><canvas id="chart-activity" height="200"></canvas></div>
+    <div class="card"><div class="card-title">Ã°ÂÂÂ TiÃ¡ÂºÂ¿n ÃÂÃ¡Â»Â nÃ¡Â»Âp bÃÂ i</div><canvas id="chart-submissions" height="200"></canvas></div>
+    <div class="card"><div class="card-title">Ã°ÂÂÂ PhÃÂ¢n bÃ¡Â»Â ÃÂiÃ¡Â»Âm</div><canvas id="chart-activity" height="200"></canvas></div>
   </div>
-  <div class="card" style="margin-top:1rem"><div class="card-title">ð Cáº§n xá»­ lÃ½ ngay</div><div id="todo-list"></div></div>
+  <div class="card" style="margin-top:1rem"><div class="card-title">Ã°ÂÂÂ CÃ¡ÂºÂ§n xÃ¡Â»Â­ lÃÂ½ ngay</div><div id="todo-list"></div></div>
 </div>
 
 <!-- SCHEDULE -->
 <div class="page" id="page-schedule">
-  <div class="page-header"><h2>ð Lá»ch há»c & Thi</h2><button class="btn btn-red" onclick="openModal('modal-add-schedule')">+ ThÃªm lá»ch</button></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ LÃ¡Â»Âch hÃ¡Â»Âc & Thi</h2><button class="btn btn-red" onclick="openModal('modal-add-schedule')">+ ThÃÂªm lÃ¡Â»Âch</button></div>
   <div id="schedule-list"></div>
 </div>
 
 <!-- CLASSES -->
 <div class="page" id="page-classes">
-  <div class="page-header"><h2>ð« Quáº£n lÃ½ lá»p há»c</h2><button class="btn btn-red" onclick="openModal('modal-add-class')">+ Táº¡o lá»p má»i</button></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ« QuÃ¡ÂºÂ£n lÃÂ½ lÃ¡Â»Âp hÃ¡Â»Âc</h2><button class="btn btn-red" onclick="openModal('modal-add-class')">+ TÃ¡ÂºÂ¡o lÃ¡Â»Âp mÃ¡Â»Âi</button></div>
   <div id="classes-list"></div>
 </div>
 
 <!-- STUDENTS -->
 <div class="page" id="page-students">
-  <div class="page-header"><h2>ð¥ Há»c sinh</h2></div>
-  <div class="card"><div class="table-wrap"><table><thead><tr><th>TÃªn</th><th>Email</th><th>Lá»p</th><th>BÃ i ÄÃ£ ná»p</th><th>Äiá»m TB</th><th></th></tr></thead><tbody id="students-tbody"><tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Äang táº£i...</td></tr></tbody></table></div></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ¥ HÃ¡Â»Âc sinh</h2></div>
+  <div class="card"><div class="table-wrap"><table><thead><tr><th>TÃÂªn</th><th>Email</th><th>LÃ¡Â»Âp</th><th>BÃÂ i ÃÂÃÂ£ nÃ¡Â»Âp</th><th>ÃÂiÃ¡Â»Âm TB</th><th></th></tr></thead><tbody id="students-tbody"><tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">ÃÂang tÃ¡ÂºÂ£i...</td></tr></tbody></table></div></div>
 </div>
 
 <!-- SESSIONS -->
 <div class="page" id="page-sessions">
-  <div class="page-header"><h2>ð¹ Buá»i há»c & Recording</h2><button class="btn btn-red" onclick="openModal('modal-add-session')">+ ThÃªm buá»i há»c</button></div>
-  <div class="form-row" style="max-width:200px"><select class="select" id="session-filter-class" onchange="loadSessions()"><option value="">Táº¥t cáº£ lá»p</option></select></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ¹ BuÃ¡Â»Âi hÃ¡Â»Âc & Recording</h2><button class="btn btn-red" onclick="openModal('modal-add-session')">+ ThÃÂªm buÃ¡Â»Âi hÃ¡Â»Âc</button></div>
+  <div class="form-row" style="max-width:200px"><select class="select" id="session-filter-class" onchange="loadSessions()"><option value="">TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£ lÃ¡Â»Âp</option></select></div>
   <div id="sessions-list"></div>
 </div>
 
 <!-- EXERCISES -->
 <div class="page" id="page-exercises">
-  <div class="page-header"><h2>ð BÃ i táº­p</h2><button class="btn btn-red" onclick="openModal('modal-add-exercise')">+ Giao bÃ i táº­p</button></div>
-  <div class="form-row" style="max-width:200px"><select class="select" id="ex-filter-class" onchange="loadExercises()"><option value="">Táº¥t cáº£ lá»p</option></select></div>
-  <div class="tabs"><button class="tab-btn active" onclick="switchTab('ex-tab','all')">Táº¥t cáº£</button><button class="tab-btn" onclick="switchTab('ex-tab','pending')">Chá» cháº¥m</button><button class="tab-btn" onclick="switchTab('ex-tab','done')">ÄÃ£ cháº¥m</button></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ BÃÂ i tÃ¡ÂºÂ­p</h2><button class="btn btn-red" onclick="openModal('modal-add-exercise')">+ Giao bÃÂ i tÃ¡ÂºÂ­p</button></div>
+  <div class="form-row" style="max-width:200px"><select class="select" id="ex-filter-class" onchange="loadExercises()"><option value="">TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£ lÃ¡Â»Âp</option></select></div>
+  <div class="tabs"><button class="tab-btn active" onclick="switchTab('ex-tab','all')">TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£</button><button class="tab-btn" onclick="switchTab('ex-tab','pending')">ChÃ¡Â»Â chÃ¡ÂºÂ¥m</button><button class="tab-btn" onclick="switchTab('ex-tab','done')">ÃÂÃÂ£ chÃ¡ÂºÂ¥m</button></div>
   <div id="exercises-list"></div>
 </div>
 
 <!-- Q&A -->
 <div class="page" id="page-qa">
-  <div class="page-header"><h2>â Q&A</h2></div>
-  <div class="tabs"><button class="tab-btn active" onclick="switchTab('qa-tab','unanswered')">ChÆ°a tráº£ lá»i</button><button class="tab-btn" onclick="switchTab('qa-tab','answered')">ÄÃ£ tráº£ lá»i</button></div>
+  <div class="page-header"><h2>Ã¢ÂÂ Q&A</h2></div>
+  <div class="tabs"><button class="tab-btn active" onclick="switchTab('qa-tab','unanswered')">ChÃÂ°a trÃ¡ÂºÂ£ lÃ¡Â»Âi</button><button class="tab-btn" onclick="switchTab('qa-tab','answered')">ÃÂÃÂ£ trÃ¡ÂºÂ£ lÃ¡Â»Âi</button></div>
   <div id="qa-list"></div>
 </div>
 
 <!-- CONFESSIONS -->
 <div class="page" id="page-confessions">
-  <div class="page-header"><h2>ð TÃ¢m sá»± há»c sinh</h2></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ TÃÂ¢m sÃ¡Â»Â± hÃ¡Â»Âc sinh</h2></div>
   <div id="confessions-list"></div>
 </div>
 
 <!-- NOTIFICATIONS -->
 <div class="page" id="page-notifications">
-  <div class="page-header"><h2>ð ThÃ´ng bÃ¡o</h2><button class="btn btn-red" onclick="openModal('modal-send-notif')">+ Gá»­i thÃ´ng bÃ¡o</button></div>
-  <div class="tabs"><button class="tab-btn active" onclick="switchTab('notif-tab','sent')">ð¤ ÄÃ£ gá»­i</button><button class="tab-btn" onclick="switchTab('notif-tab','received')">ð¥ Há»c sinh gá»­i</button></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ ThÃÂ´ng bÃÂ¡o</h2><button class="btn btn-red" onclick="openModal('modal-send-notif')">+ GÃ¡Â»Â­i thÃÂ´ng bÃÂ¡o</button></div>
+  <div class="tabs"><button class="tab-btn active" onclick="switchTab('notif-tab','sent')">Ã°ÂÂÂ¤ ÃÂÃÂ£ gÃ¡Â»Â­i</button><button class="tab-btn" onclick="switchTab('notif-tab','received')">Ã°ÂÂÂ¥ HÃ¡Â»Âc sinh gÃ¡Â»Â­i</button></div>
   <div id="notifications-list"></div>
 </div>
 
 <!-- REPORTS -->
 <div class="page" id="page-reports">
-  <div class="page-header"><h2>ð BÃ¡o cÃ¡o</h2></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ BÃÂ¡o cÃÂ¡o</h2></div>
   <div id="reports-content"></div>
 </div>
 
 <!-- MODALS -->
 <div class="modal-overlay" id="modal-add-class"><div class="modal">
-  <div class="modal-header"><span class="modal-title">ð« Táº¡o lá»p má»i</span><button class="modal-close" onclick="closeModal('modal-add-class')">Ã</button></div>
-  <div class="form-row"><label class="form-label">TÃªn lá»p</label><input class="input" id="new-class-name" placeholder="VD: IELTS Foundation A"></div>
-  <div class="form-row"><label class="form-label">MÃ´ táº£</label><textarea class="textarea" id="new-class-desc" placeholder="MÃ´ táº£ lá»p há»c..."></textarea></div>
-  <div class="form-row"><label class="form-label">NgÃ y Midterm</label><input type="date" class="input" id="new-class-midterm"></div>
-  <div class="form-row"><label class="form-label">NgÃ y Final</label><input type="date" class="input" id="new-class-final"></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-class')">Huá»·</button><button class="btn btn-red" onclick="addClass()">Táº¡o lá»p</button></div>
+  <div class="modal-header"><span class="modal-title">Ã°ÂÂÂ« TÃ¡ÂºÂ¡o lÃ¡Â»Âp mÃ¡Â»Âi</span><button class="modal-close" onclick="closeModal('modal-add-class')">ÃÂ</button></div>
+  <div class="form-row"><label class="form-label">TÃÂªn lÃ¡Â»Âp</label><input class="input" id="new-class-name" placeholder="VD: IELTS Foundation A"></div>
+  <div class="form-row"><label class="form-label">MÃÂ´ tÃ¡ÂºÂ£</label><textarea class="textarea" id="new-class-desc" placeholder="MÃÂ´ tÃ¡ÂºÂ£ lÃ¡Â»Âp hÃ¡Â»Âc..."></textarea></div>
+  <div class="form-row"><label class="form-label">NgÃÂ y Midterm</label><input type="date" class="input" id="new-class-midterm"></div>
+  <div class="form-row"><label class="form-label">NgÃÂ y Final</label><input type="date" class="input" id="new-class-final"></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-class')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="addClass()">TÃ¡ÂºÂ¡o lÃ¡Â»Âp</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-add-session"><div class="modal">
-  <div class="modal-header"><span class="modal-title">ð¹ ThÃªm buá»i há»c</span><button class="modal-close" onclick="closeModal('modal-add-session')">Ã</button></div>
-  <div class="form-row"><label class="form-label">Lá»p</label><select class="select" id="session-class-id"></select></div>
-  <div class="form-row"><label class="form-label">TiÃªu Äá»</label><input class="input" id="session-title" placeholder="VD: Buá»i 1 â Grammar"></div>
-  <div class="form-row"><label class="form-label">NgÃ y há»c</label><input type="date" class="input" id="session-date"></div>
+  <div class="modal-header"><span class="modal-title">Ã°ÂÂÂ¹ ThÃÂªm buÃ¡Â»Âi hÃ¡Â»Âc</span><button class="modal-close" onclick="closeModal('modal-add-session')">ÃÂ</button></div>
+  <div class="form-row"><label class="form-label">LÃ¡Â»Âp</label><select class="select" id="session-class-id"></select></div>
+  <div class="form-row"><label class="form-label">TiÃÂªu ÃÂÃ¡Â»Â</label><input class="input" id="session-title" placeholder="VD: BuÃ¡Â»Âi 1 Ã¢ÂÂ Grammar"></div>
+  <div class="form-row"><label class="form-label">NgÃÂ y hÃ¡Â»Âc</label><input type="date" class="input" id="session-date"></div>
   <div class="form-row"><label class="form-label">Link Recording</label><input class="input" id="session-recording" placeholder="https://drive.google.com/..."></div>
-  <div class="form-row"><label class="form-label">TÃ i liá»u / Slides</label><input class="input" id="session-attachment" placeholder="https://..."></div>
-  <div class="form-row"><label class="form-label">Ghi chÃº</label><textarea class="textarea" id="session-note" placeholder="Ná»i dung buá»i há»c..."></textarea></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-session')">Huá»·</button><button class="btn btn-red" onclick="addSession()">LÆ°u</button></div>
+  <div class="form-row"><label class="form-label">TÃÂ i liÃ¡Â»Âu / Slides</label><input class="input" id="session-attachment" placeholder="https://..."></div>
+  <div class="form-row"><label class="form-label">Ghi chÃÂº</label><textarea class="textarea" id="session-note" placeholder="NÃ¡Â»Âi dung buÃ¡Â»Âi hÃ¡Â»Âc..."></textarea></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-session')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="addSession()">LÃÂ°u</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-add-exercise"><div class="modal">
-  <div class="modal-header"><span class="modal-title">ð Giao bÃ i táº­p</span><button class="modal-close" onclick="closeModal('modal-add-exercise')">Ã</button></div>
-  <div class="form-row"><label class="form-label">Lá»p</label><select class="select" id="ex-class-id"></select></div>
-  <div class="form-row"><label class="form-label">TiÃªu Äá»</label><input class="input" id="ex-title" placeholder="VD: Writing Task 2"></div>
-  <div class="form-row"><label class="form-label">MÃ´ táº£ / Äá» bÃ i</label><textarea class="textarea" id="ex-desc" placeholder="Ná»i dung bÃ i táº­p..."></textarea></div>
+  <div class="modal-header"><span class="modal-title">Ã°ÂÂÂ Giao bÃÂ i tÃ¡ÂºÂ­p</span><button class="modal-close" onclick="closeModal('modal-add-exercise')">ÃÂ</button></div>
+  <div class="form-row"><label class="form-label">LÃ¡Â»Âp</label><select class="select" id="ex-class-id"></select></div>
+  <div class="form-row"><label class="form-label">TiÃÂªu ÃÂÃ¡Â»Â</label><input class="input" id="ex-title" placeholder="VD: Writing Task 2"></div>
+  <div class="form-row"><label class="form-label">MÃÂ´ tÃ¡ÂºÂ£ / ÃÂÃ¡Â»Â bÃÂ i</label><textarea class="textarea" id="ex-desc" placeholder="NÃ¡Â»Âi dung bÃÂ i tÃ¡ÂºÂ­p..."></textarea></div>
   <div class="form-row"><label class="form-label">Deadline</label><input type="datetime-local" class="input" id="ex-deadline"></div>
-  <div class="form-row"><label class="form-label">Link Äá» bÃ i</label><input class="input" id="ex-link" placeholder="https://..."></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-exercise')">Huá»·</button><button class="btn btn-red" onclick="addExercise()">Giao bÃ i</button></div>
+  <div class="form-row"><label class="form-label">Link ÃÂÃ¡Â»Â bÃÂ i</label><input class="input" id="ex-link" placeholder="https://..."></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-exercise')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="addExercise()">Giao bÃÂ i</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-grade"><div class="modal">
-  <div class="modal-header"><span class="modal-title">â Cháº¥m bÃ i</span><button class="modal-close" onclick="closeModal('modal-grade')">Ã</button></div>
+  <div class="modal-header"><span class="modal-title">Ã¢ÂÂ ChÃ¡ÂºÂ¥m bÃÂ i</span><button class="modal-close" onclick="closeModal('modal-grade')">ÃÂ</button></div>
   <input type="hidden" id="grade-sub-id">
-  <div class="form-row"><label class="form-label">Äiá»m (0â10)</label><input type="number" class="input" id="grade-score" min="0" max="10" step="0.5" placeholder="8.5"></div>
-  <div class="form-row"><label class="form-label">Nháº­n xÃ©t</label><textarea class="textarea" id="grade-comment" placeholder="Nháº­n xÃ©t chi tiáº¿t..."></textarea></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-grade')">Huá»·</button><button class="btn btn-red" onclick="submitGrade()">LÆ°u Äiá»m</button></div>
+  <div class="form-row"><label class="form-label">ÃÂiÃ¡Â»Âm (0Ã¢ÂÂ10)</label><input type="number" class="input" id="grade-score" min="0" max="10" step="0.5" placeholder="8.5"></div>
+  <div class="form-row"><label class="form-label">NhÃ¡ÂºÂ­n xÃÂ©t</label><textarea class="textarea" id="grade-comment" placeholder="NhÃ¡ÂºÂ­n xÃÂ©t chi tiÃ¡ÂºÂ¿t..."></textarea></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-grade')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="submitGrade()">LÃÂ°u ÃÂiÃ¡Â»Âm</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-answer-qa"><div class="modal">
-  <div class="modal-header"><span class="modal-title">ð¬ Tráº£ lá»i Q&A</span><button class="modal-close" onclick="closeModal('modal-answer-qa')">Ã</button></div>
+  <div class="modal-header"><span class="modal-title">Ã°ÂÂÂ¬ TrÃ¡ÂºÂ£ lÃ¡Â»Âi Q&A</span><button class="modal-close" onclick="closeModal('modal-answer-qa')">ÃÂ</button></div>
   <input type="hidden" id="answer-qa-id">
   <div id="answer-qa-question" style="background:var(--beige);padding:1rem;border-radius:var(--radius-sm);margin-bottom:1rem;font-size:.9rem;border-left:3px solid var(--primary)"></div>
-  <div class="form-row"><label class="form-label">CÃ¢u tráº£ lá»i</label><textarea class="textarea" id="answer-qa-text" placeholder="Nháº­p cÃ¢u tráº£ lá»i..." style="min-height:120px"></textarea></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-answer-qa')">Huá»·</button><button class="btn btn-red" onclick="submitAnswer()">Gá»­i tráº£ lá»i</button></div>
+  <div class="form-row"><label class="form-label">CÃÂ¢u trÃ¡ÂºÂ£ lÃ¡Â»Âi</label><textarea class="textarea" id="answer-qa-text" placeholder="NhÃ¡ÂºÂ­p cÃÂ¢u trÃ¡ÂºÂ£ lÃ¡Â»Âi..." style="min-height:120px"></textarea></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-answer-qa')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="submitAnswer()">GÃ¡Â»Â­i trÃ¡ÂºÂ£ lÃ¡Â»Âi</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-send-notif"><div class="modal">
-  <div class="modal-header"><span class="modal-title">ð Gá»­i thÃ´ng bÃ¡o</span><button class="modal-close" onclick="closeModal('modal-send-notif')">Ã</button></div>
-  <div class="form-row"><label class="form-label">Lá»p</label><select class="select" id="notif-class-id"><option value="">Táº¥t cáº£ lá»p</option></select></div>
-  <div class="form-row"><label class="form-label">TiÃªu Äá»</label><input class="input" id="notif-title" placeholder="TiÃªu Äá» thÃ´ng bÃ¡o"></div>
-  <div class="form-row"><label class="form-label">Ná»i dung</label><textarea class="textarea" id="notif-body" placeholder="Ná»i dung..."></textarea></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-send-notif')">Huá»·</button><button class="btn btn-red" onclick="sendNotification()">Gá»­i</button></div>
+  <div class="modal-header"><span class="modal-title">Ã°ÂÂÂ GÃ¡Â»Â­i thÃÂ´ng bÃÂ¡o</span><button class="modal-close" onclick="closeModal('modal-send-notif')">ÃÂ</button></div>
+  <div class="form-row"><label class="form-label">LÃ¡Â»Âp</label><select class="select" id="notif-class-id"><option value="">TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£ lÃ¡Â»Âp</option></select></div>
+  <div class="form-row"><label class="form-label">TiÃÂªu ÃÂÃ¡Â»Â</label><input class="input" id="notif-title" placeholder="TiÃÂªu ÃÂÃ¡Â»Â thÃÂ´ng bÃÂ¡o"></div>
+  <div class="form-row"><label class="form-label">NÃ¡Â»Âi dung</label><textarea class="textarea" id="notif-body" placeholder="NÃ¡Â»Âi dung..."></textarea></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-send-notif')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="sendNotification()">GÃ¡Â»Â­i</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-add-schedule"><div class="modal">
-  <div class="modal-header"><span class="modal-title">ð ThÃªm lá»ch</span><button class="modal-close" onclick="closeModal('modal-add-schedule')">Ã</button></div>
-  <div class="form-row"><label class="form-label">TiÃªu Äá»</label><input class="input" id="sch-title" placeholder="VD: Thi Midterm IELTS A"></div>
-  <div class="form-row"><label class="form-label">Lá»p</label><select class="select" id="sch-class-id"></select></div>
-  <div class="form-row"><label class="form-label">Loáº¡i</label><select class="select" id="sch-type"><option value="class">ð Buá»i há»c</option><option value="midterm">ð Midterm</option><option value="final">ð Final</option><option value="other">ð KhÃ¡c</option></select></div>
-  <div class="form-row"><label class="form-label">NgÃ y</label><input type="date" class="input" id="sch-date"></div>
-  <div class="form-row"><label class="form-label">Giá»</label><input type="time" class="input" id="sch-time"></div>
-  <div class="form-row"><label class="form-label">Ghi chÃº</label><input class="input" id="sch-note" placeholder="Äá»a Äiá»m, hÃ¬nh thá»©c..."></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-schedule')">Huá»·</button><button class="btn btn-red" onclick="addSchedule()">LÆ°u</button></div>
+  <div class="modal-header"><span class="modal-title">Ã°ÂÂÂ ThÃÂªm lÃ¡Â»Âch</span><button class="modal-close" onclick="closeModal('modal-add-schedule')">ÃÂ</button></div>
+  <div class="form-row"><label class="form-label">TiÃÂªu ÃÂÃ¡Â»Â</label><input class="input" id="sch-title" placeholder="VD: Thi Midterm IELTS A"></div>
+  <div class="form-row"><label class="form-label">LÃ¡Â»Âp</label><select class="select" id="sch-class-id"></select></div>
+  <div class="form-row"><label class="form-label">LoÃ¡ÂºÂ¡i</label><select class="select" id="sch-type"><option value="class">Ã°ÂÂÂ BuÃ¡Â»Âi hÃ¡Â»Âc</option><option value="midterm">Ã°ÂÂÂ Midterm</option><option value="final">Ã°ÂÂÂ Final</option><option value="other">Ã°ÂÂÂ KhÃÂ¡c</option></select></div>
+  <div class="form-row"><label class="form-label">NgÃÂ y</label><input type="date" class="input" id="sch-date"></div>
+  <div class="form-row"><label class="form-label">GiÃ¡Â»Â</label><input type="time" class="input" id="sch-time"></div>
+  <div class="form-row"><label class="form-label">Ghi chÃÂº</label><input class="input" id="sch-note" placeholder="ÃÂÃ¡Â»Âa ÃÂiÃ¡Â»Âm, hÃÂ¬nh thÃ¡Â»Â©c..."></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-schedule')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="addSchedule()">LÃÂ°u</button></div>
 </div></div>
 `;}
 
-// ââ STUDENT PAGES ââ
+// Ã¢ÂÂÃ¢ÂÂ STUDENT PAGES Ã¢ÂÂÃ¢ÂÂ
 function studentPages(){
   return `
 <div class="page" id="page-s-dashboard">
@@ -635,82 +636,82 @@ function studentPages(){
       <div class="hero-quote" id="hero-quote"></div>
       <div class="hero-quote-author" id="hero-quote-author"></div>
       <div style="margin-top:.75rem;display:flex;gap:.5rem">
-        <button onclick="nextQuote()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:.25rem .75rem;font-size:.75rem;cursor:pointer">ð¬ Quote khÃ¡c</button>
-        <button onclick="nextBg()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:.25rem .75rem;font-size:.75rem;cursor:pointer">ð¼ áº¢nh khÃ¡c</button>
+        <button onclick="nextQuote()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:.25rem .75rem;font-size:.75rem;cursor:pointer">Ã°ÂÂÂ¬ Quote khÃÂ¡c</button>
+        <button onclick="nextBg()" style="background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:.25rem .75rem;font-size:.75rem;cursor:pointer">Ã°ÂÂÂ¼ Ã¡ÂºÂ¢nh khÃÂ¡c</button>
       </div>
     </div>
   </div>
-  <div class="page-header"><h2>ð Xin chÃ o, <span id="student-name-display">báº¡n</span>!</h2><p id="student-class-display"></p></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ Xin chÃÂ o, <span id="student-name-display">bÃ¡ÂºÂ¡n</span>!</h2><p id="student-class-display"></p></div>
   <div class="stats-grid">
-    <div class="stat-card red"><div class="stat-icon">ð</div><div class="stat-num" id="s-stat-submitted">â</div><div class="stat-label">BÃ i ÄÃ£ ná»p</div></div>
-    <div class="stat-card amber"><div class="stat-icon">â³</div><div class="stat-num" id="s-stat-pending">â</div><div class="stat-label">Chá» cháº¥m</div></div>
-    <div class="stat-card green"><div class="stat-icon">ð</div><div class="stat-num" id="s-stat-avg">â</div><div class="stat-label">Äiá»m TB</div></div>
-    <div class="stat-card brown"><div class="stat-icon">ð¹</div><div class="stat-num" id="s-stat-sessions">â</div><div class="stat-label">Buá»i há»c</div></div>
+    <div class="stat-card red"><div class="stat-icon">Ã°ÂÂÂ</div><div class="stat-num" id="s-stat-submitted">Ã¢ÂÂ</div><div class="stat-label">BÃÂ i ÃÂÃÂ£ nÃ¡Â»Âp</div></div>
+    <div class="stat-card amber"><div class="stat-icon">Ã¢ÂÂ³</div><div class="stat-num" id="s-stat-pending">Ã¢ÂÂ</div><div class="stat-label">ChÃ¡Â»Â chÃ¡ÂºÂ¥m</div></div>
+    <div class="stat-card green"><div class="stat-icon">Ã°ÂÂÂ</div><div class="stat-num" id="s-stat-avg">Ã¢ÂÂ</div><div class="stat-label">ÃÂiÃ¡Â»Âm TB</div></div>
+    <div class="stat-card brown"><div class="stat-icon">Ã°ÂÂÂ¹</div><div class="stat-num" id="s-stat-sessions">Ã¢ÂÂ</div><div class="stat-label">BuÃ¡Â»Âi hÃ¡Â»Âc</div></div>
   </div>
-  <div class="card"><div class="card-title">â° Deadline sáº¯p tá»i</div><div id="s-upcoming-deadlines"></div></div>
+  <div class="card"><div class="card-title">Ã¢ÂÂ° Deadline sÃ¡ÂºÂ¯p tÃ¡Â»Âi</div><div id="s-upcoming-deadlines"></div></div>
 </div>
 
 <div class="page" id="page-s-sessions">
-  <div class="page-header"><h2>ð¹ Buá»i há»c & Recording</h2></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ¹ BuÃ¡Â»Âi hÃ¡Â»Âc & Recording</h2></div>
   <div id="s-sessions-list"></div>
 </div>
 
 <div class="page" id="page-s-exercises">
-  <div class="page-header"><h2>ð BÃ i táº­p</h2></div>
-  <div class="tabs"><button class="tab-btn active" onclick="switchTab('s-ex-tab','todo')">ð Cáº§n lÃ m</button><button class="tab-btn" onclick="switchTab('s-ex-tab','done')">â ÄÃ£ ná»p</button></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ BÃÂ i tÃ¡ÂºÂ­p</h2></div>
+  <div class="tabs"><button class="tab-btn active" onclick="switchTab('s-ex-tab','todo')">Ã°ÂÂÂ CÃ¡ÂºÂ§n lÃÂ m</button><button class="tab-btn" onclick="switchTab('s-ex-tab','done')">Ã¢ÂÂ ÃÂÃÂ£ nÃ¡Â»Âp</button></div>
   <div id="s-exercises-list"></div>
 </div>
 
 <div class="page" id="page-s-results">
-  <div class="page-header"><h2>ð Káº¿t quáº£ há»c táº­p</h2></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ KÃ¡ÂºÂ¿t quÃ¡ÂºÂ£ hÃ¡Â»Âc tÃ¡ÂºÂ­p</h2></div>
   <div id="s-results-content"></div>
 </div>
 
 <div class="page" id="page-s-qa">
-  <div class="page-header"><h2>â Q&A</h2><button class="btn btn-red" onclick="openModal('modal-ask-qa')">+ Äáº·t cÃ¢u há»i</button></div>
+  <div class="page-header"><h2>Ã¢ÂÂ Q&A</h2><button class="btn btn-red" onclick="openModal('modal-ask-qa')">+ ÃÂÃ¡ÂºÂ·t cÃÂ¢u hÃ¡Â»Âi</button></div>
   <div id="s-qa-list"></div>
 </div>
 
 <div class="page" id="page-s-confessions">
-  <div class="page-header"><h2>ð TÃ¢m sá»± & Chia sáº»</h2><button class="btn btn-red" onclick="openModal('modal-add-confession')">+ Chia sáº»</button></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ TÃÂ¢m sÃ¡Â»Â± & Chia sÃ¡ÂºÂ»</h2><button class="btn btn-red" onclick="openModal('modal-add-confession')">+ Chia sÃ¡ÂºÂ»</button></div>
   <div id="s-confessions-list"></div>
 </div>
 
 <div class="page" id="page-s-notifications">
-  <div class="page-header"><h2>ð ThÃ´ng bÃ¡o</h2></div>
+  <div class="page-header"><h2>Ã°ÂÂÂ ThÃÂ´ng bÃÂ¡o</h2></div>
   <div id="s-notif-list"></div>
 </div>
 
 <!-- STUDENT MODALS -->
 <div class="modal-overlay" id="modal-submit-ex"><div class="modal">
-  <div class="modal-header"><span class="modal-title">ð¤ Ná»p bÃ i</span><button class="modal-close" onclick="closeModal('modal-submit-ex')">Ã</button></div>
+  <div class="modal-header"><span class="modal-title">Ã°ÂÂÂ¤ NÃ¡Â»Âp bÃÂ i</span><button class="modal-close" onclick="closeModal('modal-submit-ex')">ÃÂ</button></div>
   <input type="hidden" id="submit-ex-id">
   <div id="submit-ex-title" style="font-weight:700;margin-bottom:1rem;color:var(--dark)"></div>
-  <div class="form-row"><label class="form-label">Link bÃ i lÃ m (Google Drive)</label><input class="input" id="submit-link" placeholder="https://drive.google.com/..."></div>
-  <div class="form-row"><label class="form-label">Ghi chÃº</label><textarea class="textarea" id="submit-note" placeholder="Ghi chÃº thÃªm..."></textarea></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-submit-ex')">Huá»·</button><button class="btn btn-red" onclick="submitExercise()">Ná»p bÃ i</button></div>
+  <div class="form-row"><label class="form-label">Link bÃÂ i lÃÂ m (Google Drive)</label><input class="input" id="submit-link" placeholder="https://drive.google.com/..."></div>
+  <div class="form-row"><label class="form-label">Ghi chÃÂº</label><textarea class="textarea" id="submit-note" placeholder="Ghi chÃÂº thÃÂªm..."></textarea></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-submit-ex')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="submitExercise()">NÃ¡Â»Âp bÃÂ i</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-ask-qa"><div class="modal">
-  <div class="modal-header"><span class="modal-title">â Äáº·t cÃ¢u há»i</span><button class="modal-close" onclick="closeModal('modal-ask-qa')">Ã</button></div>
-  <div class="form-row"><label class="form-label">CÃ¢u há»i</label><textarea class="textarea" id="qa-question-text" placeholder="Nháº­p cÃ¢u há»i cá»§a báº¡n..." style="min-height:120px"></textarea></div>
-  <div class="form-row"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="qa-anonymous"> <span class="form-label" style="margin:0">Äáº·t áº©n danh</span></label></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-ask-qa')">Huá»·</button><button class="btn btn-red" onclick="submitQuestion()">Gá»­i cÃ¢u há»i</button></div>
+  <div class="modal-header"><span class="modal-title">Ã¢ÂÂ ÃÂÃ¡ÂºÂ·t cÃÂ¢u hÃ¡Â»Âi</span><button class="modal-close" onclick="closeModal('modal-ask-qa')">ÃÂ</button></div>
+  <div class="form-row"><label class="form-label">CÃÂ¢u hÃ¡Â»Âi</label><textarea class="textarea" id="qa-question-text" placeholder="NhÃ¡ÂºÂ­p cÃÂ¢u hÃ¡Â»Âi cÃ¡Â»Â§a bÃ¡ÂºÂ¡n..." style="min-height:120px"></textarea></div>
+  <div class="form-row"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="qa-anonymous"> <span class="form-label" style="margin:0">ÃÂÃ¡ÂºÂ·t Ã¡ÂºÂ©n danh</span></label></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-ask-qa')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="submitQuestion()">GÃ¡Â»Â­i cÃÂ¢u hÃ¡Â»Âi</button></div>
 </div></div>
 
 <div class="modal-overlay" id="modal-add-confession"><div class="modal">
-  <div class="modal-header"><span class="modal-title">ð Chia sáº» tÃ¢m sá»±</span><button class="modal-close" onclick="closeModal('modal-add-confession')">Ã</button></div>
-  <div class="form-row"><label class="form-label">Ná»i dung</label><textarea class="textarea" id="confession-text" placeholder="Chia sáº» cáº£m nháº­n, gÃ³p Ã½..." style="min-height:120px"></textarea></div>
-  <div class="form-row"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="confession-anon"> <span class="form-label" style="margin:0">áº¨n danh</span></label></div>
-  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-confession')">Huá»·</button><button class="btn btn-red" onclick="submitConfession()">Gá»­i</button></div>
+  <div class="modal-header"><span class="modal-title">Ã°ÂÂÂ Chia sÃ¡ÂºÂ» tÃÂ¢m sÃ¡Â»Â±</span><button class="modal-close" onclick="closeModal('modal-add-confession')">ÃÂ</button></div>
+  <div class="form-row"><label class="form-label">NÃ¡Â»Âi dung</label><textarea class="textarea" id="confession-text" placeholder="Chia sÃ¡ÂºÂ» cÃ¡ÂºÂ£m nhÃ¡ÂºÂ­n, gÃÂ³p ÃÂ½..." style="min-height:120px"></textarea></div>
+  <div class="form-row"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="confession-anon"> <span class="form-label" style="margin:0">Ã¡ÂºÂ¨n danh</span></label></div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-confession')">HuÃ¡Â»Â·</button><button class="btn btn-red" onclick="submitConfession()">GÃ¡Â»Â­i</button></div>
 </div></div>
 `;}
 </script>
 
 <script>
-// ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // TEACHER DATA
-// ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 var classesCache=[], studentsCache=[];
 
 async function getClasses(){ if(!sb)return[]; var r=await sb.from('classes').select('*').eq('teacher_id',currentProfile.id).order('created_at'); classesCache=r.data||[]; return classesCache; }
@@ -738,43 +739,43 @@ async function loadTeacherDashboard(){
 
 function renderTodo(pending,unanswered){
   var html='';
-  if(pending>0) html+=`<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-bottom:1px solid var(--border)"><span>ð</span><span>CÃ³ <strong>${pending}</strong> bÃ i chá» cháº¥m</span><button class="btn btn-sm btn-red" onclick="showPage('exercises')" style="margin-left:auto">Cháº¥m ngay</button></div>`;
-  if(unanswered>0) html+=`<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem"><span>â</span><span>CÃ³ <strong>${unanswered}</strong> cÃ¢u há»i chÆ°a tráº£ lá»i</span><button class="btn btn-sm btn-red" onclick="showPage('qa')" style="margin-left:auto">Tráº£ lá»i</button></div>`;
-  if(!html) html='<div class="empty"><div class="empty-icon">â</div><p>KhÃ´ng cÃ³ viá»c cáº§n xá»­ lÃ½</p></div>';
+  if(pending>0) html+=`<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-bottom:1px solid var(--border)"><span>Ã°ÂÂÂ</span><span>CÃÂ³ <strong>${pending}</strong> bÃÂ i chÃ¡Â»Â chÃ¡ÂºÂ¥m</span><button class="btn btn-sm btn-red" onclick="showPage('exercises')" style="margin-left:auto">ChÃ¡ÂºÂ¥m ngay</button></div>`;
+  if(unanswered>0) html+=`<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem"><span>Ã¢ÂÂ</span><span>CÃÂ³ <strong>${unanswered}</strong> cÃÂ¢u hÃ¡Â»Âi chÃÂ°a trÃ¡ÂºÂ£ lÃ¡Â»Âi</span><button class="btn btn-sm btn-red" onclick="showPage('qa')" style="margin-left:auto">TrÃ¡ÂºÂ£ lÃ¡Â»Âi</button></div>`;
+  if(!html) html='<div class="empty"><div class="empty-icon">Ã¢ÂÂ</div><p>KhÃÂ´ng cÃÂ³ viÃ¡Â»Âc cÃ¡ÂºÂ§n xÃ¡Â»Â­ lÃÂ½</p></div>';
   g('todo-list').innerHTML=html;
 }
 
 function renderDashboardCharts(classes){
   var labels=classes.map(function(c){return c.name.substring(0,10);});
   var c1=g('chart-submissions');
-  if(c1){if(c1._chart)c1._chart.destroy(); c1._chart=new Chart(c1,{type:'bar',data:{labels:labels.length?labels:['ChÆ°a cÃ³ lá»p'],datasets:[{label:'BÃ i ÄÃ£ ná»p',data:classes.map(function(){return Math.floor(Math.random()*20+5);}),backgroundColor:'rgba(192,57,43,.75)',borderRadius:8,borderColor:'rgba(192,57,43,1)',borderWidth:1}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});}
+  if(c1){if(c1._chart)c1._chart.destroy(); c1._chart=new Chart(c1,{type:'bar',data:{labels:labels.length?labels:['ChÃÂ°a cÃÂ³ lÃ¡Â»Âp'],datasets:[{label:'BÃÂ i ÃÂÃÂ£ nÃ¡Â»Âp',data:classes.map(function(){return Math.floor(Math.random()*20+5);}),backgroundColor:'rgba(192,57,43,.75)',borderRadius:8,borderColor:'rgba(192,57,43,1)',borderWidth:1}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});}
   var c2=g('chart-activity');
-  if(c2){if(c2._chart)c2._chart.destroy(); c2._chart=new Chart(c2,{type:'doughnut',data:{labels:['ÄÃ£ ná»p','Chá» cháº¥m','CÃ³ Äiá»m'],datasets:[{data:[65,20,15],backgroundColor:['rgba(192,57,43,.8)','rgba(212,165,116,.8)','rgba(39,174,96,.8)'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});}
+  if(c2){if(c2._chart)c2._chart.destroy(); c2._chart=new Chart(c2,{type:'doughnut',data:{labels:['ÃÂÃÂ£ nÃ¡Â»Âp','ChÃ¡Â»Â chÃ¡ÂºÂ¥m','CÃÂ³ ÃÂiÃ¡Â»Âm'],datasets:[{data:[65,20,15],backgroundColor:['rgba(192,57,43,.8)','rgba(212,165,116,.8)','rgba(39,174,96,.8)'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});}
 }
 
 function renderDemoDashboard(){g('stat-students').textContent='12';g('stat-pending').textContent='3';g('stat-qa').textContent='2';g('stat-sessions').textContent='8';renderDashboardCharts([{name:'IELTS A'},{name:'IELTS B'}]);renderTodo(3,2);}
 
 async function loadClasses(){
   var classes=await getClasses();
-  if(!classes.length){g('classes-list').innerHTML='<div class="empty"><div class="empty-icon">ð«</div><p>ChÆ°a cÃ³ lá»p nÃ o. Táº¡o lá»p Äáº§u tiÃªn!</p></div>';return;}
+  if(!classes.length){g('classes-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ«</div><p>ChÃÂ°a cÃÂ³ lÃ¡Â»Âp nÃÂ o. TÃ¡ÂºÂ¡o lÃ¡Â»Âp ÃÂÃ¡ÂºÂ§u tiÃÂªn!</p></div>';return;}
   var html='<div class="grid-2">';
   classes.forEach(function(c){
     html+=`<div class="class-card">
       <div class="class-card-header">
         <div style="display:flex;justify-content:space-between;align-items:start">
           <div><div style="font-size:1.15rem;font-weight:800">${c.name}</div><div style="font-size:.82rem;opacity:.85;margin-top:.2rem">${c.description||''}</div></div>
-          <div style="display:flex;gap:.4rem"><button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3)" onclick="deleteClass(${c.id},'${c.name}')">ð</button></div>
+          <div style="display:flex;gap:.4rem"><button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3)" onclick="deleteClass(${c.id},'${c.name}')">Ã°ÂÂÂ</button></div>
         </div>
         <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
-          ${c.midterm_date?`<span style="background:rgba(255,255,255,.2);color:white;font-size:.75rem;padding:.2rem .6rem;border-radius:20px">ð Midterm: ${fmtDate(c.midterm_date)}</span>`:''}
-          ${c.final_date?`<span style="background:rgba(255,255,255,.2);color:white;font-size:.75rem;padding:.2rem .6rem;border-radius:20px">ð Final: ${fmtDate(c.final_date)}</span>`:''}
+          ${c.midterm_date?`<span style="background:rgba(255,255,255,.2);color:white;font-size:.75rem;padding:.2rem .6rem;border-radius:20px">Ã°ÂÂÂ Midterm: ${fmtDate(c.midterm_date)}</span>`:''}
+          ${c.final_date?`<span style="background:rgba(255,255,255,.2);color:white;font-size:.75rem;padding:.2rem .6rem;border-radius:20px">Ã°ÂÂÂ Final: ${fmtDate(c.final_date)}</span>`:''}
         </div>
       </div>
       <div class="class-card-body">
-        <div class="class-card-stat">ð MÃ£ má»i: <span class="code-badge" id="code-${c.id}" onclick="copyCode('${c.id}')">...</span><button class="btn btn-sm btn-outline" onclick="generateCode(${c.id})" style="margin-left:auto">ð Táº¡o má»i</button></div>
-        <div class="class-card-stat">ð¥ Há»c sinh: <span id="count-stu-${c.id}">...</span></div>
-        <div class="class-card-stat">ð BÃ i táº­p: <span id="count-ex-${c.id}">...</span></div>
-        <div class="class-card-stat">ð¹ Buá»i há»c: <span id="count-ses-${c.id}">...</span></div>
+        <div class="class-card-stat">Ã°ÂÂÂ MÃÂ£ mÃ¡Â»Âi: <span class="code-badge" id="code-${c.id}" onclick="copyCode('${c.id}')">...</span><button class="btn btn-sm btn-outline" onclick="generateCode(${c.id})" style="margin-left:auto">Ã°ÂÂÂ TÃ¡ÂºÂ¡o mÃ¡Â»Âi</button></div>
+        <div class="class-card-stat">Ã°ÂÂÂ¥ HÃ¡Â»Âc sinh: <span id="count-stu-${c.id}">...</span></div>
+        <div class="class-card-stat">Ã°ÂÂÂ BÃÂ i tÃ¡ÂºÂ­p: <span id="count-ex-${c.id}">...</span></div>
+        <div class="class-card-stat">Ã°ÂÂÂ¹ BuÃ¡Â»Âi hÃ¡Â»Âc: <span id="count-ses-${c.id}">...</span></div>
       </div>
     </div>`;
   });
@@ -788,38 +789,38 @@ async function loadClassStats(classId){
   var stu=await sb.from('profiles').select('id',{count:'exact'}).eq('class_id',classId).eq('role','student');
   var ex=await sb.from('exercises').select('id',{count:'exact'}).eq('class_id',classId);
   var ses=await sb.from('sessions').select('id',{count:'exact'}).eq('class_id',classId);
-  var s=g('count-stu-'+classId); if(s)s.textContent=(stu.count||0)+' há»c sinh';
-  var e=g('count-ex-'+classId); if(e)e.textContent=(ex.count||0)+' bÃ i';
-  var ss=g('count-ses-'+classId); if(ss)ss.textContent=(ses.count||0)+' buá»i';
+  var s=g('count-stu-'+classId); if(s)s.textContent=(stu.count||0)+' hÃ¡Â»Âc sinh';
+  var e=g('count-ex-'+classId); if(e)e.textContent=(ex.count||0)+' bÃÂ i';
+  var ss=g('count-ses-'+classId); if(ss)ss.textContent=(ses.count||0)+' buÃ¡Â»Âi';
 }
 
 async function loadInviteCode(classId){
   if(!sb)return;
   var r=await sb.from('invite_codes').select('code').eq('class_id',classId).order('created_at',{ascending:false}).limit(1);
-  var el=g('code-'+classId); if(el)el.textContent=(r.data&&r.data.length)?r.data[0].code:'â';
+  var el=g('code-'+classId); if(el)el.textContent=(r.data&&r.data.length)?r.data[0].code:'Ã¢ÂÂ';
 }
 
-function copyCode(classId){ var el=g('code-'+classId); if(el&&navigator.clipboard){navigator.clipboard.writeText(el.textContent);toast('ÄÃ£ sao chÃ©p mÃ£: '+el.textContent,'success');} }
+function copyCode(classId){ var el=g('code-'+classId); if(el&&navigator.clipboard){navigator.clipboard.writeText(el.textContent);toast('ÃÂÃÂ£ sao chÃÂ©p mÃÂ£: '+el.textContent,'success');} }
 
 async function addClass(){
   var name=v('new-class-name'),desc=v('new-class-desc'),midterm=g('new-class-midterm').value,final=g('new-class-final').value;
-  if(!name){toast('Vui lÃ²ng nháº­p tÃªn lá»p','error');return;}
-  if(!sb){toast('KhÃ´ng káº¿t ná»i Supabase','error');return;}
+  if(!name){toast('Vui lÃÂ²ng nhÃ¡ÂºÂ­p tÃÂªn lÃ¡Â»Âp','error');return;}
+  if(!sb){toast('KhÃÂ´ng kÃ¡ÂºÂ¿t nÃ¡Â»Âi Supabase','error');return;}
   var r=await sb.from('classes').insert({name:name,description:desc,teacher_id:currentProfile.id,midterm_date:midterm||null,final_date:final||null}).select().single();
-  if(r.error){toast('Lá»i: '+r.error.message,'error');return;}
-  closeModal('modal-add-class'); toast('ÄÃ£ táº¡o lá»p '+name,'success');
+  if(r.error){toast('LÃ¡Â»Âi: '+r.error.message,'error');return;}
+  closeModal('modal-add-class'); toast('ÃÂÃÂ£ tÃ¡ÂºÂ¡o lÃ¡Â»Âp '+name,'success');
   ['new-class-name','new-class-desc'].forEach(function(id){g(id).value='';});
   loadClasses();
 }
 
-async function deleteClass(id,name){ showConfirm('XoÃ¡ lá»p há»c','XoÃ¡ lá»p "'+name+'"? KhÃ´ng thá» hoÃ n tÃ¡c.',async function(){ await sb.from('classes').delete().eq('id',id); toast('ÄÃ£ xoÃ¡ lá»p '+name); loadClasses(); }); }
+async function deleteClass(id,name){ showConfirm('XoÃÂ¡ lÃ¡Â»Âp hÃ¡Â»Âc','XoÃÂ¡ lÃ¡Â»Âp "'+name+'"? KhÃÂ´ng thÃ¡Â»Â hoÃÂ n tÃÂ¡c.',async function(){ await sb.from('classes').delete().eq('id',id); toast('ÃÂÃÂ£ xoÃÂ¡ lÃ¡Â»Âp '+name); loadClasses(); }); }
 
 async function generateCode(classId){
   if(!sb)return;
   var code='FMT'+Math.random().toString(36).substring(2,7).toUpperCase();
   var cls=classesCache.find(function(c){return c.id===classId;});
   await sb.from('invite_codes').insert({code:code,class_id:classId,class_name:cls?cls.name:'',teacher_id:currentProfile.id});
-  toast('â MÃ£ má»i: '+code+' (ÄÃ£ sao chÃ©p)','success');
+  toast('Ã¢ÂÂ MÃÂ£ mÃ¡Â»Âi: '+code+' (ÃÂÃÂ£ sao chÃÂ©p)','success');
   navigator.clipboard&&navigator.clipboard.writeText(code);
   loadInviteCode(classId);
 }
@@ -827,43 +828,43 @@ async function generateCode(classId){
 async function loadStudents(){
   var classes=await getClasses();
   var classIds=classes.map(function(c){return c.id;});
-  if(!classIds.length){g('students-tbody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray)">ChÆ°a cÃ³ lá»p nÃ o</td></tr>';return;}
+  if(!classIds.length){g('students-tbody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray)">ChÃÂ°a cÃÂ³ lÃ¡Â»Âp nÃÂ o</td></tr>';return;}
   var r=await sb.from('profiles').select('*').eq('role','student').in('class_id',classIds);
   var students=r.data||[];
-  if(!students.length){g('students-tbody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray)">ChÆ°a cÃ³ há»c sinh</td></tr>';return;}
+  if(!students.length){g('students-tbody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray)">ChÃÂ°a cÃÂ³ hÃ¡Â»Âc sinh</td></tr>';return;}
   var html='';
   students.forEach(function(s){
     var cls=classesCache.find(function(c){return c.id===s.class_id;});
-    html+=`<tr><td><strong>${s.name}</strong></td><td style="color:var(--gray)">${s.email}</td><td><span class="badge badge-red">${cls?cls.name:'â'}</span></td><td>â</td><td>â</td><td><button class="btn btn-sm btn-danger" onclick="removeStudent('${s.id}','${s.name}')">XoÃ¡</button></td></tr>`;
+    html+=`<tr><td><strong>${s.name}</strong></td><td style="color:var(--gray)">${s.email}</td><td><span class="badge badge-red">${cls?cls.name:'Ã¢ÂÂ'}</span></td><td>Ã¢ÂÂ</td><td>Ã¢ÂÂ</td><td><button class="btn btn-sm btn-danger" onclick="removeStudent('${s.id}','${s.name}')">XoÃÂ¡</button></td></tr>`;
   });
   g('students-tbody').innerHTML=html;
 }
 
-async function removeStudent(id,name){ showConfirm('XoÃ¡ há»c sinh','XoÃ¡ "'+name+'" khá»i lá»p?',async function(){ await sb.from('profiles').delete().eq('id',id); toast('ÄÃ£ xoÃ¡ '+name); loadStudents(); }); }
+async function removeStudent(id,name){ showConfirm('XoÃÂ¡ hÃ¡Â»Âc sinh','XoÃÂ¡ "'+name+'" khÃ¡Â»Âi lÃ¡Â»Âp?',async function(){ await sb.from('profiles').delete().eq('id',id); toast('ÃÂÃÂ£ xoÃÂ¡ '+name); loadStudents(); }); }
 
 async function loadSessions(){
   var classes=await getClasses();
   var classIds=classes.map(function(c){return c.id;});
   populateClassDropdown('session-class-id',classes);
   populateClassDropdown('session-filter-class',classes,true);
-  if(!classIds.length){g('sessions-list').innerHTML='<div class="empty"><div class="empty-icon">ð¹</div><p>ChÆ°a cÃ³ buá»i há»c</p></div>';return;}
+  if(!classIds.length){g('sessions-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ¹</div><p>ChÃÂ°a cÃÂ³ buÃ¡Â»Âi hÃ¡Â»Âc</p></div>';return;}
   var filterCls=g('session-filter-class')&&g('session-filter-class').value;
   var q=sb.from('sessions').select('*').in('class_id',classIds).order('session_date',{ascending:false});
   if(filterCls) q=q.eq('class_id',parseInt(filterCls));
   var r=await q;
   var sessions=r.data||[];
-  if(!sessions.length){g('sessions-list').innerHTML='<div class="empty"><div class="empty-icon">ð¹</div><p>ChÆ°a cÃ³ buá»i há»c nÃ o</p></div>';return;}
+  if(!sessions.length){g('sessions-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ¹</div><p>ChÃÂ°a cÃÂ³ buÃ¡Â»Âi hÃ¡Â»Âc nÃÂ o</p></div>';return;}
   var html='';
   sessions.forEach(function(s){
     var cls=classesCache.find(function(c){return c.id===s.class_id;});
     html+=`<div class="card" style="margin-bottom:.75rem">
       <div style="display:flex;justify-content:space-between;align-items:start">
-        <div><div style="font-weight:700">${s.title}</div><div style="font-size:.8rem;color:var(--gray);margin-top:.25rem">ð ${fmtDate(s.session_date)} Â· <span class="badge badge-red">${cls?cls.name:'â'}</span></div>${s.note?`<div style="font-size:.85rem;color:var(--gray);margin-top:.4rem">${s.note}</div>`:''}</div>
-        <button class="btn btn-sm btn-danger" onclick="deleteSession(${s.id},'${s.title}')">ð</button>
+        <div><div style="font-weight:700">${s.title}</div><div style="font-size:.8rem;color:var(--gray);margin-top:.25rem">Ã°ÂÂÂ ${fmtDate(s.session_date)} ÃÂ· <span class="badge badge-red">${cls?cls.name:'Ã¢ÂÂ'}</span></div>${s.note?`<div style="font-size:.85rem;color:var(--gray);margin-top:.4rem">${s.note}</div>`:''}</div>
+        <button class="btn btn-sm btn-danger" onclick="deleteSession(${s.id},'${s.title}')">Ã°ÂÂÂ</button>
       </div>
       <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
-        ${s.recording_url?`<a href="${s.recording_url}" target="_blank" class="btn btn-sm btn-red">ð¥ Recording</a>`:'<span class="badge badge-gray">ChÆ°a cÃ³ recording</span>'}
-        ${s.attachment_url?`<a href="${s.attachment_url}" target="_blank" class="btn btn-sm btn-outline">ð TÃ i liá»u</a>`:''}
+        ${s.recording_url?`<a href="${s.recording_url}" target="_blank" class="btn btn-sm btn-red">Ã°ÂÂÂ¥ Recording</a>`:'<span class="badge badge-gray">ChÃÂ°a cÃÂ³ recording</span>'}
+        ${s.attachment_url?`<a href="${s.attachment_url}" target="_blank" class="btn btn-sm btn-outline">Ã°ÂÂÂ TÃÂ i liÃ¡Â»Âu</a>`:''}
       </div>
     </div>`;
   });
@@ -872,13 +873,13 @@ async function loadSessions(){
 
 async function addSession(){
   var classId=g('session-class-id').value,title=v('session-title'),date=g('session-date').value,rec=v('session-recording'),att=v('session-attachment'),note=v('session-note');
-  if(!classId||!title){toast('Vui lÃ²ng chá»n lá»p vÃ  nháº­p tiÃªu Äá»','error');return;}
+  if(!classId||!title){toast('Vui lÃÂ²ng chÃ¡Â»Ân lÃ¡Â»Âp vÃÂ  nhÃ¡ÂºÂ­p tiÃÂªu ÃÂÃ¡Â»Â','error');return;}
   var r=await sb.from('sessions').insert({class_id:parseInt(classId),title:title,session_date:date||null,recording_url:rec||null,attachment_url:att||null,note:note||null});
-  if(r.error){toast('Lá»i: '+r.error.message,'error');return;}
-  closeModal('modal-add-session'); toast('ÄÃ£ thÃªm buá»i há»c','success'); loadSessions();
+  if(r.error){toast('LÃ¡Â»Âi: '+r.error.message,'error');return;}
+  closeModal('modal-add-session'); toast('ÃÂÃÂ£ thÃÂªm buÃ¡Â»Âi hÃ¡Â»Âc','success'); loadSessions();
 }
 
-async function deleteSession(id,title){ showConfirm('XoÃ¡ buá»i há»c','XoÃ¡ "'+title+'"?',async function(){ await sb.from('sessions').delete().eq('id',id); toast('ÄÃ£ xoÃ¡'); loadSessions(); }); }
+async function deleteSession(id,title){ showConfirm('XoÃÂ¡ buÃ¡Â»Âi hÃ¡Â»Âc','XoÃÂ¡ "'+title+'"?',async function(){ await sb.from('sessions').delete().eq('id',id); toast('ÃÂÃÂ£ xoÃÂ¡'); loadSessions(); }); }
 
 async function loadExercises(filter){
   filter=filter||'all';
@@ -886,13 +887,13 @@ async function loadExercises(filter){
   var classIds=classes.map(function(c){return c.id;});
   populateClassDropdown('ex-class-id',classes);
   populateClassDropdown('ex-filter-class',classes,true);
-  if(!classIds.length){g('exercises-list').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ bÃ i táº­p</p></div>';return;}
+  if(!classIds.length){g('exercises-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ bÃÂ i tÃ¡ÂºÂ­p</p></div>';return;}
   var filterCls=g('ex-filter-class')&&g('ex-filter-class').value;
   var q=sb.from('exercises').select('*').in('class_id',classIds).order('created_at',{ascending:false});
   if(filterCls) q=q.eq('class_id',parseInt(filterCls));
   var exRes=await q;
   var exercises=exRes.data||[];
-  if(!exercises.length){g('exercises-list').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ bÃ i táº­p nÃ o</p></div>';return;}
+  if(!exercises.length){g('exercises-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ bÃÂ i tÃ¡ÂºÂ­p nÃÂ o</p></div>';return;}
   var html='';
   for(var i=0;i<exercises.length;i++){
     var ex=exercises[i];
@@ -907,64 +908,64 @@ async function loadExercises(filter){
     var prog=totalStu?Math.round(subs.length/totalStu*100):0;
     html+=`<div class="card" style="margin-bottom:.75rem">
       <div style="display:flex;justify-content:space-between;align-items:start">
-        <div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="font-size:.8rem;color:var(--gray);margin-top:.25rem"><span class="badge badge-red">${cls?cls.name:'â'}</span>${ex.deadline?' Â· â° '+fmtDate(ex.deadline):''}</div>${ex.description?`<div style="font-size:.85rem;color:var(--gray);margin-top:.4rem">${ex.description}</div>`:''}</div>
-        <button class="btn btn-sm btn-danger" onclick="deleteExercise(${ex.id},'${ex.title}')">ð</button>
+        <div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="font-size:.8rem;color:var(--gray);margin-top:.25rem"><span class="badge badge-red">${cls?cls.name:'Ã¢ÂÂ'}</span>${ex.deadline?' ÃÂ· Ã¢ÂÂ° '+fmtDate(ex.deadline):''}</div>${ex.description?`<div style="font-size:.85rem;color:var(--gray);margin-top:.4rem">${ex.description}</div>`:''}</div>
+        <button class="btn btn-sm btn-danger" onclick="deleteExercise(${ex.id},'${ex.title}')">Ã°ÂÂÂ</button>
       </div>
-      <div style="margin-top:.75rem"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--gray)">Tiáº¿n Äá» ná»p bÃ i</span><span style="font-weight:600">${subs.length}/${totalStu}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div></div>
-      ${pending.length?`<div style="margin-top:.75rem"><div style="font-size:.78rem;font-weight:700;color:var(--warning);margin-bottom:.4rem">â³ Chá» cháº¥m (${pending.length})</div>`+pending.map(function(sub){return`<div style="display:flex;align-items:center;gap:.75rem;padding:.5rem;background:var(--beige);border-radius:var(--radius-sm);margin-bottom:.35rem;font-size:.84rem"><span style="flex:1">ð¤ ${sub.profiles?sub.profiles.name:'â'}${sub.drive_link?' Â· <a href="'+sub.drive_link+'" target="_blank" style="color:var(--primary)">ð Xem bÃ i</a>':''}</span><button class="btn btn-sm btn-red" onclick="openGrade(${sub.id})">Cháº¥m Äiá»m</button></div>`;}).join('')+'</div>':''}
-      ${graded.length?`<div style="margin-top:.5rem"><div style="font-size:.78rem;font-weight:700;color:var(--success);margin-bottom:.4rem">â ÄÃ£ cháº¥m (${graded.length})</div>`+graded.map(function(sub){return`<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:#E8F8EF;border-radius:var(--radius-sm);margin-bottom:.3rem;font-size:.84rem"><span style="flex:1">ð¤ ${sub.profiles?sub.profiles.name:'â'}</span><span class="badge badge-green">â­ ${sub.score}/10</span></div>`;}).join('')+'</div>':''}
+      <div style="margin-top:.75rem"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--gray)">TiÃ¡ÂºÂ¿n ÃÂÃ¡Â»Â nÃ¡Â»Âp bÃÂ i</span><span style="font-weight:600">${subs.length}/${totalStu}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div></div>
+      ${pending.length?`<div style="margin-top:.75rem"><div style="font-size:.78rem;font-weight:700;color:var(--warning);margin-bottom:.4rem">Ã¢ÂÂ³ ChÃ¡Â»Â chÃ¡ÂºÂ¥m (${pending.length})</div>`+pending.map(function(sub){return`<div style="display:flex;align-items:center;gap:.75rem;padding:.5rem;background:var(--beige);border-radius:var(--radius-sm);margin-bottom:.35rem;font-size:.84rem"><span style="flex:1">Ã°ÂÂÂ¤ ${sub.profiles?sub.profiles.name:'Ã¢ÂÂ'}${sub.drive_link?' ÃÂ· <a href="'+sub.drive_link+'" target="_blank" style="color:var(--primary)">Ã°ÂÂÂ Xem bÃÂ i</a>':''}</span><button class="btn btn-sm btn-red" onclick="openGrade(${sub.id})">ChÃ¡ÂºÂ¥m ÃÂiÃ¡Â»Âm</button></div>`;}).join('')+'</div>':''}
+      ${graded.length?`<div style="margin-top:.5rem"><div style="font-size:.78rem;font-weight:700;color:var(--success);margin-bottom:.4rem">Ã¢ÂÂ ÃÂÃÂ£ chÃ¡ÂºÂ¥m (${graded.length})</div>`+graded.map(function(sub){return`<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:#E8F8EF;border-radius:var(--radius-sm);margin-bottom:.3rem;font-size:.84rem"><span style="flex:1">Ã°ÂÂÂ¤ ${sub.profiles?sub.profiles.name:'Ã¢ÂÂ'}</span><span class="badge badge-green">Ã¢Â­Â ${sub.score}/10</span></div>`;}).join('')+'</div>':''}
     </div>`;
   }
-  if(!html)html='<div class="empty"><div class="empty-icon">ð</div><p>KhÃ´ng cÃ³ bÃ i táº­p</p></div>';
+  if(!html)html='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>KhÃÂ´ng cÃÂ³ bÃÂ i tÃ¡ÂºÂ­p</p></div>';
   g('exercises-list').innerHTML=html;
 }
 
 function openGrade(subId){g('grade-sub-id').value=subId;g('grade-score').value='';g('grade-comment').value='';openModal('modal-grade');}
-async function submitGrade(){var subId=parseInt(g('grade-sub-id').value),score=parseFloat(g('grade-score').value),comment=v('grade-comment');if(isNaN(score)||score<0||score>10){toast('Äiá»m tá»« 0 Äáº¿n 10','error');return;}var r=await sb.from('submissions').update({score:score,teacher_comment:comment,graded_at:new Date().toISOString()}).eq('id',subId);if(r.error){toast('Lá»i: '+r.error.message,'error');return;}closeModal('modal-grade');toast('ÄÃ£ cháº¥m Äiá»m','success');loadExercises();}
+async function submitGrade(){var subId=parseInt(g('grade-sub-id').value),score=parseFloat(g('grade-score').value),comment=v('grade-comment');if(isNaN(score)||score<0||score>10){toast('ÃÂiÃ¡Â»Âm tÃ¡Â»Â« 0 ÃÂÃ¡ÂºÂ¿n 10','error');return;}var r=await sb.from('submissions').update({score:score,teacher_comment:comment,graded_at:new Date().toISOString()}).eq('id',subId);if(r.error){toast('LÃ¡Â»Âi: '+r.error.message,'error');return;}closeModal('modal-grade');toast('ÃÂÃÂ£ chÃ¡ÂºÂ¥m ÃÂiÃ¡Â»Âm','success');loadExercises();}
 
-async function addExercise(){var classId=g('ex-class-id').value,title=v('ex-title'),desc=v('ex-desc'),deadline=g('ex-deadline').value,link=v('ex-link');if(!classId||!title){toast('Vui lÃ²ng chá»n lá»p vÃ  nháº­p tiÃªu Äá»','error');return;}var r=await sb.from('exercises').insert({class_id:parseInt(classId),title:title,description:desc||null,deadline:deadline||null,link:link||null,teacher_id:currentProfile.id});if(r.error){toast('Lá»i: '+r.error.message,'error');return;}closeModal('modal-add-exercise');toast('ÄÃ£ giao bÃ i táº­p','success');loadExercises();}
-async function deleteExercise(id,title){showConfirm('XoÃ¡ bÃ i táº­p','XoÃ¡ "'+title+'"?',async function(){await sb.from('submissions').delete().eq('exercise_id',id);await sb.from('exercises').delete().eq('id',id);toast('ÄÃ£ xoÃ¡');loadExercises();});}
+async function addExercise(){var classId=g('ex-class-id').value,title=v('ex-title'),desc=v('ex-desc'),deadline=g('ex-deadline').value,link=v('ex-link');if(!classId||!title){toast('Vui lÃÂ²ng chÃ¡Â»Ân lÃ¡Â»Âp vÃÂ  nhÃ¡ÂºÂ­p tiÃÂªu ÃÂÃ¡Â»Â','error');return;}var r=await sb.from('exercises').insert({class_id:parseInt(classId),title:title,description:desc||null,deadline:deadline||null,link:link||null,teacher_id:currentProfile.id});if(r.error){toast('LÃ¡Â»Âi: '+r.error.message,'error');return;}closeModal('modal-add-exercise');toast('ÃÂÃÂ£ giao bÃÂ i tÃ¡ÂºÂ­p','success');loadExercises();}
+async function deleteExercise(id,title){showConfirm('XoÃÂ¡ bÃÂ i tÃ¡ÂºÂ­p','XoÃÂ¡ "'+title+'"?',async function(){await sb.from('submissions').delete().eq('exercise_id',id);await sb.from('exercises').delete().eq('id',id);toast('ÃÂÃÂ£ xoÃÂ¡');loadExercises();});}
 
 async function loadQA(filter){
   filter=filter||'unanswered';
   var classes=await getClasses();
   var classIds=classes.map(function(c){return c.id;});
-  if(!classIds.length){g('qa-list').innerHTML='<div class="empty"><div class="empty-icon">â</div><p>ChÆ°a cÃ³ cÃ¢u há»i</p></div>';return;}
+  if(!classIds.length){g('qa-list').innerHTML='<div class="empty"><div class="empty-icon">Ã¢ÂÂ</div><p>ChÃÂ°a cÃÂ³ cÃÂ¢u hÃ¡Â»Âi</p></div>';return;}
   var q=sb.from('qa_items').select('*,profiles(name)').in('class_id',classIds).order('created_at',{ascending:false});
   if(filter==='unanswered')q=q.is('answer',null); else q=q.not('answer','is',null);
   var r=await q; var items=r.data||[];
-  if(!items.length){g('qa-list').innerHTML='<div class="empty"><div class="empty-icon">â</div><p>KhÃ´ng cÃ³ cÃ¢u há»i</p></div>';return;}
+  if(!items.length){g('qa-list').innerHTML='<div class="empty"><div class="empty-icon">Ã¢ÂÂ</div><p>KhÃÂ´ng cÃÂ³ cÃÂ¢u hÃ¡Â»Âi</p></div>';return;}
   var html='';
   items.forEach(function(item){
     var cls=classesCache.find(function(c){return c.id===item.class_id;});
     html+=`<div class="qa-item ${item.answer?'answered':''}">
-      <div class="qa-meta">${item.is_anonymous?'ð­ áº¨n danh':(item.profiles?'ð¤ '+item.profiles.name:'â')} Â· <span class="badge badge-red">${cls?cls.name:'â'}</span> Â· ${timeAgo(item.created_at)}</div>
+      <div class="qa-meta">${item.is_anonymous?'Ã°ÂÂÂ­ Ã¡ÂºÂ¨n danh':(item.profiles?'Ã°ÂÂÂ¤ '+item.profiles.name:'Ã¢ÂÂ')} ÃÂ· <span class="badge badge-red">${cls?cls.name:'Ã¢ÂÂ'}</span> ÃÂ· ${timeAgo(item.created_at)}</div>
       <div style="font-size:.92rem;margin:.35rem 0">${item.question}</div>
-      ${item.answer?`<div class="qa-answer"><div class="qa-answer-label">ð¬ GiÃ¡o viÃªn tráº£ lá»i</div>${item.answer}</div>`:`<button class="btn btn-sm btn-red" onclick="openAnswerQA(${item.id},'${item.question.replace(/'/g,"\\'").substring(0,100)}')">ð¬ Tráº£ lá»i</button>`}
-      <div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteQA(${item.id})">ð</button></div>
+      ${item.answer?`<div class="qa-answer"><div class="qa-answer-label">Ã°ÂÂÂ¬ GiÃÂ¡o viÃÂªn trÃ¡ÂºÂ£ lÃ¡Â»Âi</div>${item.answer}</div>`:`<button class="btn btn-sm btn-red" onclick="openAnswerQA(${item.id},'${item.question.replace(/'/g,"\\'").substring(0,100)}')">Ã°ÂÂÂ¬ TrÃ¡ÂºÂ£ lÃ¡Â»Âi</button>`}
+      <div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteQA(${item.id})">Ã°ÂÂÂ</button></div>
     </div>`;
   });
   g('qa-list').innerHTML=html;
 }
 
 function openAnswerQA(id,question){g('answer-qa-id').value=id;g('answer-qa-question').textContent=question;g('answer-qa-text').value='';openModal('modal-answer-qa');}
-async function submitAnswer(){var id=parseInt(g('answer-qa-id').value),answer=v('answer-qa-text');if(!answer){toast('Vui lÃ²ng nháº­p cÃ¢u tráº£ lá»i','error');return;}await sb.from('qa_items').update({answer:answer,answered_at:new Date().toISOString()}).eq('id',id);closeModal('modal-answer-qa');toast('ÄÃ£ tráº£ lá»i','success');loadQA();}
-async function deleteQA(id){showConfirm('XoÃ¡ cÃ¢u há»i','XoÃ¡ cÃ¢u há»i nÃ y?',async function(){await sb.from('qa_items').delete().eq('id',id);toast('ÄÃ£ xoÃ¡');loadQA();});}
+async function submitAnswer(){var id=parseInt(g('answer-qa-id').value),answer=v('answer-qa-text');if(!answer){toast('Vui lÃÂ²ng nhÃ¡ÂºÂ­p cÃÂ¢u trÃ¡ÂºÂ£ lÃ¡Â»Âi','error');return;}await sb.from('qa_items').update({answer:answer,answered_at:new Date().toISOString()}).eq('id',id);closeModal('modal-answer-qa');toast('ÃÂÃÂ£ trÃ¡ÂºÂ£ lÃ¡Â»Âi','success');loadQA();}
+async function deleteQA(id){showConfirm('XoÃÂ¡ cÃÂ¢u hÃ¡Â»Âi','XoÃÂ¡ cÃÂ¢u hÃ¡Â»Âi nÃÂ y?',async function(){await sb.from('qa_items').delete().eq('id',id);toast('ÃÂÃÂ£ xoÃÂ¡');loadQA();});}
 
 async function loadConfessions(){
   var classes=await getClasses();var classIds=classes.map(function(c){return c.id;});
-  if(!classIds.length){g('confessions-list').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ tÃ¢m sá»±</p></div>';return;}
+  if(!classIds.length){g('confessions-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ tÃÂ¢m sÃ¡Â»Â±</p></div>';return;}
   var r=await sb.from('confessions').select('*,profiles(name)').in('class_id',classIds).order('created_at',{ascending:false});
   var items=r.data||[];
-  if(!items.length){g('confessions-list').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>Há»c sinh chÆ°a chia sáº» gÃ¬</p></div>';return;}
+  if(!items.length){g('confessions-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>HÃ¡Â»Âc sinh chÃÂ°a chia sÃ¡ÂºÂ» gÃÂ¬</p></div>';return;}
   var html='';
   items.forEach(function(item){
     var cls=classesCache.find(function(c){return c.id===item.class_id;});
-    html+=`<div class="confession-item"><div class="confession-meta">${item.is_anonymous?'ð­ áº¨n danh':(item.profiles?'ð¤ '+item.profiles.name:'â')} Â· <span class="badge badge-red">${cls?cls.name:'â'}</span> Â· ${timeAgo(item.created_at)}</div><div style="font-size:.9rem;margin-top:.25rem">${item.content}</div><div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteConfession(${item.id})">ð</button></div></div>`;
+    html+=`<div class="confession-item"><div class="confession-meta">${item.is_anonymous?'Ã°ÂÂÂ­ Ã¡ÂºÂ¨n danh':(item.profiles?'Ã°ÂÂÂ¤ '+item.profiles.name:'Ã¢ÂÂ')} ÃÂ· <span class="badge badge-red">${cls?cls.name:'Ã¢ÂÂ'}</span> ÃÂ· ${timeAgo(item.created_at)}</div><div style="font-size:.9rem;margin-top:.25rem">${item.content}</div><div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteConfession(${item.id})">Ã°ÂÂÂ</button></div></div>`;
   });
   g('confessions-list').innerHTML=html;
 }
-async function deleteConfession(id){showConfirm('XoÃ¡','XoÃ¡ chia sáº» nÃ y?',async function(){await sb.from('confessions').delete().eq('id',id);toast('ÄÃ£ xoÃ¡');loadConfessions();});}
+async function deleteConfession(id){showConfirm('XoÃÂ¡','XoÃÂ¡ chia sÃ¡ÂºÂ» nÃÂ y?',async function(){await sb.from('confessions').delete().eq('id',id);toast('ÃÂÃÂ£ xoÃÂ¡');loadConfessions();});}
 
 async function loadNotifications(tab){
   tab=tab||'sent';
@@ -973,56 +974,56 @@ async function loadNotifications(tab){
   if(tab==='sent'){
     var r=await sb.from('notifications').select('*').eq('sender_id',currentProfile.id).order('created_at',{ascending:false});
     var items=r.data||[];
-    if(!items.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">ð¤</div><p>ChÆ°a gá»­i thÃ´ng bÃ¡o nÃ o</p></div>';return;}
-    g('notifications-list').innerHTML=items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="display:flex;justify-content:space-between"><div><div style="font-weight:700">${n.title}</div><div style="font-size:.75rem;color:var(--gray)">${timeAgo(n.created_at)}</div></div><button class="btn btn-sm btn-danger" onclick="deleteNotif(${n.id})">ð</button></div><div style="margin-top:.5rem;font-size:.9rem">${n.body}</div></div>`;}).join('');
+    if(!items.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ¤</div><p>ChÃÂ°a gÃ¡Â»Â­i thÃÂ´ng bÃÂ¡o nÃÂ o</p></div>';return;}
+    g('notifications-list').innerHTML=items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="display:flex;justify-content:space-between"><div><div style="font-weight:700">${n.title}</div><div style="font-size:.75rem;color:var(--gray)">${timeAgo(n.created_at)}</div></div><button class="btn btn-sm btn-danger" onclick="deleteNotif(${n.id})">Ã°ÂÂÂ</button></div><div style="margin-top:.5rem;font-size:.9rem">${n.body}</div></div>`;}).join('');
   } else {
-    if(!classIds.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">ð¥</div><p>ChÆ°a cÃ³ tin nháº¯n</p></div>';return;}
+    if(!classIds.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ¥</div><p>ChÃÂ°a cÃÂ³ tin nhÃ¡ÂºÂ¯n</p></div>';return;}
     var r2=await sb.from('student_messages').select('*,profiles(name)').in('class_id',classIds).order('created_at',{ascending:false});
     var items2=r2.data||[];
-    if(!items2.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">ð¥</div><p>Há»c sinh chÆ°a gá»­i tin nháº¯n</p></div>';return;}
-    g('notifications-list').innerHTML=items2.map(function(m){return`<div class="card" style="margin-bottom:.75rem"><div style="font-size:.8rem;color:var(--gray)">ð¤ ${m.profiles?m.profiles.name:'â'} Â· ${timeAgo(m.created_at)}</div><div style="font-weight:700;margin-top:.25rem">${m.subject||'Tin nháº¯n'}</div><div style="font-size:.9rem;margin-top:.25rem">${m.content}</div></div>`;}).join('');
+    if(!items2.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ¥</div><p>HÃ¡Â»Âc sinh chÃÂ°a gÃ¡Â»Â­i tin nhÃ¡ÂºÂ¯n</p></div>';return;}
+    g('notifications-list').innerHTML=items2.map(function(m){return`<div class="card" style="margin-bottom:.75rem"><div style="font-size:.8rem;color:var(--gray)">Ã°ÂÂÂ¤ ${m.profiles?m.profiles.name:'Ã¢ÂÂ'} ÃÂ· ${timeAgo(m.created_at)}</div><div style="font-weight:700;margin-top:.25rem">${m.subject||'Tin nhÃ¡ÂºÂ¯n'}</div><div style="font-size:.9rem;margin-top:.25rem">${m.content}</div></div>`;}).join('');
   }
 }
-async function sendNotification(){var classId=g('notif-class-id').value,title=v('notif-title'),body=v('notif-body');if(!title||!body){toast('Vui lÃ²ng Äiá»n Äáº§y Äá»§','error');return;}var data={title:title,body:body,sender_id:currentProfile.id};if(classId)data.class_id=parseInt(classId);await sb.from('notifications').insert(data);closeModal('modal-send-notif');toast('ÄÃ£ gá»­i thÃ´ng bÃ¡o','success');loadNotifications('sent');}
-async function deleteNotif(id){showConfirm('XoÃ¡ thÃ´ng bÃ¡o','XoÃ¡ thÃ´ng bÃ¡o nÃ y?',async function(){await sb.from('notifications').delete().eq('id',id);toast('ÄÃ£ xoÃ¡');loadNotifications('sent');});}
+async function sendNotification(){var classId=g('notif-class-id').value,title=v('notif-title'),body=v('notif-body');if(!title||!body){toast('Vui lÃÂ²ng ÃÂiÃ¡Â»Ân ÃÂÃ¡ÂºÂ§y ÃÂÃ¡Â»Â§','error');return;}var data={title:title,body:body,sender_id:currentProfile.id};if(classId)data.class_id=parseInt(classId);await sb.from('notifications').insert(data);closeModal('modal-send-notif');toast('ÃÂÃÂ£ gÃ¡Â»Â­i thÃÂ´ng bÃÂ¡o','success');loadNotifications('sent');}
+async function deleteNotif(id){showConfirm('XoÃÂ¡ thÃÂ´ng bÃÂ¡o','XoÃÂ¡ thÃÂ´ng bÃÂ¡o nÃÂ y?',async function(){await sb.from('notifications').delete().eq('id',id);toast('ÃÂÃÂ£ xoÃÂ¡');loadNotifications('sent');});}
 
 async function loadSchedule(){
   var classes=await getClasses();populateClassDropdown('sch-class-id',classes);
   var classIds=classes.map(function(c){return c.id;});
-  if(!classIds.length){g('schedule-list').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ lá»ch nÃ o</p></div>';return;}
+  if(!classIds.length){g('schedule-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ lÃ¡Â»Âch nÃÂ o</p></div>';return;}
   var r=await sb.from('schedules').select('*').in('class_id',classIds).order('event_date');
   var items=r.data||[];
-  if(!items.length){g('schedule-list').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ lá»ch nÃ o</p></div>';return;}
-  var typeEmoji={class:'ð',midterm:'ð',final:'ð',other:'ð'};
+  if(!items.length){g('schedule-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ lÃ¡Â»Âch nÃÂ o</p></div>';return;}
+  var typeEmoji={class:'Ã°ÂÂÂ',midterm:'Ã°ÂÂÂ',final:'Ã°ÂÂÂ',other:'Ã°ÂÂÂ'};
   g('schedule-list').innerHTML=items.map(function(s){
     var d=new Date(s.event_date);var cls=classesCache.find(function(c){return c.id===s.class_id;});
-    return`<div class="schedule-item"><div class="schedule-date"><div class="day">${d.getDate()}</div><div class="month">${d.toLocaleString('vi-VN',{month:'short'})}</div></div><div style="flex:1"><div style="font-weight:700">${typeEmoji[s.type]||'ð'} ${s.title}</div><div style="font-size:.8rem;color:var(--gray);margin-top:.2rem"><span class="badge badge-red">${cls?cls.name:'â'}</span>${s.time?' Â· '+s.time:''}${s.note?' Â· '+s.note:''}</div></div><button class="btn btn-sm btn-danger" onclick="deleteSchedule(${s.id})">ð</button></div>`;
+    return`<div class="schedule-item"><div class="schedule-date"><div class="day">${d.getDate()}</div><div class="month">${d.toLocaleString('vi-VN',{month:'short'})}</div></div><div style="flex:1"><div style="font-weight:700">${typeEmoji[s.type]||'Ã°ÂÂÂ'} ${s.title}</div><div style="font-size:.8rem;color:var(--gray);margin-top:.2rem"><span class="badge badge-red">${cls?cls.name:'Ã¢ÂÂ'}</span>${s.time?' ÃÂ· '+s.time:''}${s.note?' ÃÂ· '+s.note:''}</div></div><button class="btn btn-sm btn-danger" onclick="deleteSchedule(${s.id})">Ã°ÂÂÂ</button></div>`;
   }).join('');
 }
-async function addSchedule(){var title=v('sch-title'),classId=g('sch-class-id').value,type=g('sch-type').value,date=g('sch-date').value,time=g('sch-time').value,note=v('sch-note');if(!title||!date){toast('Vui lÃ²ng nháº­p tiÃªu Äá» vÃ  ngÃ y','error');return;}await sb.from('schedules').insert({title:title,class_id:parseInt(classId)||null,type:type,event_date:date,time:time||null,note:note||null,teacher_id:currentProfile.id});closeModal('modal-add-schedule');toast('ÄÃ£ thÃªm lá»ch','success');loadSchedule();}
-async function deleteSchedule(id){showConfirm('XoÃ¡ lá»ch','XoÃ¡ lá»ch nÃ y?',async function(){await sb.from('schedules').delete().eq('id',id);toast('ÄÃ£ xoÃ¡');loadSchedule();});}
+async function addSchedule(){var title=v('sch-title'),classId=g('sch-class-id').value,type=g('sch-type').value,date=g('sch-date').value,time=g('sch-time').value,note=v('sch-note');if(!title||!date){toast('Vui lÃÂ²ng nhÃ¡ÂºÂ­p tiÃÂªu ÃÂÃ¡Â»Â vÃÂ  ngÃÂ y','error');return;}await sb.from('schedules').insert({title:title,class_id:parseInt(classId)||null,type:type,event_date:date,time:time||null,note:note||null,teacher_id:currentProfile.id});closeModal('modal-add-schedule');toast('ÃÂÃÂ£ thÃÂªm lÃ¡Â»Âch','success');loadSchedule();}
+async function deleteSchedule(id){showConfirm('XoÃÂ¡ lÃ¡Â»Âch','XoÃÂ¡ lÃ¡Â»Âch nÃÂ y?',async function(){await sb.from('schedules').delete().eq('id',id);toast('ÃÂÃÂ£ xoÃÂ¡');loadSchedule();});}
 
 async function loadReports(){
   var classes=await getClasses();
-  if(!classes.length){g('reports-content').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ dá»¯ liá»u</p></div>';return;}
+  if(!classes.length){g('reports-content').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ dÃ¡Â»Â¯ liÃ¡Â»Âu</p></div>';return;}
   var html='<div class="grid-2">';
   for(var i=0;i<classes.length;i++){
     var cls=classes[i];
     var stu=await sb.from('profiles').select('id',{count:'exact'}).eq('class_id',cls.id).eq('role','student');
     var ex=await sb.from('exercises').select('id',{count:'exact'}).eq('class_id',cls.id);
-    html+=`<div class="class-card"><div class="class-card-header"><div style="font-size:1.1rem;font-weight:800">${cls.name}</div>${cls.midterm_date?`<div style="font-size:.78rem;opacity:.85;margin-top:.5rem">ð Midterm: ${fmtDate(cls.midterm_date)}</div>`:''} ${cls.final_date?`<div style="font-size:.78rem;opacity:.85">ð Final: ${fmtDate(cls.final_date)}</div>`:''}</div><div class="class-card-body"><div class="class-card-stat">ð¥ <strong>${stu.count||0}</strong> há»c sinh</div><div class="class-card-stat">ð <strong>${ex.count||0}</strong> bÃ i táº­p</div></div></div>`;
+    html+=`<div class="class-card"><div class="class-card-header"><div style="font-size:1.1rem;font-weight:800">${cls.name}</div>${cls.midterm_date?`<div style="font-size:.78rem;opacity:.85;margin-top:.5rem">Ã°ÂÂÂ Midterm: ${fmtDate(cls.midterm_date)}</div>`:''} ${cls.final_date?`<div style="font-size:.78rem;opacity:.85">Ã°ÂÂÂ Final: ${fmtDate(cls.final_date)}</div>`:''}</div><div class="class-card-body"><div class="class-card-stat">Ã°ÂÂÂ¥ <strong>${stu.count||0}</strong> hÃ¡Â»Âc sinh</div><div class="class-card-stat">Ã°ÂÂÂ <strong>${ex.count||0}</strong> bÃÂ i tÃ¡ÂºÂ­p</div></div></div>`;
   }
   html+='</div>';
   g('reports-content').innerHTML=html;
 }
 
-function populateClassDropdown(selectId,classes,addAll){var sel=g(selectId);if(!sel)return;var html=addAll?'<option value="">Táº¥t cáº£ lá»p</option>':'<option value="">-- Chá»n lá»p --</option>';classes.forEach(function(c){html+=`<option value="${c.id}">${c.name}</option>`;});sel.innerHTML=html;}
+function populateClassDropdown(selectId,classes,addAll){var sel=g(selectId);if(!sel)return;var html=addAll?'<option value="">TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£ lÃ¡Â»Âp</option>':'<option value="">-- ChÃ¡Â»Ân lÃ¡Â»Âp --</option>';classes.forEach(function(c){html+=`<option value="${c.id}">${c.name}</option>`;});sel.innerHTML=html;}
 </script>
 
 <script>
-// ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // STUDENT DATA
-// ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 var myClass=null;
 
 async function getMyClass(){if(!sb||!currentProfile)return null;var r=await sb.from('classes').select('*').eq('id',currentProfile.class_id).single();myClass=r.data;return myClass;}
@@ -1030,7 +1031,7 @@ async function getMyClass(){if(!sb||!currentProfile)return null;var r=await sb.f
 async function loadStudentDashboard(){
   var cls=await getMyClass();
   if(g('student-name-display'))g('student-name-display').textContent=currentProfile.name;
-  if(g('student-class-display'))g('student-class-display').textContent=cls?'ð« Lá»p: '+cls.name:'ChÆ°a cÃ³ lá»p';
+  if(g('student-class-display'))g('student-class-display').textContent=cls?'Ã°ÂÂÂ« LÃ¡Â»Âp: '+cls.name:'ChÃÂ°a cÃÂ³ lÃ¡Â»Âp';
   if(!cls)return;
   var sesRes=await sb.from('sessions').select('id',{count:'exact'}).eq('class_id',cls.id);
   if(g('s-stat-sessions'))g('s-stat-sessions').textContent=sesRes.count||0;
@@ -1040,7 +1041,7 @@ async function loadStudentDashboard(){
     var subRes=await sb.from('submissions').select('*').eq('student_id',currentProfile.id).in('exercise_id',exIds);
     var subs=subRes.data||[];
     var graded=subs.filter(function(s){return s.score!==null;});
-    var avg=graded.length?(graded.reduce(function(a,s){return a+parseFloat(s.score);},0)/graded.length).toFixed(1):'â';
+    var avg=graded.length?(graded.reduce(function(a,s){return a+parseFloat(s.score);},0)/graded.length).toFixed(1):'Ã¢ÂÂ';
     if(g('s-stat-submitted'))g('s-stat-submitted').textContent=subs.length;
     if(g('s-stat-pending'))g('s-stat-pending').textContent=subs.filter(function(s){return s.score===null;}).length;
     if(g('s-stat-avg'))g('s-stat-avg').textContent=avg;
@@ -1049,21 +1050,21 @@ async function loadStudentDashboard(){
   var exAllRes=await sb.from('exercises').select('*').eq('class_id',cls.id).not('deadline','is',null).order('deadline');
   var upcoming=(exAllRes.data||[]).filter(function(e){return new Date(e.deadline)>now;}).slice(0,5);
   var dlEl=g('s-upcoming-deadlines');
-  if(dlEl){dlEl.innerHTML=upcoming.length?upcoming.map(function(e){return`<div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)"><span>ð</span><span style="flex:1">${e.title}</span><span class="badge badge-amber">â° ${fmtDate(e.deadline)}</span></div>`;}).join(''):'<div class="empty"><div class="empty-icon">ð</div><p>KhÃ´ng cÃ³ deadline sáº¯p tá»i</p></div>';}
+  if(dlEl){dlEl.innerHTML=upcoming.length?upcoming.map(function(e){return`<div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)"><span>Ã°ÂÂÂ</span><span style="flex:1">${e.title}</span><span class="badge badge-amber">Ã¢ÂÂ° ${fmtDate(e.deadline)}</span></div>`;}).join(''):'<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>KhÃÂ´ng cÃÂ³ deadline sÃ¡ÂºÂ¯p tÃ¡Â»Âi</p></div>';}
 }
 
 async function loadStudentSessions(){
   var cls=await getMyClass();
-  if(!cls){g('s-sessions-list').innerHTML='<div class="empty"><div class="empty-icon">ð¹</div><p>ChÆ°a cÃ³ buá»i há»c</p></div>';return;}
+  if(!cls){g('s-sessions-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ¹</div><p>ChÃÂ°a cÃÂ³ buÃ¡Â»Âi hÃ¡Â»Âc</p></div>';return;}
   var r=await sb.from('sessions').select('*').eq('class_id',cls.id).order('session_date',{ascending:false});
   var sessions=r.data||[];
-  if(!sessions.length){g('s-sessions-list').innerHTML='<div class="empty"><div class="empty-icon">ð¹</div><p>ChÆ°a cÃ³ buá»i há»c nÃ o</p></div>';return;}
-  g('s-sessions-list').innerHTML=sessions.map(function(s){return`<div class="recording-card"><div class="recording-icon">ð¹</div><div class="recording-info"><div class="recording-title">${s.title}</div><div class="recording-meta">ð ${fmtDate(s.session_date)}</div>${s.note?`<div class="recording-meta">${s.note}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:.4rem">${s.recording_url?`<a href="${s.recording_url}" target="_blank" class="btn btn-sm btn-red">ð¥ Xem recording</a>`:'<span class="badge badge-gray">ChÆ°a cÃ³ recording</span>'}${s.attachment_url?`<a href="${s.attachment_url}" target="_blank" class="btn btn-sm btn-outline">ð TÃ i liá»u</a>`:''}</div></div>`;}).join('');}
+  if(!sessions.length){g('s-sessions-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ¹</div><p>ChÃÂ°a cÃÂ³ buÃ¡Â»Âi hÃ¡Â»Âc nÃÂ o</p></div>';return;}
+  g('s-sessions-list').innerHTML=sessions.map(function(s){return`<div class="recording-card"><div class="recording-icon">Ã°ÂÂÂ¹</div><div class="recording-info"><div class="recording-title">${s.title}</div><div class="recording-meta">Ã°ÂÂÂ ${fmtDate(s.session_date)}</div>${s.note?`<div class="recording-meta">${s.note}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:.4rem">${s.recording_url?`<a href="${s.recording_url}" target="_blank" class="btn btn-sm btn-red">Ã°ÂÂÂ¥ Xem recording</a>`:'<span class="badge badge-gray">ChÃÂ°a cÃÂ³ recording</span>'}${s.attachment_url?`<a href="${s.attachment_url}" target="_blank" class="btn btn-sm btn-outline">Ã°ÂÂÂ TÃÂ i liÃ¡Â»Âu</a>`:''}</div></div>`;}).join('');}
 
 async function loadStudentExercises(filter){
   filter=filter||'todo';
   var cls=await getMyClass();
-  if(!cls){g('s-exercises-list').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ bÃ i táº­p</p></div>';return;}
+  if(!cls){g('s-exercises-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ bÃÂ i tÃ¡ÂºÂ­p</p></div>';return;}
   var exRes=await sb.from('exercises').select('*').eq('class_id',cls.id).order('created_at',{ascending:false});
   var exercises=exRes.data||[];
   var exIds=exercises.map(function(e){return e.id;});
@@ -1076,82 +1077,82 @@ async function loadStudentExercises(filter){
     if(filter==='done'&&!submitted)return;
     html+=`<div class="card" style="margin-bottom:.75rem${overdue?';border-left:3px solid var(--danger)':''}">
       <div style="display:flex;justify-content:space-between;align-items:start">
-        <div><div style="font-weight:700">${ex.title}</div>${ex.deadline?`<div style="font-size:.8rem;color:${overdue?'var(--danger)':'var(--gray)'};margin-top:.2rem">â° ${fmtDate(ex.deadline)}${overdue?' (QuÃ¡ háº¡n)':''}</div>`:''} ${ex.description?`<div style="font-size:.85rem;color:var(--gray);margin-top:.35rem">${ex.description}</div>`:''}</div>
-        ${submitted?'<span class="badge badge-green">â ÄÃ£ ná»p</span>':'<span class="badge badge-amber">ð ChÆ°a ná»p</span>'}
+        <div><div style="font-weight:700">${ex.title}</div>${ex.deadline?`<div style="font-size:.8rem;color:${overdue?'var(--danger)':'var(--gray)'};margin-top:.2rem">Ã¢ÂÂ° ${fmtDate(ex.deadline)}${overdue?' (QuÃÂ¡ hÃ¡ÂºÂ¡n)':''}</div>`:''} ${ex.description?`<div style="font-size:.85rem;color:var(--gray);margin-top:.35rem">${ex.description}</div>`:''}</div>
+        ${submitted?'<span class="badge badge-green">Ã¢ÂÂ ÃÂÃÂ£ nÃ¡Â»Âp</span>':'<span class="badge badge-amber">Ã°ÂÂÂ ChÃÂ°a nÃ¡Â»Âp</span>'}
       </div>
-      ${ex.link?`<div style="margin-top:.5rem"><a href="${ex.link}" target="_blank" class="btn btn-sm btn-outline">ð Xem Äá» bÃ i</a></div>`:''}
+      ${ex.link?`<div style="margin-top:.5rem"><a href="${ex.link}" target="_blank" class="btn btn-sm btn-outline">Ã°ÂÂÂ Xem ÃÂÃ¡Â»Â bÃÂ i</a></div>`:''}
       ${submitted?`<div style="margin-top:.75rem;background:var(--beige);border-radius:var(--radius-sm);padding:.75rem">
-        <div style="font-size:.78rem;font-weight:700;margin-bottom:.25rem;color:var(--gray)">ð¤ BÃ i ÄÃ£ ná»p</div>
-        ${sub.drive_link?`<a href="${sub.drive_link}" target="_blank" style="color:var(--primary);font-size:.85rem">ð Xem bÃ i lÃ m</a>`:''}
-        ${sub.score!==null?`<div style="margin-top:.35rem"><span class="badge badge-green">â­ Äiá»m: ${sub.score}/10</span></div>`:'<div style="font-size:.78rem;color:var(--gray);margin-top:.25rem">â³ Chá» cháº¥m Äiá»m</div>'}
-        ${sub.teacher_comment?`<div style="font-size:.85rem;margin-top:.35rem;color:var(--gray);font-style:italic">ð¬ "${sub.teacher_comment}"</div>`:''}
-      </div>`:`<div style="margin-top:.75rem"><button class="btn btn-red" onclick="openSubmitEx(${ex.id},'${ex.title.replace(/'/g,"\\'")}')">ð¤ Ná»p bÃ i</button></div>`}
+        <div style="font-size:.78rem;font-weight:700;margin-bottom:.25rem;color:var(--gray)">Ã°ÂÂÂ¤ BÃÂ i ÃÂÃÂ£ nÃ¡Â»Âp</div>
+        ${sub.drive_link?`<a href="${sub.drive_link}" target="_blank" style="color:var(--primary);font-size:.85rem">Ã°ÂÂÂ Xem bÃÂ i lÃÂ m</a>`:''}
+        ${sub.score!==null?`<div style="margin-top:.35rem"><span class="badge badge-green">Ã¢Â­Â ÃÂiÃ¡Â»Âm: ${sub.score}/10</span></div>`:'<div style="font-size:.78rem;color:var(--gray);margin-top:.25rem">Ã¢ÂÂ³ ChÃ¡Â»Â chÃ¡ÂºÂ¥m ÃÂiÃ¡Â»Âm</div>'}
+        ${sub.teacher_comment?`<div style="font-size:.85rem;margin-top:.35rem;color:var(--gray);font-style:italic">Ã°ÂÂÂ¬ "${sub.teacher_comment}"</div>`:''}
+      </div>`:`<div style="margin-top:.75rem"><button class="btn btn-red" onclick="openSubmitEx(${ex.id},'${ex.title.replace(/'/g,"\\'")}')">Ã°ÂÂÂ¤ NÃ¡Â»Âp bÃÂ i</button></div>`}
     </div>`;
   });
-  if(!html)html='<div class="empty"><div class="empty-icon">ð</div><p>KhÃ´ng cÃ³ bÃ i táº­p '+(filter==='todo'?'cáº§n lÃ m':'ÄÃ£ ná»p')+'</p></div>';
+  if(!html)html='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>KhÃÂ´ng cÃÂ³ bÃÂ i tÃ¡ÂºÂ­p '+(filter==='todo'?'cÃ¡ÂºÂ§n lÃÂ m':'ÃÂÃÂ£ nÃ¡Â»Âp')+'</p></div>';
   g('s-exercises-list').innerHTML=html;
 }
 
-function openSubmitEx(id,title){g('submit-ex-id').value=id;g('submit-ex-title').textContent='ð '+title;g('submit-link').value='';g('submit-note').value='';openModal('modal-submit-ex');}
-async function submitExercise(){var exId=parseInt(g('submit-ex-id').value),link=v('submit-link'),note=v('submit-note');var r=await sb.from('submissions').insert({exercise_id:exId,student_id:currentProfile.id,drive_link:link||null,note:note||null,submitted_at:new Date().toISOString()});if(r.error){toast('Lá»i: '+r.error.message,'error');return;}closeModal('modal-submit-ex');toast('ÄÃ£ ná»p bÃ i!','success');loadStudentExercises();}
+function openSubmitEx(id,title){g('submit-ex-id').value=id;g('submit-ex-title').textContent='Ã°ÂÂÂ '+title;g('submit-link').value='';g('submit-note').value='';openModal('modal-submit-ex');}
+async function submitExercise(){var exId=parseInt(g('submit-ex-id').value),link=v('submit-link'),note=v('submit-note');var r=await sb.from('submissions').insert({exercise_id:exId,student_id:currentProfile.id,drive_link:link||null,note:note||null,submitted_at:new Date().toISOString()});if(r.error){toast('LÃ¡Â»Âi: '+r.error.message,'error');return;}closeModal('modal-submit-ex');toast('ÃÂÃÂ£ nÃ¡Â»Âp bÃÂ i!','success');loadStudentExercises();}
 
 async function loadStudentResults(){
   var cls=await getMyClass();
-  if(!cls){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ káº¿t quáº£</p></div>';return;}
+  if(!cls){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ kÃ¡ÂºÂ¿t quÃ¡ÂºÂ£</p></div>';return;}
   var exRes=await sb.from('exercises').select('*').eq('class_id',cls.id);
   var exIds=(exRes.data||[]).map(function(e){return e.id;});
-  if(!exIds.length){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ bÃ i táº­p</p></div>';return;}
+  if(!exIds.length){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ bÃÂ i tÃ¡ÂºÂ­p</p></div>';return;}
   var subRes=await sb.from('submissions').select('*').eq('student_id',currentProfile.id).in('exercise_id',exIds).not('score','is',null);
   var subs=subRes.data||[];
-  if(!subs.length){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ bÃ i ÄÆ°á»£c cháº¥m</p></div>';return;}
+  if(!subs.length){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ bÃÂ i ÃÂÃÂ°Ã¡Â»Â£c chÃ¡ÂºÂ¥m</p></div>';return;}
   var exMap={};(exRes.data||[]).forEach(function(e){exMap[e.id]=e;});
   var avg=(subs.reduce(function(a,s){return a+parseFloat(s.score);},0)/subs.length).toFixed(1);
-  g('s-results-content').innerHTML=`<div class="stats-grid" style="margin-bottom:1.5rem"><div class="stat-card red"><div class="stat-icon">ð</div><div class="stat-num">${subs.length}</div><div class="stat-label">BÃ i ÄÃ£ cháº¥m</div></div><div class="stat-card green"><div class="stat-icon">â­</div><div class="stat-num">${avg}</div><div class="stat-label">Äiá»m trung bÃ¬nh</div></div></div><div class="card"><div class="card-title">ð Chi tiáº¿t Äiá»m</div><div class="table-wrap"><table><thead><tr><th>BÃ i táº­p</th><th>Äiá»m</th><th>Nháº­n xÃ©t</th><th>NgÃ y cháº¥m</th></tr></thead><tbody>${subs.map(function(s){var ex=exMap[s.exercise_id];return`<tr><td>${ex?ex.title:'â'}</td><td><span class="badge ${parseFloat(s.score)>=8?'badge-green':parseFloat(s.score)>=6?'badge-amber':'badge-red'}">${s.score}/10</span></td><td style="font-size:.85rem;color:var(--gray);font-style:italic">${s.teacher_comment||'â'}</td><td>${fmtDate(s.graded_at)}</td></tr>`;}).join('')}</tbody></table></div></div>`;
+  g('s-results-content').innerHTML=`<div class="stats-grid" style="margin-bottom:1.5rem"><div class="stat-card red"><div class="stat-icon">Ã°ÂÂÂ</div><div class="stat-num">${subs.length}</div><div class="stat-label">BÃÂ i ÃÂÃÂ£ chÃ¡ÂºÂ¥m</div></div><div class="stat-card green"><div class="stat-icon">Ã¢Â­Â</div><div class="stat-num">${avg}</div><div class="stat-label">ÃÂiÃ¡Â»Âm trung bÃÂ¬nh</div></div></div><div class="card"><div class="card-title">Ã°ÂÂÂ Chi tiÃ¡ÂºÂ¿t ÃÂiÃ¡Â»Âm</div><div class="table-wrap"><table><thead><tr><th>BÃÂ i tÃ¡ÂºÂ­p</th><th>ÃÂiÃ¡Â»Âm</th><th>NhÃ¡ÂºÂ­n xÃÂ©t</th><th>NgÃÂ y chÃ¡ÂºÂ¥m</th></tr></thead><tbody>${subs.map(function(s){var ex=exMap[s.exercise_id];return`<tr><td>${ex?ex.title:'Ã¢ÂÂ'}</td><td><span class="badge ${parseFloat(s.score)>=8?'badge-green':parseFloat(s.score)>=6?'badge-amber':'badge-red'}">${s.score}/10</span></td><td style="font-size:.85rem;color:var(--gray);font-style:italic">${s.teacher_comment||'Ã¢ÂÂ'}</td><td>${fmtDate(s.graded_at)}</td></tr>`;}).join('')}</tbody></table></div></div>`;
 }
 
 async function loadStudentQA(){
   var cls=await getMyClass();
-  if(!cls){g('s-qa-list').innerHTML='<div class="empty"><div class="empty-icon">â</div><p>ChÆ°a cÃ³ cÃ¢u há»i</p></div>';return;}
+  if(!cls){g('s-qa-list').innerHTML='<div class="empty"><div class="empty-icon">Ã¢ÂÂ</div><p>ChÃÂ°a cÃÂ³ cÃÂ¢u hÃ¡Â»Âi</p></div>';return;}
   var r=await sb.from('qa_items').select('*,profiles(name)').eq('class_id',cls.id).order('created_at',{ascending:false});
   var items=r.data||[];
   var html='';
   items.forEach(function(item){
     var isMe=item.student_id===currentProfile.id;
     html+=`<div class="qa-item ${item.answer?'answered':''}">
-      <div class="qa-meta">${item.is_anonymous?'ð­ áº¨n danh':(item.profiles?'ð¤ '+item.profiles.name:'â')} Â· ${timeAgo(item.created_at)}</div>
+      <div class="qa-meta">${item.is_anonymous?'Ã°ÂÂÂ­ Ã¡ÂºÂ¨n danh':(item.profiles?'Ã°ÂÂÂ¤ '+item.profiles.name:'Ã¢ÂÂ')} ÃÂ· ${timeAgo(item.created_at)}</div>
       <div style="font-size:.92rem;margin:.35rem 0">${item.question}</div>
-      ${item.answer?`<div class="qa-answer"><div class="qa-answer-label">ð¬ GiÃ¡o viÃªn tráº£ lá»i</div>${item.answer}</div>`:'<span class="badge badge-gray">â³ Chá» giÃ¡o viÃªn tráº£ lá»i</span>'}
+      ${item.answer?`<div class="qa-answer"><div class="qa-answer-label">Ã°ÂÂÂ¬ GiÃÂ¡o viÃÂªn trÃ¡ÂºÂ£ lÃ¡Â»Âi</div>${item.answer}</div>`:'<span class="badge badge-gray">Ã¢ÂÂ³ ChÃ¡Â»Â giÃÂ¡o viÃÂªn trÃ¡ÂºÂ£ lÃ¡Â»Âi</span>'}
       <div class="reactions" id="reactions-${item.id}"></div>
-      ${isMe?`<div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyQA(${item.id})">ð</button></div>`:''}
+      ${isMe?`<div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyQA(${item.id})">Ã°ÂÂÂ</button></div>`:''}
     </div>`;
   });
-  if(!html)html='<div class="empty"><div class="empty-icon">â</div><p>ChÆ°a cÃ³ cÃ¢u há»i nÃ o. Há»i Äiá»u gÃ¬ ÄÃ³!</p></div>';
+  if(!html)html='<div class="empty"><div class="empty-icon">Ã¢ÂÂ</div><p>ChÃÂ°a cÃÂ³ cÃÂ¢u hÃ¡Â»Âi nÃÂ o. HÃ¡Â»Âi ÃÂiÃ¡Â»Âu gÃÂ¬ ÃÂÃÂ³!</p></div>';
   g('s-qa-list').innerHTML=html;
   items.forEach(function(item){loadReactions(item.id);});
 }
 
-async function loadReactions(qaId){var el=g('reactions-'+qaId);if(!el)return;var r=await sb.from('qa_reactions').select('emoji').eq('qa_id',qaId);var counts={};(r.data||[]).forEach(function(rx){counts[rx.emoji]=(counts[rx.emoji]||0)+1;});el.innerHTML=['ð','â¤ï¸','ð¤','ð®'].map(function(e){return`<button class="reaction-btn" onclick="toggleReaction(${qaId},'${e}')">${e} ${counts[e]||0}</button>`;}).join('');}
+async function loadReactions(qaId){var el=g('reactions-'+qaId);if(!el)return;var r=await sb.from('qa_reactions').select('emoji').eq('qa_id',qaId);var counts={};(r.data||[]).forEach(function(rx){counts[rx.emoji]=(counts[rx.emoji]||0)+1;});el.innerHTML=['Ã°ÂÂÂ','Ã¢ÂÂ¤Ã¯Â¸Â','Ã°ÂÂ¤Â','Ã°ÂÂÂ®'].map(function(e){return`<button class="reaction-btn" onclick="toggleReaction(${qaId},'${e}')">${e} ${counts[e]||0}</button>`;}).join('');}
 async function toggleReaction(qaId,emoji){var check=await sb.from('qa_reactions').select('id').eq('qa_id',qaId).eq('user_id',currentProfile.id).eq('emoji',emoji).limit(1);if(check.data&&check.data.length){await sb.from('qa_reactions').delete().eq('id',check.data[0].id);}else{await sb.from('qa_reactions').insert({qa_id:qaId,user_id:currentProfile.id,emoji:emoji});}loadReactions(qaId);}
 
-async function submitQuestion(){var cls=await getMyClass();var text=v('qa-question-text'),anon=g('qa-anonymous').checked;if(!text){toast('Vui lÃ²ng nháº­p cÃ¢u há»i','error');return;}await sb.from('qa_items').insert({class_id:cls.id,question:text,student_id:currentProfile.id,is_anonymous:anon});closeModal('modal-ask-qa');toast('ÄÃ£ gá»­i cÃ¢u há»i!','success');g('qa-question-text').value='';loadStudentQA();}
-async function deleteMyQA(id){showConfirm('XoÃ¡ cÃ¢u há»i','XoÃ¡ cÃ¢u há»i cá»§a báº¡n?',async function(){await sb.from('qa_items').delete().eq('id',id).eq('student_id',currentProfile.id);toast('ÄÃ£ xoÃ¡');loadStudentQA();});}
+async function submitQuestion(){var cls=await getMyClass();var text=v('qa-question-text'),anon=g('qa-anonymous').checked;if(!text){toast('Vui lÃÂ²ng nhÃ¡ÂºÂ­p cÃÂ¢u hÃ¡Â»Âi','error');return;}await sb.from('qa_items').insert({class_id:cls.id,question:text,student_id:currentProfile.id,is_anonymous:anon});closeModal('modal-ask-qa');toast('ÃÂÃÂ£ gÃ¡Â»Â­i cÃÂ¢u hÃ¡Â»Âi!','success');g('qa-question-text').value='';loadStudentQA();}
+async function deleteMyQA(id){showConfirm('XoÃÂ¡ cÃÂ¢u hÃ¡Â»Âi','XoÃÂ¡ cÃÂ¢u hÃ¡Â»Âi cÃ¡Â»Â§a bÃ¡ÂºÂ¡n?',async function(){await sb.from('qa_items').delete().eq('id',id).eq('student_id',currentProfile.id);toast('ÃÂÃÂ£ xoÃÂ¡');loadStudentQA();});}
 
 async function loadStudentConfessions(){
   var cls=await getMyClass();
-  if(!cls){g('s-confessions-list').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ chia sáº»</p></div>';return;}
+  if(!cls){g('s-confessions-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ chia sÃ¡ÂºÂ»</p></div>';return;}
   var r=await sb.from('confessions').select('*').eq('class_id',cls.id).eq('student_id',currentProfile.id).order('created_at',{ascending:false});
   var items=r.data||[];
-  g('s-confessions-list').innerHTML=items.length?items.map(function(item){return`<div class="confession-item"><div class="confession-meta">${item.is_anonymous?'ð­ áº¨n danh':'ð¤ Báº¡n'} Â· ${timeAgo(item.created_at)}</div><div style="font-size:.9rem;margin-top:.25rem">${item.content}</div><div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyConfession(${item.id})">ð</button></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">ð</div><p>Chia sáº» cáº£m nháº­n, gÃ³p Ã½ vá»i giÃ¡o viÃªn!</p></div>';
+  g('s-confessions-list').innerHTML=items.length?items.map(function(item){return`<div class="confession-item"><div class="confession-meta">${item.is_anonymous?'Ã°ÂÂÂ­ Ã¡ÂºÂ¨n danh':'Ã°ÂÂÂ¤ BÃ¡ÂºÂ¡n'} ÃÂ· ${timeAgo(item.created_at)}</div><div style="font-size:.9rem;margin-top:.25rem">${item.content}</div><div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyConfession(${item.id})">Ã°ÂÂÂ</button></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>Chia sÃ¡ÂºÂ» cÃ¡ÂºÂ£m nhÃ¡ÂºÂ­n, gÃÂ³p ÃÂ½ vÃ¡Â»Âi giÃÂ¡o viÃÂªn!</p></div>';
 }
-async function submitConfession(){var cls=await getMyClass();var text=v('confession-text'),anon=g('confession-anon').checked;if(!text){toast('Vui lÃ²ng nháº­p ná»i dung','error');return;}await sb.from('confessions').insert({class_id:cls.id,content:text,student_id:currentProfile.id,is_anonymous:anon});closeModal('modal-add-confession');toast('ÄÃ£ gá»­i!','success');g('confession-text').value='';loadStudentConfessions();}
-async function deleteMyConfession(id){showConfirm('XoÃ¡','XoÃ¡ chia sáº» nÃ y?',async function(){await sb.from('confessions').delete().eq('id',id).eq('student_id',currentProfile.id);toast('ÄÃ£ xoÃ¡');loadStudentConfessions();});}
+async function submitConfession(){var cls=await getMyClass();var text=v('confession-text'),anon=g('confession-anon').checked;if(!text){toast('Vui lÃÂ²ng nhÃ¡ÂºÂ­p nÃ¡Â»Âi dung','error');return;}await sb.from('confessions').insert({class_id:cls.id,content:text,student_id:currentProfile.id,is_anonymous:anon});closeModal('modal-add-confession');toast('ÃÂÃÂ£ gÃ¡Â»Â­i!','success');g('confession-text').value='';loadStudentConfessions();}
+async function deleteMyConfession(id){showConfirm('XoÃÂ¡','XoÃÂ¡ chia sÃ¡ÂºÂ» nÃÂ y?',async function(){await sb.from('confessions').delete().eq('id',id).eq('student_id',currentProfile.id);toast('ÃÂÃÂ£ xoÃÂ¡');loadStudentConfessions();});}
 
 async function loadStudentNotifications(){
   var cls=await getMyClass();
-  if(!cls){g('s-notif-list').innerHTML='<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ thÃ´ng bÃ¡o</p></div>';return;}
+  if(!cls){g('s-notif-list').innerHTML='<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ thÃÂ´ng bÃÂ¡o</p></div>';return;}
   var r=await sb.from('notifications').select('*').or('class_id.eq.'+cls.id+',class_id.is.null').order('created_at',{ascending:false});
   var items=r.data||[];
-  g('s-notif-list').innerHTML=items.length?items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="font-weight:700">${n.title}</div><div style="font-size:.75rem;color:var(--gray);margin-bottom:.4rem">${timeAgo(n.created_at)}</div><div style="font-size:.9rem">${n.body}</div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">ð</div><p>ChÆ°a cÃ³ thÃ´ng bÃ¡o</p></div>';
+  g('s-notif-list').innerHTML=items.length?items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="font-weight:700">${n.title}</div><div style="font-size:.75rem;color:var(--gray);margin-bottom:.4rem">${timeAgo(n.created_at)}</div><div style="font-size:.9rem">${n.body}</div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">Ã°ÂÂÂ</div><p>ChÃÂ°a cÃÂ³ thÃÂ´ng bÃÂ¡o</p></div>';
 }
 </script>
 </body>
