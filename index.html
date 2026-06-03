@@ -82,7 +82,8 @@ body { font-family: 'Segoe UI', sans-serif; background:var(--beige); color:var(-
   border-right:1px solid rgba(212,165,116,0.15);
 }
 .sidebar-header { padding:1.5rem 1.25rem; border-bottom:1px solid rgba(212,165,116,0.15); }
-.sidebar-logo { font-size:1.3rem; font-weight:800; background:linear-gradient(135deg,#FFFDF9,var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.sidebar-logo { font-size:1.3rem; font-weight:800; color:white; display:flex; align-items:center; gap:.4rem; }
+.logo-icon { font-size:1.6rem; background:linear-gradient(135deg,#FFD700,#FF6B35); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 6px rgba(255,180,50,.6)); }
 .sidebar-user { font-size:.73rem; color:rgba(212,165,116,0.7); margin-top:.3rem; }
 .sidebar-nav { flex:1; padding:1rem 0; overflow-y:auto; }
 .nav-section { padding:.5rem 1.25rem; font-size:.62rem; font-weight:700; color:rgba(212,165,116,0.4); text-transform:uppercase; letter-spacing:.12em; margin-top:.5rem; }
@@ -296,7 +297,7 @@ tr:hover td { background:var(--accent-light); }
   <div class="app-layout">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo">✨ FMT Sidekick</div>
+        <div class="sidebar-logo"><span class="logo-icon">✦</span> FMT Sidekick</div>
         <div class="sidebar-user" id="sidebar-user-info">Đang tải...</div>
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
