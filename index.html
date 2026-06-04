@@ -267,8 +267,8 @@ tr:hover td { background:var(--accent-light); }
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">
-      <h1>✨ FMT Sidekick</h1>
-      <p>Nền tảng học tập thông minh</p>
+      <h1><svg viewBox="0 0 24 24" width="0.95em" height="0.95em" style="vertical-align:-0.08em;margin-right:.16em"><defs><linearGradient id="sgA" x1="0" y1="24" x2="24" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#C0392B"/><stop offset="1" stop-color="#D4A574"/></linearGradient></defs><g stroke="url(#sgA)" stroke-width="1.7" stroke-linecap="round"><line x1="2" y1="21" x2="6" y2="17"/><line x1="5" y1="22.2" x2="8.5" y2="18.7"/><line x1="1.2" y1="17.2" x2="4" y2="14.4"/></g><polygon fill="url(#sgA)" transform="translate(7.2 1.2) scale(0.65)" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>FMT Sidekick</h1>
+      <p>Investment in knowledge pays the best interest</p>
     </div>
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchAuth('login')">Đăng nhập</button>
@@ -296,7 +296,7 @@ tr:hover td { background:var(--accent-light); }
   <div class="app-layout">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo">✨ FMT Sidekick</div>
+        <div class="sidebar-logo"><svg viewBox="0 0 24 24" width="1.05em" height="1.05em" style="vertical-align:-0.18em;margin-right:.16em"><defs><linearGradient id="sgB" x1="0" y1="24" x2="24" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFDF9"/><stop offset="1" stop-color="#D4A574"/></linearGradient></defs><g stroke="url(#sgB)" stroke-width="1.7" stroke-linecap="round"><line x1="2" y1="21" x2="6" y2="17"/><line x1="5" y1="22.2" x2="8.5" y2="18.7"/><line x1="1.2" y1="17.2" x2="4" y2="14.4"/></g><polygon fill="url(#sgB)" transform="translate(7.2 1.2) scale(0.65)" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>FMT Sidekick</div>
         <div class="sidebar-user" id="sidebar-user-info">Đang tải...</div>
       </div>
       <nav class="sidebar-nav" id="sidebar-nav"></nav>
@@ -383,7 +383,6 @@ function nextBg(){ bgIdx=(bgIdx+1)%heroBgs.length; var el=g('hero-banner'); if(e
 // ── CLOCK ──
 function startClock(){
   var el=g('clock-display'); if(!el)return;
-  // Set initial bg & quote
   var banner=g('hero-banner');
   if(banner) banner.style.backgroundImage='url('+heroBgs[bgIdx]+')';
   var q=quotes[quoteIdx];
@@ -401,7 +400,6 @@ function startClock(){
     if(de){ var days=['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy']; de.textContent=days[now.getDay()]+', '+now.toLocaleDateString('vi-VN'); }
   }
   tick(); setInterval(tick,1000);
-  // Change quote every 30s, bg every 60s
   setInterval(nextQuote, 30000);
   setInterval(nextBg, 60000);
 }
@@ -547,14 +545,14 @@ function teacherPages(){
 
 <!-- CONFESSIONS -->
 <div class="page" id="page-confessions">
-  <div class="page-header"><h2>💌 Tâm sự học sinh</h2></div>
+  <div class="page-header"><h2>💌 Tâm sự học sinh <span style="background:var(--primary-light);color:var(--primary);font-size:.7rem;padding:.15rem .45rem;border-radius:10px;font-weight:600">🔒 Riêng tư</span></h2></div>
   <div id="confessions-list"></div>
 </div>
 
 <!-- NOTIFICATIONS -->
 <div class="page" id="page-notifications">
   <div class="page-header"><h2>🔔 Thông báo</h2><button class="btn btn-red" onclick="openModal('modal-send-notif')">+ Gửi thông báo</button></div>
-  <div class="tabs"><button class="tab-btn active" onclick="switchTab('notif-tab','sent')">📤 Đã gửi</button><button class="tab-btn" onclick="switchTab('notif-tab','received')">📥 Học sinh gửi</button></div>
+  <div class="tabs"><button class="tab-btn active" onclick="switchTab('notif-tab','sent')">📤 Đã gửi</button><button class="tab-btn" onclick="switchTab('notif-tab','received')">📥 HS nộp bài / nhắn</button></div>
   <div id="notifications-list"></div>
 </div>
 
@@ -594,7 +592,7 @@ function teacherPages(){
   <div class="form-row"><label class="form-label">Link đề bài</label><input class="input" id="ex-link" placeholder="https://..."></div>
   <div class="form-row"><label class="form-label">📋 Tasks (mỗi dòng 1 task)</label><textarea class="textarea" id="ex-tasks" placeholder="Task 1: Vocabulary
 Task 2: Reading
-Task 3: Writing" style="min-height:70px"></textarea><div style="font-size:.73rem;color:var(--gray);margin-top:.2rem">Học sinh tick: ✅ Xong / 😓 Khó / ⚡ Một phần</div></div>
+Task 3: Writing" style="min-height:70px"></textarea><div style="font-size:.73rem;color:var(--gray);margin-top:.2rem">Học sinh tick: ✅ Xong / ⚡ Một phần / 😓 Khó</div></div>
   <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-exercise')">Huỷ</button><button class="btn btn-red" onclick="addExercise()">Giao bài</button></div>
 </div></div>
 
@@ -677,7 +675,7 @@ function studentPages(){
 </div>
 
 <div class="page" id="page-s-qa">
-  <div class="page-header"><h2>❓ Q&A</h2><button class="btn btn-red" onclick="openModal('modal-ask-qa')">+ Đặt câu hỏi</button></div>
+  <div class="page-header"><h2>❓ Q&A <span style="background:var(--accent-light);color:var(--accent-dark);font-size:.7rem;padding:.15rem .45rem;border-radius:10px;font-weight:600">🌐 Chung cả lớp</span></h2><button class="btn btn-red" onclick="openModal('modal-ask-qa')">+ Đặt câu hỏi</button></div>
   <div id="s-qa-list"></div>
 </div>
 
@@ -921,6 +919,7 @@ async function loadExercises(filter){
         <button class="btn btn-sm btn-danger" onclick="deleteExercise(${ex.id},'${ex.title}')">🗑</button>
       </div>
       <div style="margin-top:.75rem"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--gray)">Tiến độ nộp bài</span><span style="font-weight:600">${subs.length}/${totalStu}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div></div>
+      <div id="ts-${ex.id}"></div>
       ${pending.length?`<div style="margin-top:.75rem"><div style="font-size:.78rem;font-weight:700;color:var(--warning);margin-bottom:.4rem">⏳ Chờ chấm (${pending.length})</div>`+pending.map(function(sub){return`<div style="display:flex;align-items:center;gap:.75rem;padding:.5rem;background:var(--beige);border-radius:var(--radius-sm);margin-bottom:.35rem;font-size:.84rem"><span style="flex:1">👤 ${sub.profiles?sub.profiles.name:'—'}${sub.drive_link?' · <a href="'+sub.drive_link+'" target="_blank" style="color:var(--primary)">📄 Xem bài</a>':''}</span><button class="btn btn-sm btn-red" onclick="openGrade(${sub.id})">Chấm điểm</button></div>`;}).join('')+'</div>':''}
       ${graded.length?`<div style="margin-top:.5rem"><div style="font-size:.78rem;font-weight:700;color:var(--success);margin-bottom:.4rem">✅ Đã chấm (${graded.length})</div>`+graded.map(function(sub){return`<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:#E8F8EF;border-radius:var(--radius-sm);margin-bottom:.3rem;font-size:.84rem"><span style="flex:1">👤 ${sub.profiles?sub.profiles.name:'—'}</span><span class="badge badge-green">⭐ ${sub.score}/10</span></div>`;}).join('')+'</div>':''}
     </div>`;
@@ -954,15 +953,17 @@ async function loadQA(filter){
       <div class="qa-meta">${item.is_anonymous?'🎭 Ẩn danh':(item.profiles?'👤 '+item.profiles.name:'—')} · <span class="badge badge-red">${cls?cls.name:'—'}</span> · ${timeAgo(item.created_at)}</div>
       <div style="font-size:.92rem;margin:.35rem 0">${item.question}</div>
       ${item.answer?`<div class="qa-answer"><div class="qa-answer-label">💬 Giáo viên trả lời</div>${item.answer}</div>`:`<button class="btn btn-sm btn-red" onclick="openAnswerQA(${item.id},'${item.question.replace(/'/g,"\\'").substring(0,100)}')">💬 Trả lời</button>`}
+      <div class="reactions" id="tr-${item.id}"></div>
+      <div id="tc-${item.id}" style="margin-top:.3rem"></div>
+      <div style="display:flex;gap:.5rem;margin-top:.4rem"><input class="input" id="tci-${item.id}" placeholder="Bình luận thêm..." style="font-size:.82rem;padding:.35rem .65rem" onkeydown="if(event.key==='Enter')submitQAComment(${item.id})"><button class="btn btn-sm btn-red" onclick="submitQAComment(${item.id})">Gửi</button></div>
       <div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteQA(${item.id})">🗑</button></div>
     </div>`;
   });
   g('qa-list').innerHTML=html;
-items.forEach(function(item){
-  var el=document.getElementById('tr-'+item.id);
-  if(el){['👍','❤️','🎯','🤔'].forEach(function(e){var b=document.createElement('button');b.className='reaction-btn';b.textContent=e+' 0';b.onclick=function(){toggleTeacherReact(item.id,e,this);};el.appendChild(b);});}
-  loadQAComments(item.id,'t');
-});
+  items.forEach(function(item){
+    loadTeacherReactions(item.id);
+    loadQAComments(item.id,'t');
+  });
 }
 
 function openAnswerQA(id,question){g('answer-qa-id').value=id;g('answer-qa-question').textContent=question;g('answer-qa-text').value='';openModal('modal-answer-qa');}
@@ -997,8 +998,8 @@ async function loadNotifications(tab){
     if(!classIds.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">📥</div><p>Chưa có tin nhắn</p></div>';return;}
     var r2=await sb.from('student_messages').select('*,profiles(name)').in('class_id',classIds).order('created_at',{ascending:false});
     var items2=r2.data||[];
-    if(!items2.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">📥</div><p>Học sinh chưa gửi tin nhắn</p></div>';return;}
-    g('notifications-list').innerHTML=items2.map(function(m){return`<div class="card" style="margin-bottom:.75rem"><div style="font-size:.8rem;color:var(--gray)">👤 ${m.profiles?m.profiles.name:'—'} · ${timeAgo(m.created_at)}</div><div style="font-weight:700;margin-top:.25rem">${m.subject||'Tin nhắn'}</div><div style="font-size:.9rem;margin-top:.25rem">${m.content}</div></div>`;}).join('');
+    if(!items2.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">📥</div><p>Chưa có học sinh nộp bài / nhắn tin</p></div>';return;}
+    g('notifications-list').innerHTML=items2.map(function(m){return`<div class="card" style="margin-bottom:.75rem"><div style="font-size:.8rem;color:var(--gray)">👤 ${m.profiles?m.profiles.name:'—'} · ${timeAgo(m.created_at)}</div><div style="font-weight:700;margin-top:.25rem">${m.subject||'Tin nhắn'}</div><div style="font-size:.9rem;margin-top:.25rem">${m.content||''}</div></div>`;}).join('');
   }
 }
 async function sendNotification(){var classId=g('notif-class-id').value,title=v('notif-title'),body=v('notif-body');if(!title||!body){toast('Vui lòng điền đầy đủ','error');return;}var data={title:title,body:body,sender_id:currentProfile.id};if(classId)data.class_id=parseInt(classId);await sb.from('notifications').insert(data);closeModal('modal-send-notif');toast('Đã gửi thông báo','success');loadNotifications('sent');}
@@ -1080,6 +1081,7 @@ async function loadStudentSessions(){
 
 async function loadStudentExercises(filter){
   filter=filter||'todo';
+  window._sExFilter=filter;
   var cls=await getMyClass();
   if(!cls){g('s-exercises-list').innerHTML='<div class="empty"><div class="empty-icon">📝</div><p>Chưa có bài tập</p></div>';return;}
   var exRes=await sb.from('exercises').select('*').eq('class_id',cls.id).order('created_at',{ascending:false});
@@ -1088,18 +1090,20 @@ async function loadStudentExercises(filter){
   var subMap={};
   if(exIds.length){var subRes=await sb.from('submissions').select('*').eq('student_id',currentProfile.id).in('exercise_id',exIds);(subRes.data||[]).forEach(function(s){subMap[s.exercise_id]=s;});}
   var html='';
+  var shown=[];
   exercises.forEach(function(ex){
     var sub=subMap[ex.id],submitted=!!sub,overdue=ex.deadline&&new Date(ex.deadline)<new Date()&&!submitted;
     if(filter==='todo'&&submitted)return;
     if(filter==='done'&&!submitted)return;
+    shown.push(ex);
     html+=`<div class="card" style="margin-bottom:.75rem${overdue?';border-left:3px solid var(--danger)':''}">
       <div style="display:flex;justify-content:space-between;align-items:start">
         <div><div style="font-weight:700">${ex.title}</div>${ex.deadline?`<div style="font-size:.8rem;color:${overdue?'var(--danger)':'var(--gray)'};margin-top:.2rem">⏰ ${fmtDate(ex.deadline)}${overdue?' (Quá hạn)':''}</div>`:''} ${ex.description?`<div style="font-size:.85rem;color:var(--gray);margin-top:.35rem">${ex.description}</div>`:''}</div>
         ${submitted?'<span class="badge badge-green">✅ Đã nộp</span>':'<span class="badge badge-amber">📌 Chưa nộp</span>'}
       </div>
       ${ex.link?`<div style="margin-top:.5rem"><a href="${ex.link}" target="_blank" class="btn btn-sm btn-outline">📄 Xem đề bài</a></div>`:''}
-      <div id="ts-${ex.id}"></div>
-      ${submitted?`<div id="stask-${ex.id}"></div><div style="margin-top:.75rem;background:var(--beige);border-radius:var(--radius-sm);padding:.75rem">
+      <div id="stask-${ex.id}"></div>
+      ${submitted?`<div style="margin-top:.75rem;background:var(--beige);border-radius:var(--radius-sm);padding:.75rem">
         <div style="font-size:.78rem;font-weight:700;margin-bottom:.25rem;color:var(--gray)">📤 Bài đã nộp</div>
         ${sub.drive_link?`<a href="${sub.drive_link}" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Xem bài làm</a>`:''}
         ${sub.score!==null?`<div style="margin-top:.35rem"><span class="badge badge-green">⭐ Điểm: ${sub.score}/10</span></div>`:'<div style="font-size:.78rem;color:var(--gray);margin-top:.25rem">⏳ Chờ chấm điểm</div>'}
@@ -1109,17 +1113,53 @@ async function loadStudentExercises(filter){
   });
   if(!html)html='<div class="empty"><div class="empty-icon">📝</div><p>Không có bài tập '+(filter==='todo'?'cần làm':'đã nộp')+'</p></div>';
   g('s-exercises-list').innerHTML=html;
-  exercises.forEach(function(ex){var el=document.getElementById('stask-'+ex.id);if(!el)return;sb.from('task_items').select('*').eq('exercise_id',ex.id).order('order_num').then(function(tr){if(!tr.data||!tr.data.length)return;sb.from('task_submissions').select('*').eq('student_id',currentProfile.id).in('task_id',tr.data.map(function(t){return t.id;})).then(function(sr){var sm={};(sr.data||[]).forEach(function(s){sm[s.task_id]=s.status;});var h='<div style="margin:.5rem 0;border:1px solid var(--border);border-radius:8px;overflow:hidden"><div style="background:var(--beige);padding:.3rem .75rem;font-size:.72rem;font-weight:700;color:var(--gray)">📋 TASKS</div>';tr.data.forEach(function(task){var st=sm[task.id]||'todo';h+='<div style="display:flex;align-items:center;gap:.4rem;padding:.4rem .75rem;border-top:1px solid var(--border);background:'+(st==='done'?'#E8F8EF':st==='hard'?'#FDECEA':st==='partial'?'#FFF4E5':'white')+';"><span style="flex:1;font-size:.82rem">'+task.title+'</span>';[{v:'done',e:'✅',c:'#1B8A5A'},{v:'partial',e:'⚡',c:'#B7570A'},{v:'hard',e:'😓',c:'var(--primary)'}].forEach(function(b){h+='<button onclick="setTaskStatus('+task.id+',\''+b.v+'\','+ex.id+')" style="border:1px solid '+(st===b.v?b.c:'var(--border)')+';background:'+(st===b.v?b.c:'white')+';color:'+(st===b.v?'white':b.c)+';border-radius:20px;padding:.18rem .5rem;font-size:.72rem;cursor:pointer">'+b.e+'</button>';});h+='</div>';});h+='</div>';el.innerHTML=h;});});});}); 
+  shown.forEach(function(ex){loadStudentTasks(ex.id);});
+}
+
+// Checklist task phía học sinh — luôn hiện nếu bài có task, không phụ thuộc đã nộp hay chưa
+async function loadStudentTasks(exId){
+  var el=document.getElementById('stask-'+exId);
+  if(!el||!sb) return;
+  var tr=await sb.from('task_items').select('*').eq('exercise_id',exId).order('order_num');
+  if(!tr.data||!tr.data.length){el.innerHTML='';return;}
+  var ids=tr.data.map(function(t){return t.id;});
+  var sr=await sb.from('task_submissions').select('*').eq('student_id',currentProfile.id).in('task_id',ids);
+  var sm={};(sr.data||[]).forEach(function(s){sm[s.task_id]=s.status;});
+  var h='<div style="margin:.6rem 0;border:1px solid var(--border);border-radius:8px;overflow:hidden"><div style="background:var(--beige);padding:.35rem .75rem;font-size:.72rem;font-weight:700;color:var(--gray)">📋 CHECKLIST — tick trạng thái từng phần</div>';
+  tr.data.forEach(function(task){
+    var st=sm[task.id]||'todo';
+    h+='<div style="display:flex;align-items:center;gap:.4rem;padding:.45rem .75rem;border-top:1px solid var(--border);background:'+(st==='done'?'#E8F8EF':st==='hard'?'#FDECEA':st==='partial'?'#FFF4E5':'white')+'"><span style="flex:1;font-size:.82rem">'+task.title+'</span>';
+    [{v:'done',e:'✅',c:'#1B8A5A'},{v:'partial',e:'⚡',c:'#B7570A'},{v:'hard',e:'😓',c:'#C0392B'}].forEach(function(b){
+      h+='<button onclick="setTaskStatus('+task.id+',\''+b.v+'\','+exId+')" title="'+(b.v==='done'?'Xong':b.v==='partial'?'Làm một phần':'Khó chưa làm được')+'" style="border:1px solid '+(st===b.v?b.c:'var(--border)')+';background:'+(st===b.v?b.c:'white')+';color:'+(st===b.v?'white':b.c)+';border-radius:20px;padding:.2rem .55rem;font-size:.75rem;cursor:pointer">'+b.e+'</button>';
+    });
+    h+='</div>';
+  });
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+async function setTaskStatus(taskId, status, exId){
+  if(!sb||!currentProfile) return;
+  await sb.from('task_submissions').upsert({task_id:taskId,student_id:currentProfile.id,status:status,updated_at:new Date().toISOString()},{onConflict:'task_id,student_id'});
+  loadStudentTasks(exId);
 }
 
 function openSubmitEx(id,title){g('submit-ex-id').value=id;g('submit-ex-title').textContent='📝 '+title;g('submit-link').value='';g('submit-note').value='';openModal('modal-submit-ex');}
 async function submitExercise(){
-var exId=parseInt(g('submit-ex-id').value),link=v('submit-link'),note=v('submit-note');
-var r=await sb.from('submissions').insert({exercise_id:exId,student_id:currentProfile.id,drive_link:link||null,note:note||null,submitted_at:new Date().toISOString()});
-if(r.error){toast('Lỗi: '+r.error.message,'error');return;}
-var exInfo=await sb.from('exercises').select('title,class_id,teacher_id').eq('id',exId).single();
-if(exInfo.data&&exInfo.data.teacher_id){await sb.from('notifications').insert({sender_id:currentProfile.id,class_id:exInfo.data.class_id,title:'📝 '+currentProfile.name+' nộp bài: '+exInfo.data.title,body:currentProfile.name+' đã nộp bài. Vào Bài tập để chấm điểm.'});}
-closeModal('modal-submit-ex');toast('Đã nộp bài! Giáo viên đã được thông báo ✅','success');loadStudentExercises();
+  var exId=parseInt(g('submit-ex-id').value),link=v('submit-link'),note=v('submit-note');
+  var r=await sb.from('submissions').insert({exercise_id:exId,student_id:currentProfile.id,drive_link:link||null,note:note||null,submitted_at:new Date().toISOString()});
+  if(r.error){toast('Lỗi: '+r.error.message,'error');return;}
+  // Báo cho giáo viên: đẩy vào hộp thư "HS nộp bài / nhắn" (chỉ giáo viên thấy)
+  var exInfo=await sb.from('exercises').select('title,class_id').eq('id',exId).single();
+  if(exInfo.data){
+    await sb.from('student_messages').insert({
+      class_id:exInfo.data.class_id,
+      student_id:currentProfile.id,
+      subject:'📝 Nộp bài: '+exInfo.data.title,
+      content:currentProfile.name+' vừa nộp bài "'+exInfo.data.title+'". Vào mục Bài tập để chấm điểm.'
+    });
+  }
+  closeModal('modal-submit-ex');toast('Đã nộp bài! Giáo viên đã được thông báo ✅','success');loadStudentExercises(window._sExFilter||'todo');
 }
 
 async function loadStudentResults(){
@@ -1149,10 +1189,8 @@ async function loadStudentQA(){
       <div style="font-size:.92rem;margin:.35rem 0">${item.question}</div>
       ${item.answer?`<div class="qa-answer"><div class="qa-answer-label">💬 Giáo viên trả lời</div>${item.answer}</div>`:'<span class="badge badge-gray">⏳ Chờ giáo viên trả lời</span>'}
       <div class="reactions" id="reactions-${item.id}"></div>
-      <div id="cmts-${item.id}" style="margin-top:.3rem"></div>
-      <div style="display:flex;gap:.5rem;margin-top:.4rem"><input class="input" id="ci-${item.id}" placeholder="Bình luận..." style="font-size:.82rem;padding:.3rem .6rem" onkeydown="if(event.key==='Enter')submitQAComment(${item.id})"><button class="btn btn-sm btn-red" onclick="submitQAComment(${item.id})">Gửi</button></div>
       <div id="cmts-${item.id}" style="margin-top:.4rem"></div>
-      <div style="display:flex;gap:.5rem;margin-top:.5rem"><input class="input" id="ci-${item.id}" placeholder="Bình luận..." style="font-size:.82rem;padding:.35rem .65rem" onkeydown="if(event.key==='Enter')submitQAComment(${item.id})"><button class="btn btn-sm btn-red" onclick="submitQAComment(${item.id})">Gửi</button></div>
+      <div style="display:flex;gap:.5rem;margin-top:.5rem"><input class="input" id="ci-${item.id}" placeholder="Bình luận / trả lời thêm..." style="font-size:.82rem;padding:.35rem .65rem" onkeydown="if(event.key==='Enter')submitQAComment(${item.id})"><button class="btn btn-sm btn-red" onclick="submitQAComment(${item.id})">Gửi</button></div>
       ${isMe?`<div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyQA(${item.id})">🗑</button></div>`:''}
     </div>`;
   });
@@ -1172,7 +1210,7 @@ async function loadStudentConfessions(){
   if(!cls){g('s-confessions-list').innerHTML='<div class="empty"><div class="empty-icon">💌</div><p>Chưa có chia sẻ</p></div>';return;}
   var r=await sb.from('confessions').select('*').eq('class_id',cls.id).eq('student_id',currentProfile.id).order('created_at',{ascending:false});
   var items=r.data||[];
-  g('s-confessions-list').innerHTML=items.length?items.map(function(item){return`<div class="confession-item"><div class="confession-meta">${item.is_anonymous?'🎭 Ẩn danh':'👤 Bạn'} · ${timeAgo(item.created_at)}</div><div style="font-size:.9rem;margin-top:.25rem">${item.content}</div><div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyConfession(${item.id})">🗑</button></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">💌</div><p>Chia sẻ cảm nhận, góp ý với giáo viên!</p></div>';
+  g('s-confessions-list').innerHTML=items.length?items.map(function(item){return`<div class="confession-item"><div class="confession-meta">${item.is_anonymous?'🎭 Ẩn danh':'👤 Bạn'} · ${timeAgo(item.created_at)}</div><div style="font-size:.9rem;margin-top:.25rem">${item.content}</div><div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyConfession(${item.id})">🗑</button></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">💌</div><p>Chia sẻ cảm nhận, góp ý với giáo viên! (Chỉ bạn và giáo viên thấy)</p></div>';
 }
 async function submitConfession(){var cls=await getMyClass();var text=v('confession-text'),anon=g('confession-anon').checked;if(!text){toast('Vui lòng nhập nội dung','error');return;}await sb.from('confessions').insert({class_id:cls.id,content:text,student_id:currentProfile.id,is_anonymous:anon});closeModal('modal-add-confession');toast('Đã gửi!','success');g('confession-text').value='';loadStudentConfessions();}
 async function deleteMyConfession(id){showConfirm('Xoá','Xoá chia sẻ này?',async function(){await sb.from('confessions').delete().eq('id',id).eq('student_id',currentProfile.id);toast('Đã xoá');loadStudentConfessions();});}
@@ -1185,6 +1223,7 @@ async function loadStudentNotifications(){
   g('s-notif-list').innerHTML=items.length?items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="font-weight:700">${n.title}</div><div style="font-size:.75rem;color:var(--gray);margin-bottom:.4rem">${timeAgo(n.created_at)}</div><div style="font-size:.9rem">${n.body}</div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">🔔</div><p>Chưa có thông báo</p></div>';
 }
 
+// ── Q&A: COMMENT (bình luận thảo luận, chung cả lớp) ──
 async function loadQAComments(qaId, prefix) {
   prefix = prefix||'';
   var elId = prefix ? 'tc-'+qaId : 'cmts-'+qaId;
@@ -1216,6 +1255,7 @@ async function submitQAComment(qaId) {
   toast('Đã bình luận','success');
 }
 
+// ── Q&A: REACT phía giáo viên ──
 function loadTeacherReactions(qaId) {
   var el = document.getElementById('tr-'+qaId);
   if(!el||!sb) return;
@@ -1239,6 +1279,7 @@ async function toggleTReact(qaId, emoji, btn) {
   loadTeacherReactions(qaId);
 }
 
+// ── Thống kê task phía giáo viên (căn cứ chữa theo số đông) ──
 async function loadTaskStats(exId, containerId) {
   if(!sb) return;
   var el = document.getElementById(containerId);
@@ -1249,7 +1290,7 @@ async function loadTaskStats(exId, containerId) {
   var sr = await sb.from('task_submissions').select('*').in('task_id',ids);
   var m={};
   ids.forEach(function(id){m[id]={done:0,hard:0,partial:0};});
-  (sr.data||[]).forEach(function(s){if(m[s.task_id])m[s.task_id][s.status]=(m[s.task_id][s.status]||0)+1;});
+  (sr.data||[]).forEach(function(s){if(m[s.task_id]&&m[s.task_id][s.status]!==undefined)m[s.task_id][s.status]+=1;});
   var html='<div style="border:1px solid var(--border);border-radius:8px;margin:.75rem 0;overflow:hidden"><div style="background:var(--beige);padding:.4rem .75rem;font-size:.73rem;font-weight:700;color:var(--gray)">📊 THỐNG KÊ TASKS</div>';
   tr.data.forEach(function(task){
     var s=m[task.id];
@@ -1257,16 +1298,10 @@ async function loadTaskStats(exId, containerId) {
     html+='<span style="flex:1">'+task.title+'</span>';
     html+='<span style="display:flex;gap:.5rem"><span style="color:#1B8A5A;font-weight:600">✅'+s.done+'</span><span style="color:#B7570A;font-weight:600">⚡'+s.partial+'</span><span style="color:var(--primary);font-weight:600">😓'+s.hard+'</span></span>';
     html+='</div>';
-    if(s.hard>1)html+='<div style="padding:.2rem .75rem;background:#FDECEA;font-size:.73rem;color:var(--primary)">⚠️ '+s.hard+' HS thấy khó — nên chữa lại!</div>';
+    if(s.hard>1)html+='<div style="padding:.2rem .75rem;background:#FDECEA;font-size:.73rem;color:var(--primary)">⚠️ '+s.hard+' HS thấy khó — nên chữa lại cho cả lớp!</div>';
   });
   html+='</div>';
   el.innerHTML=html;
-}
-
-async function setTaskStatus(taskId, status, exId) {
-  if(!sb||!currentProfile) return;
-  await sb.from('task_submissions').upsert({task_id:taskId,student_id:currentProfile.id,status:status,updated_at:new Date().toISOString()},{onConflict:'task_id,student_id'});
-  loadStudentExercises(document.querySelector('#page-s-exercises .tab-btn.active') && document.querySelector('#page-s-exercises .tab-btn.active').textContent.includes('Xong') ? 'done' : 'todo');
 }
 </script>
 </body>
