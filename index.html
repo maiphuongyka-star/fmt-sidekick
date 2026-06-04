@@ -592,6 +592,9 @@ function teacherPages(){
   <div class="form-row"><label class="form-label">Mô tả / Đề bài</label><textarea class="textarea" id="ex-desc" placeholder="Nội dung bài tập..."></textarea></div>
   <div class="form-row"><label class="form-label">Deadline</label><input type="datetime-local" class="input" id="ex-deadline"></div>
   <div class="form-row"><label class="form-label">Link đề bài</label><input class="input" id="ex-link" placeholder="https://..."></div>
+  <div class="form-row"><label class="form-label">📋 Tasks (mỗi dòng 1 task)</label><textarea class="textarea" id="ex-tasks" placeholder="Task 1: Vocabulary
+Task 2: Reading
+Task 3: Writing" style="min-height:70px"></textarea><div style="font-size:.73rem;color:var(--gray);margin-top:.2rem">Học sinh tick: ✅ Xong / 😓 Khó / ⚡ Một phần</div></div>
   <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-exercise')">Huỷ</button><button class="btn btn-red" onclick="addExercise()">Giao bài</button></div>
 </div></div>
 
@@ -679,7 +682,7 @@ function studentPages(){
 </div>
 
 <div class="page" id="page-s-confessions">
-  <div class="page-header"><h2>💌 Tâm sự & Chia sẻ</h2><button class="btn btn-red" onclick="openModal('modal-add-confession')">+ Chia sẻ</button></div>
+  <div class="page-header"><h2>💌 Tâm sự & Chia sẻ <span style="background:var(--primary-light);color:var(--primary);font-size:.7rem;padding:.15rem .45rem;border-radius:10px;font-weight:600">🔒 Riêng tư với GV</span></h2><button class="btn btn-red" onclick="openModal('modal-add-confession')">+ Chia sẻ</button></div>
   <div id="s-confessions-list"></div>
 </div>
 
@@ -924,12 +927,15 @@ async function loadExercises(filter){
   }
   if(!html)html='<div class="empty"><div class="empty-icon">📝</div><p>Không có bài tập</p></div>';
   g('exercises-list').innerHTML=html;
+  exercises.forEach(function(ex){if(document.getElementById('ts-'+ex.id))loadTaskStats(ex.id,'ts-'+ex.id);});
 }
 
 function openGrade(subId){g('grade-sub-id').value=subId;g('grade-score').value='';g('grade-comment').value='';openModal('modal-grade');}
 async function submitGrade(){var subId=parseInt(g('grade-sub-id').value),score=parseFloat(g('grade-score').value),comment=v('grade-comment');if(isNaN(score)||score<0||score>10){toast('Điểm từ 0 đến 10','error');return;}var r=await sb.from('submissions').update({score:score,teacher_comment:comment,graded_at:new Date().toISOString()}).eq('id',subId);if(r.error){toast('Lỗi: '+r.error.message,'error');return;}closeModal('modal-grade');toast('Đã chấm điểm','success');loadExercises();}
 
-async function addExercise(){var classId=g('ex-class-id').value,title=v('ex-title'),desc=v('ex-desc'),deadline=g('ex-deadline').value,link=v('ex-link');if(!classId||!title){toast('Vui lòng chọn lớp và nhập tiêu đề','error');return;}var r=await sb.from('exercises').insert({class_id:parseInt(classId),title:title,description:desc||null,deadline:deadline||null,link:link||null,teacher_id:currentProfile.id});if(r.error){toast('Lỗi: '+r.error.message,'error');return;}closeModal('modal-add-exercise');toast('Đã giao bài tập','success');loadExercises();}
+async function addExercise(){var classId=g('ex-class-id').value,title=v('ex-title'),desc=v('ex-desc'),deadline=g('ex-deadline').value,link=v('ex-link');if(!classId||!title){toast('Vui lòng chọn lớp và nhập tiêu đề','error');return;}var r=await sb.from('exercises').insert({class_id:parseInt(classId),title:title,description:desc||null,deadline:deadline||null,link:link||null,teacher_id:currentProfile.id}).select().single();if(r.error){toast('Lỗi: '+r.error.message,'error');return;}
+var tasksRaw=v('ex-tasks');if(tasksRaw&&r.data){var tasks=tasksRaw.split('\n').map(function(t){return t.trim();}).filter(function(t){return t.length>0;});if(tasks.length>0){var td=tasks.map(function(t,i){return{exercise_id:r.data.id,title:t,order_num:i};});await sb.from('task_items').insert(td);}}
+closeModal('modal-add-exercise');toast('Đã giao bài tập','success');loadExercises();}
 async function deleteExercise(id,title){showConfirm('Xoá bài tập','Xoá "'+title+'"?',async function(){await sb.from('submissions').delete().eq('exercise_id',id);await sb.from('exercises').delete().eq('id',id);toast('Đã xoá');loadExercises();});}
 
 async function loadQA(filter){
@@ -952,6 +958,11 @@ async function loadQA(filter){
     </div>`;
   });
   g('qa-list').innerHTML=html;
+items.forEach(function(item){
+  var el=document.getElementById('tr-'+item.id);
+  if(el){['👍','❤️','🎯','🤔'].forEach(function(e){var b=document.createElement('button');b.className='reaction-btn';b.textContent=e+' 0';b.onclick=function(){toggleTeacherReact(item.id,e,this);};el.appendChild(b);});}
+  loadQAComments(item.id,'t');
+});
 }
 
 function openAnswerQA(id,question){g('answer-qa-id').value=id;g('answer-qa-question').textContent=question;g('answer-qa-text').value='';openModal('modal-answer-qa');}
@@ -1087,7 +1098,8 @@ async function loadStudentExercises(filter){
         ${submitted?'<span class="badge badge-green">✅ Đã nộp</span>':'<span class="badge badge-amber">📌 Chưa nộp</span>'}
       </div>
       ${ex.link?`<div style="margin-top:.5rem"><a href="${ex.link}" target="_blank" class="btn btn-sm btn-outline">📄 Xem đề bài</a></div>`:''}
-      ${submitted?`<div style="margin-top:.75rem;background:var(--beige);border-radius:var(--radius-sm);padding:.75rem">
+      <div id="ts-${ex.id}"></div>
+      ${submitted?`<div id="stask-${ex.id}"></div><div style="margin-top:.75rem;background:var(--beige);border-radius:var(--radius-sm);padding:.75rem">
         <div style="font-size:.78rem;font-weight:700;margin-bottom:.25rem;color:var(--gray)">📤 Bài đã nộp</div>
         ${sub.drive_link?`<a href="${sub.drive_link}" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Xem bài làm</a>`:''}
         ${sub.score!==null?`<div style="margin-top:.35rem"><span class="badge badge-green">⭐ Điểm: ${sub.score}/10</span></div>`:'<div style="font-size:.78rem;color:var(--gray);margin-top:.25rem">⏳ Chờ chấm điểm</div>'}
@@ -1097,10 +1109,18 @@ async function loadStudentExercises(filter){
   });
   if(!html)html='<div class="empty"><div class="empty-icon">📝</div><p>Không có bài tập '+(filter==='todo'?'cần làm':'đã nộp')+'</p></div>';
   g('s-exercises-list').innerHTML=html;
+  exercises.forEach(function(ex){var el=document.getElementById('stask-'+ex.id);if(!el)return;sb.from('task_items').select('*').eq('exercise_id',ex.id).order('order_num').then(function(tr){if(!tr.data||!tr.data.length)return;sb.from('task_submissions').select('*').eq('student_id',currentProfile.id).in('task_id',tr.data.map(function(t){return t.id;})).then(function(sr){var sm={};(sr.data||[]).forEach(function(s){sm[s.task_id]=s.status;});var h='<div style="margin:.5rem 0;border:1px solid var(--border);border-radius:8px;overflow:hidden"><div style="background:var(--beige);padding:.3rem .75rem;font-size:.72rem;font-weight:700;color:var(--gray)">📋 TASKS</div>';tr.data.forEach(function(task){var st=sm[task.id]||'todo';h+='<div style="display:flex;align-items:center;gap:.4rem;padding:.4rem .75rem;border-top:1px solid var(--border);background:'+(st==='done'?'#E8F8EF':st==='hard'?'#FDECEA':st==='partial'?'#FFF4E5':'white')+';"><span style="flex:1;font-size:.82rem">'+task.title+'</span>';[{v:'done',e:'✅',c:'#1B8A5A'},{v:'partial',e:'⚡',c:'#B7570A'},{v:'hard',e:'😓',c:'var(--primary)'}].forEach(function(b){h+='<button onclick="setTaskStatus('+task.id+',\''+b.v+'\','+ex.id+')" style="border:1px solid '+(st===b.v?b.c:'var(--border)')+';background:'+(st===b.v?b.c:'white')+';color:'+(st===b.v?'white':b.c)+';border-radius:20px;padding:.18rem .5rem;font-size:.72rem;cursor:pointer">'+b.e+'</button>';});h+='</div>';});h+='</div>';el.innerHTML=h;});});});}); 
 }
 
 function openSubmitEx(id,title){g('submit-ex-id').value=id;g('submit-ex-title').textContent='📝 '+title;g('submit-link').value='';g('submit-note').value='';openModal('modal-submit-ex');}
-async function submitExercise(){var exId=parseInt(g('submit-ex-id').value),link=v('submit-link'),note=v('submit-note');var r=await sb.from('submissions').insert({exercise_id:exId,student_id:currentProfile.id,drive_link:link||null,note:note||null,submitted_at:new Date().toISOString()});if(r.error){toast('Lỗi: '+r.error.message,'error');return;}closeModal('modal-submit-ex');toast('Đã nộp bài!','success');loadStudentExercises();}
+async function submitExercise(){
+var exId=parseInt(g('submit-ex-id').value),link=v('submit-link'),note=v('submit-note');
+var r=await sb.from('submissions').insert({exercise_id:exId,student_id:currentProfile.id,drive_link:link||null,note:note||null,submitted_at:new Date().toISOString()});
+if(r.error){toast('Lỗi: '+r.error.message,'error');return;}
+var exInfo=await sb.from('exercises').select('title,class_id,teacher_id').eq('id',exId).single();
+if(exInfo.data&&exInfo.data.teacher_id){await sb.from('notifications').insert({sender_id:currentProfile.id,class_id:exInfo.data.class_id,title:'📝 '+currentProfile.name+' nộp bài: '+exInfo.data.title,body:currentProfile.name+' đã nộp bài. Vào Bài tập để chấm điểm.'});}
+closeModal('modal-submit-ex');toast('Đã nộp bài! Giáo viên đã được thông báo ✅','success');loadStudentExercises();
+}
 
 async function loadStudentResults(){
   var cls=await getMyClass();
@@ -1129,12 +1149,16 @@ async function loadStudentQA(){
       <div style="font-size:.92rem;margin:.35rem 0">${item.question}</div>
       ${item.answer?`<div class="qa-answer"><div class="qa-answer-label">💬 Giáo viên trả lời</div>${item.answer}</div>`:'<span class="badge badge-gray">⏳ Chờ giáo viên trả lời</span>'}
       <div class="reactions" id="reactions-${item.id}"></div>
+      <div id="cmts-${item.id}" style="margin-top:.3rem"></div>
+      <div style="display:flex;gap:.5rem;margin-top:.4rem"><input class="input" id="ci-${item.id}" placeholder="Bình luận..." style="font-size:.82rem;padding:.3rem .6rem" onkeydown="if(event.key==='Enter')submitQAComment(${item.id})"><button class="btn btn-sm btn-red" onclick="submitQAComment(${item.id})">Gửi</button></div>
+      <div id="cmts-${item.id}" style="margin-top:.4rem"></div>
+      <div style="display:flex;gap:.5rem;margin-top:.5rem"><input class="input" id="ci-${item.id}" placeholder="Bình luận..." style="font-size:.82rem;padding:.35rem .65rem" onkeydown="if(event.key==='Enter')submitQAComment(${item.id})"><button class="btn btn-sm btn-red" onclick="submitQAComment(${item.id})">Gửi</button></div>
       ${isMe?`<div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyQA(${item.id})">🗑</button></div>`:''}
     </div>`;
   });
   if(!html)html='<div class="empty"><div class="empty-icon">❓</div><p>Chưa có câu hỏi nào. Hỏi điều gì đó!</p></div>';
   g('s-qa-list').innerHTML=html;
-  items.forEach(function(item){loadReactions(item.id);});
+  items.forEach(function(item){loadReactions(item.id);loadQAComments(item.id);});
 }
 
 async function loadReactions(qaId){var el=g('reactions-'+qaId);if(!el)return;var r=await sb.from('qa_reactions').select('emoji').eq('qa_id',qaId);var counts={};(r.data||[]).forEach(function(rx){counts[rx.emoji]=(counts[rx.emoji]||0)+1;});el.innerHTML=['👍','❤️','🤔','😮'].map(function(e){return`<button class="reaction-btn" onclick="toggleReaction(${qaId},'${e}')">${e} ${counts[e]||0}</button>`;}).join('');}
@@ -1159,6 +1183,90 @@ async function loadStudentNotifications(){
   var r=await sb.from('notifications').select('*').or('class_id.eq.'+cls.id+',class_id.is.null').order('created_at',{ascending:false});
   var items=r.data||[];
   g('s-notif-list').innerHTML=items.length?items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="font-weight:700">${n.title}</div><div style="font-size:.75rem;color:var(--gray);margin-bottom:.4rem">${timeAgo(n.created_at)}</div><div style="font-size:.9rem">${n.body}</div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">🔔</div><p>Chưa có thông báo</p></div>';
+}
+
+async function loadQAComments(qaId, prefix) {
+  prefix = prefix||'';
+  var elId = prefix ? 'tc-'+qaId : 'cmts-'+qaId;
+  var el = document.getElementById(elId);
+  if(!el||!sb) return;
+  var r = await sb.from('qa_comments').select('*').eq('qa_id',qaId).order('created_at');
+  if(!r.data||!r.data.length){el.innerHTML='';return;}
+  el.innerHTML = '<div style="border-top:1px solid var(--border);padding:.4rem 0">' +
+    r.data.map(function(cm){
+      return '<div style="padding:.3rem .5rem;border-radius:5px;margin:.2rem 0;background:'+(cm.user_role==='teacher'?'var(--primary-light)':'var(--beige)')+';font-size:.82rem">' +
+        '<b style="color:'+(cm.user_role==='teacher'?'var(--primary)':'var(--dark)')+'">'+
+        (cm.user_role==='teacher'?'👨‍🏫 ':'👤 ')+cm.user_name+'</b>' +
+        ' <span style="color:var(--gray);font-size:.7rem">'+timeAgo(cm.created_at)+'</span>'+
+        '<div>'+cm.content+'</div></div>';
+    }).join('') + '</div>';
+}
+
+async function submitQAComment(qaId) {
+  if(!sb||!currentProfile) return;
+  var inputId = currentProfile.role==='teacher' ? 'tci-'+qaId : 'ci-'+qaId;
+  var el = document.getElementById(inputId);
+  if(!el) return;
+  var text = el.value.trim();
+  if(!text) return;
+  await sb.from('qa_comments').insert({qa_id:qaId,user_id:currentProfile.id,user_name:currentProfile.name,user_role:currentProfile.role,content:text});
+  el.value='';
+  loadQAComments(qaId);
+  loadQAComments(qaId,'t');
+  toast('Đã bình luận','success');
+}
+
+function loadTeacherReactions(qaId) {
+  var el = document.getElementById('tr-'+qaId);
+  if(!el||!sb) return;
+  sb.from('qa_reactions').select('emoji').eq('qa_id',qaId).then(function(r){
+    var cnt={};
+    (r.data||[]).forEach(function(x){cnt[x.emoji]=(cnt[x.emoji]||0)+1;});
+    el.innerHTML = ['👍','❤️','🎯','🤔','💡'].map(function(e){
+      return '<button class="reaction-btn" onclick="toggleTReact('+qaId+',\''+e+'\',this)">'+e+' '+(cnt[e]||0)+'</button>';
+    }).join('');
+  });
+}
+
+async function toggleTReact(qaId, emoji, btn) {
+  if(!sb||!currentProfile) return;
+  var chk = await sb.from('qa_reactions').select('id').eq('qa_id',qaId).eq('user_id',currentProfile.id).eq('emoji',emoji).limit(1);
+  if(chk.data&&chk.data.length){
+    await sb.from('qa_reactions').delete().eq('id',chk.data[0].id);
+  } else {
+    await sb.from('qa_reactions').insert({qa_id:qaId,user_id:currentProfile.id,emoji:emoji});
+  }
+  loadTeacherReactions(qaId);
+}
+
+async function loadTaskStats(exId, containerId) {
+  if(!sb) return;
+  var el = document.getElementById(containerId);
+  if(!el) return;
+  var tr = await sb.from('task_items').select('*').eq('exercise_id',exId).order('order_num');
+  if(!tr.data||!tr.data.length) return;
+  var ids = tr.data.map(function(t){return t.id;});
+  var sr = await sb.from('task_submissions').select('*').in('task_id',ids);
+  var m={};
+  ids.forEach(function(id){m[id]={done:0,hard:0,partial:0};});
+  (sr.data||[]).forEach(function(s){if(m[s.task_id])m[s.task_id][s.status]=(m[s.task_id][s.status]||0)+1;});
+  var html='<div style="border:1px solid var(--border);border-radius:8px;margin:.75rem 0;overflow:hidden"><div style="background:var(--beige);padding:.4rem .75rem;font-size:.73rem;font-weight:700;color:var(--gray)">📊 THỐNG KÊ TASKS</div>';
+  tr.data.forEach(function(task){
+    var s=m[task.id];
+    html+='<div style="padding:.4rem .75rem;border-top:1px solid var(--border);font-size:.82rem;display:flex;justify-content:space-between;align-items:center">';
+    html+='<span style="flex:1">'+task.title+'</span>';
+    html+='<span style="display:flex;gap:.5rem"><span style="color:#1B8A5A;font-weight:600">✅'+s.done+'</span><span style="color:#B7570A;font-weight:600">⚡'+s.partial+'</span><span style="color:var(--primary);font-weight:600">😓'+s.hard+'</span></span>';
+    html+='</div>';
+    if(s.hard>1)html+='<div style="padding:.2rem .75rem;background:#FDECEA;font-size:.73rem;color:var(--primary)">⚠️ '+s.hard+' HS thấy khó — nên chữa lại!</div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+async function setTaskStatus(taskId, status, exId) {
+  if(!sb||!currentProfile) return;
+  await sb.from('task_submissions').upsert({task_id:taskId,student_id:currentProfile.id,status:status,updated_at:new Date().toISOString()},{onConflict:'task_id,student_id'});
+  loadStudentExercises(document.querySelector('#page-s-exercises .tab-btn.active') && document.querySelector('#page-s-exercises .tab-btn.active').textContent.includes('Xong') ? 'done' : 'todo');
 }
 </script>
 </body>
