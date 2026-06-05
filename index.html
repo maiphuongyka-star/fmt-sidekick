@@ -105,6 +105,10 @@ body { font-family: 'Segoe UI', sans-serif; background:var(--beige); color:var(-
 .page-header h2 { font-size:1.5rem; font-weight:800; color:var(--dark); }
 .page-header p { color:var(--gray); font-size:.88rem; margin-top:.2rem; }
 
+/* Class section header */
+.class-section { margin:1.25rem 0 .6rem; font-weight:800; font-size:1.05rem; color:var(--dark); display:flex; align-items:center; gap:.5rem; }
+.class-section:first-child { margin-top:.25rem; }
+
 /* Hero banner */
 .hero-banner {
   border-radius:var(--radius); overflow:hidden; margin-bottom:1.5rem;
@@ -412,7 +416,7 @@ function switchAuth(tab){
 async function checkSession(){ if(!sb)return; var s=await sb.auth.getSession(); if(s.data&&s.data.session){ currentUser=s.data.session.user; await loadProfile(); } }
 async function loadProfile(){ if(!currentUser||!sb)return; var r=await sb.from('profiles').select('*').eq('id',currentUser.id).single(); if(r.data){ currentProfile=r.data; showApp(); } }
 async function doLogin(){ var email=v('login-email'),pwd=v('login-pwd'); if(!email||!pwd){setAuthMsg('login-msg','Vui lòng điền đầy đủ',true);return;} if(!sb){setAuthMsg('login-msg','⏳ Đang kết nối, nhấn lại sau 2 giây...',false);window._pl=doLogin;return;} setAuthMsg('login-msg','Đang đăng nhập...',false); var r=await sb.auth.signInWithPassword({email:email,password:pwd}); if(r.error){setAuthMsg('login-msg',r.error.message,true);return;} currentUser=r.data.user; await loadProfile(); }
-async function doRegister(){ var code=v('reg-code').toUpperCase(),name=v('reg-name'),email=v('reg-email'),pwd=v('reg-pwd'); if(!code||!name||!email||!pwd){setAuthMsg('reg-msg','Vui lòng điền đầy đủ',true);return;} if(pwd.length<6){setAuthMsg('reg-msg','Mật khẩu ít nhất 6 ký tự',true);return;} if(!sb){setAuthMsg('reg-msg','⏳ Đang kết nối...',false);window._pl=doRegister;return;} setAuthMsg('reg-msg','Đang kiểm tra mã lớp...',false); var ic=await sb.from('invite_codes').select('*').eq('code',code).limit(1); if(!ic.data||!ic.data.length){setAuthMsg('reg-msg','Mã lớp không đúng',true);return;} var inv=ic.data[0]; setAuthMsg('reg-msg','Đang tạo tài khoản...',false); var reg=await sb.auth.signUp({email:email,password:pwd}); if(reg.error){setAuthMsg('reg-msg',reg.error.message,true);return;} await sb.from('profiles').upsert({id:reg.data.user.id,name:name,email:email,role:'student',class_id:inv.class_id}); setAuthMsg('reg-msg','✅ Đăng ký thành công! Vào lớp: '+(inv.class_name||code),false); setTimeout(function(){ switchAuth('login'); g('login-email').value=email; },2000); }
+async function doRegister(){ var code=v('reg-code').toUpperCase(),name=v('reg-name'),email=v('reg-email'),pwd=v('reg-pwd'); if(!code||!name||!email||!pwd){setAuthMsg('reg-msg','Vui lòng điền đầy đủ',true);return;} if(pwd.length<6){setAuthMsg('reg-msg','Mật khẩu ít nhất 6 ký tự',true);return;} if(!sb){setAuthMsg('reg-msg','⏳ Đang kết nối...',false);window._pl=doRegister;return;} setAuthMsg('reg-msg','Đang kiểm tra mã lớp...',false); var ic=await sb.from('invite_codes').select('*').eq('code',code).limit(1); if(!ic.data||!ic.data.length){setAuthMsg('reg-msg','Mã lớp không đúng',true);return;} var inv=ic.data[0]; setAuthMsg('reg-msg','Đang tạo tài khoản...',false); var reg=await sb.auth.signUp({email:email,password:pwd}); if(reg.error){setAuthMsg('reg-msg',reg.error.message,true);return;} await sb.from('profiles').upsert({id:reg.data.user.id,name:name,email:email,role:'student',class_id:inv.class_id}); await sb.from('enrollments').insert({student_id:reg.data.user.id,class_id:inv.class_id}); setAuthMsg('reg-msg','✅ Đăng ký thành công! Vào lớp: '+(inv.class_name||code),false); setTimeout(function(){ switchAuth('login'); g('login-email').value=email; },2000); }
 async function doLogout(){ if(sb)await sb.auth.signOut(); currentUser=null; currentProfile=null; g('app').style.display='none'; g('auth-screen').style.display='flex'; }
 function showDemoMode(){ currentProfile={id:'demo',name:'Giáo viên Demo',role:'teacher',class_id:1}; showApp(); }
 </script>
@@ -517,8 +521,8 @@ function teacherPages(){
 
 <!-- STUDENTS -->
 <div class="page" id="page-students">
-  <div class="page-header"><h2>👥 Học sinh</h2></div>
-  <div class="card"><div class="table-wrap"><table><thead><tr><th>Tên</th><th>Email</th><th>Lớp</th><th>Bài đã nộp</th><th>Điểm TB</th><th></th></tr></thead><tbody id="students-tbody"><tr><td colspan="6" style="text-align:center;color:var(--gray);padding:2rem">Đang tải...</td></tr></tbody></table></div></div>
+  <div class="page-header"><h2>👥 Học sinh <span style="font-size:.75rem;color:var(--gray);font-weight:500">(gom theo lớp)</span></h2></div>
+  <div id="students-list"></div>
 </div>
 
 <!-- SESSIONS -->
@@ -648,7 +652,7 @@ function studentPages(){
       </div>
     </div>
   </div>
-  <div class="page-header"><h2>👋 Xin chào, <span id="student-name-display">bạn</span>!</h2><p id="student-class-display"></p></div>
+  <div class="page-header"><div><h2>👋 Xin chào, <span id="student-name-display">bạn</span>!</h2><p id="student-class-display"></p></div><button class="btn btn-red" onclick="openModal('modal-join-class')">➕ Tham gia lớp</button></div>
   <div class="stats-grid">
     <div class="stat-card red"><div class="stat-icon">📝</div><div class="stat-num" id="s-stat-submitted">—</div><div class="stat-label">Bài đã nộp</div></div>
     <div class="stat-card amber"><div class="stat-icon">⏳</div><div class="stat-num" id="s-stat-pending">—</div><div class="stat-label">Chờ chấm</div></div>
@@ -690,6 +694,13 @@ function studentPages(){
 </div>
 
 <!-- STUDENT MODALS -->
+<div class="modal-overlay" id="modal-join-class"><div class="modal">
+  <div class="modal-header"><span class="modal-title">➕ Tham gia lớp mới</span><button class="modal-close" onclick="closeModal('modal-join-class')">×</button></div>
+  <div class="form-row"><label class="form-label">Mã lớp (giáo viên cấp)</label><input class="input" id="join-code" placeholder="VD: FMT2024A" style="text-transform:uppercase"></div>
+  <div style="font-size:.78rem;color:var(--gray);margin-bottom:.5rem">Bạn có thể tham gia nhiều lớp. Mỗi lớp một mã.</div>
+  <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-join-class')">Huỷ</button><button class="btn btn-red" onclick="joinClass()">Tham gia</button></div>
+</div></div>
+
 <div class="modal-overlay" id="modal-submit-ex"><div class="modal">
   <div class="modal-header"><span class="modal-title">📤 Nộp bài</span><button class="modal-close" onclick="closeModal('modal-submit-ex')">×</button></div>
   <input type="hidden" id="submit-ex-id">
@@ -701,6 +712,7 @@ function studentPages(){
 
 <div class="modal-overlay" id="modal-ask-qa"><div class="modal">
   <div class="modal-header"><span class="modal-title">❓ Đặt câu hỏi</span><button class="modal-close" onclick="closeModal('modal-ask-qa')">×</button></div>
+  <div class="form-row"><label class="form-label">Lớp</label><select class="select" id="qa-class-id"></select></div>
   <div class="form-row"><label class="form-label">Câu hỏi</label><textarea class="textarea" id="qa-question-text" placeholder="Nhập câu hỏi của bạn..." style="min-height:120px"></textarea></div>
   <div class="form-row"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="qa-anonymous"> <span class="form-label" style="margin:0">Đặt ẩn danh</span></label></div>
   <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-ask-qa')">Huỷ</button><button class="btn btn-red" onclick="submitQuestion()">Gửi câu hỏi</button></div>
@@ -708,6 +720,7 @@ function studentPages(){
 
 <div class="modal-overlay" id="modal-add-confession"><div class="modal">
   <div class="modal-header"><span class="modal-title">💌 Chia sẻ tâm sự</span><button class="modal-close" onclick="closeModal('modal-add-confession')">×</button></div>
+  <div class="form-row"><label class="form-label">Gửi tới lớp</label><select class="select" id="confession-class-id"></select></div>
   <div class="form-row"><label class="form-label">Nội dung</label><textarea class="textarea" id="confession-text" placeholder="Chia sẻ cảm nhận, góp ý..." style="min-height:120px"></textarea></div>
   <div class="form-row"><label style="display:flex;align-items:center;gap:.5rem;cursor:pointer"><input type="checkbox" id="confession-anon"> <span class="form-label" style="margin:0">Ẩn danh</span></label></div>
   <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-confession')">Huỷ</button><button class="btn btn-red" onclick="submitConfession()">Gửi</button></div>
@@ -719,38 +732,49 @@ function studentPages(){
 // ══════════════════════════════════════════════════════
 // TEACHER DATA
 // ══════════════════════════════════════════════════════
-var classesCache=[], studentsCache=[];
+var classesCache=[], enrollCache=[];
 
 async function getClasses(){ if(!sb)return[]; var r=await sb.from('classes').select('*').eq('teacher_id',currentProfile.id).order('created_at'); classesCache=r.data||[]; return classesCache; }
+async function loadEnrollments(classIds){ if(!sb||!classIds.length){enrollCache=[];return [];} var r=await sb.from('enrollments').select('*,profiles(id,name,email)').in('class_id',classIds); enrollCache=r.data||[]; return enrollCache; }
+function classStudentCount(cid){ return enrollCache.filter(function(e){return e.class_id===cid;}).length; }
 
 async function loadTeacherDashboard(){
   if(!sb){renderDemoDashboard();return;}
   var classes=await getClasses();
   var classIds=classes.map(function(c){return c.id;});
-  if(!classIds.length){g('stat-students').textContent='0';g('stat-pending').textContent='0';g('stat-qa').textContent='0';g('stat-sessions').textContent='0';renderDashboardCharts([]);renderTodo(0,0);return;}
-  var stuRes=await sb.from('profiles').select('*').eq('role','student').in('class_id',classIds);
-  studentsCache=stuRes.data||[];
-  g('stat-students').textContent=studentsCache.length;
-  var exRes=await sb.from('exercises').select('id').in('class_id',classIds);
-  var exIds=(exRes.data||[]).map(function(e){return e.id;});
-  var pendSub=0;
-  if(exIds.length){var subRes=await sb.from('submissions').select('id').in('exercise_id',exIds).is('score',null); pendSub=(subRes.data||[]).length;}
-  g('stat-pending').textContent=pendSub;
+  if(!classIds.length){g('stat-students').textContent='0';g('stat-pending').textContent='0';g('stat-qa').textContent='0';g('stat-sessions').textContent='0';renderDashboardCharts([]);renderTodo({},0);return;}
+  await loadEnrollments(classIds);
+  var uniq={}; enrollCache.forEach(function(e){uniq[e.student_id]=1;});
+  g('stat-students').textContent=Object.keys(uniq).length;
+  var exRes=await sb.from('exercises').select('id,class_id').in('class_id',classIds);
+  var exClass={}; (exRes.data||[]).forEach(function(e){exClass[e.id]=e.class_id;});
+  var exIds=Object.keys(exClass).map(Number);
+  var pendByClass={}; classIds.forEach(function(c){pendByClass[c]=0;});
+  if(exIds.length){var subRes=await sb.from('submissions').select('exercise_id').in('exercise_id',exIds).is('score',null);(subRes.data||[]).forEach(function(s){var c=exClass[s.exercise_id];if(c!=null)pendByClass[c]=(pendByClass[c]||0)+1;});}
+  var pendTotal=Object.keys(pendByClass).reduce(function(a,k){return a+pendByClass[k];},0);
+  g('stat-pending').textContent=pendTotal;
   var qaRes=await sb.from('qa_items').select('id').in('class_id',classIds).is('answer',null);
   g('stat-qa').textContent=(qaRes.data||[]).length;
   var sesRes=await sb.from('sessions').select('id').in('class_id',classIds);
   g('stat-sessions').textContent=(sesRes.data||[]).length;
   renderDashboardCharts(classes);
-  renderTodo(pendSub,(qaRes.data||[]).length);
+  renderTodo(pendByClass,(qaRes.data||[]).length);
 }
 
-function renderTodo(pending,unanswered){
+function renderTodo(pendByClass,unanswered){
   var html='';
-  if(pending>0) html+=`<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;border-bottom:1px solid var(--border)"><span>📝</span><span>Có <strong>${pending}</strong> bài chờ chấm</span><button class="btn btn-sm btn-red" onclick="showPage('exercises')" style="margin-left:auto">Chấm ngay</button></div>`;
-  if(unanswered>0) html+=`<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem"><span>❓</span><span>Có <strong>${unanswered}</strong> câu hỏi chưa trả lời</span><button class="btn btn-sm btn-red" onclick="showPage('qa')" style="margin-left:auto">Trả lời</button></div>`;
+  var withPending=classesCache.filter(function(c){return (pendByClass[c.id]||0)>0;});
+  if(withPending.length){
+    html+='<div style="font-size:.78rem;font-weight:700;color:var(--warning);margin:.1rem 0 .4rem">📝 Bài chờ chấm theo lớp</div>';
+    withPending.forEach(function(c){
+      html+=`<div style="display:flex;align-items:center;gap:.6rem;padding:.5rem .6rem;border-bottom:1px solid var(--border);flex-wrap:wrap"><span class="badge badge-red">${c.name}</span><span><strong>${pendByClass[c.id]}</strong> bài chờ chấm</span><button class="btn btn-sm btn-red" onclick="openExercisesForClass(${c.id})" style="margin-left:auto">Chấm</button></div>`;
+    });
+  }
+  if(unanswered>0) html+=`<div style="display:flex;align-items:center;gap:.75rem;padding:.6rem"><span>❓</span><span>Có <strong>${unanswered}</strong> câu hỏi chưa trả lời</span><button class="btn btn-sm btn-red" onclick="showPage('qa')" style="margin-left:auto">Trả lời</button></div>`;
   if(!html) html='<div class="empty"><div class="empty-icon">✅</div><p>Không có việc cần xử lý</p></div>';
   g('todo-list').innerHTML=html;
 }
+function openExercisesForClass(classId){ window._presetExClass=String(classId); showPage('exercises'); }
 
 function renderDashboardCharts(classes){
   var labels=classes.map(function(c){return c.name.substring(0,10);});
@@ -760,7 +784,7 @@ function renderDashboardCharts(classes){
   if(c2){if(c2._chart)c2._chart.destroy(); c2._chart=new Chart(c2,{type:'doughnut',data:{labels:['Đã nộp','Chờ chấm','Có điểm'],datasets:[{data:[65,20,15],backgroundColor:['rgba(192,57,43,.8)','rgba(212,165,116,.8)','rgba(39,174,96,.8)'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});}
 }
 
-function renderDemoDashboard(){g('stat-students').textContent='12';g('stat-pending').textContent='3';g('stat-qa').textContent='2';g('stat-sessions').textContent='8';renderDashboardCharts([{name:'IELTS A'},{name:'IELTS B'}]);renderTodo(3,2);}
+function renderDemoDashboard(){g('stat-students').textContent='12';g('stat-pending').textContent='3';g('stat-qa').textContent='2';g('stat-sessions').textContent='8';renderDashboardCharts([{name:'IELTS A'},{name:'IELTS B'}]);renderTodo({},2);}
 
 async function loadClasses(){
   var classes=await getClasses();
@@ -793,7 +817,7 @@ async function loadClasses(){
 
 async function loadClassStats(classId){
   if(!sb)return;
-  var stu=await sb.from('profiles').select('id',{count:'exact'}).eq('class_id',classId).eq('role','student');
+  var stu=await sb.from('enrollments').select('id',{count:'exact'}).eq('class_id',classId);
   var ex=await sb.from('exercises').select('id',{count:'exact'}).eq('class_id',classId);
   var ses=await sb.from('sessions').select('id',{count:'exact'}).eq('class_id',classId);
   var s=g('count-stu-'+classId); if(s)s.textContent=(stu.count||0)+' học sinh';
@@ -835,19 +859,21 @@ async function generateCode(classId){
 async function loadStudents(){
   var classes=await getClasses();
   var classIds=classes.map(function(c){return c.id;});
-  if(!classIds.length){g('students-tbody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray)">Chưa có lớp nào</td></tr>';return;}
-  var r=await sb.from('profiles').select('*').eq('role','student').in('class_id',classIds);
-  var students=r.data||[];
-  if(!students.length){g('students-tbody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray)">Chưa có học sinh</td></tr>';return;}
+  if(!classIds.length){g('students-list').innerHTML='<div class="empty"><div class="empty-icon">👥</div><p>Chưa có lớp nào</p></div>';return;}
+  await loadEnrollments(classIds);
   var html='';
-  students.forEach(function(s){
-    var cls=classesCache.find(function(c){return c.id===s.class_id;});
-    html+=`<tr><td><strong>${s.name}</strong></td><td style="color:var(--gray)">${s.email}</td><td><span class="badge badge-red">${cls?cls.name:'—'}</span></td><td>—</td><td>—</td><td><button class="btn btn-sm btn-danger" onclick="removeStudent('${s.id}','${s.name}')">Xoá</button></td></tr>`;
+  classes.forEach(function(c){
+    var studs=enrollCache.filter(function(e){return e.class_id===c.id;});
+    html+=`<div class="card" style="margin-bottom:1rem"><div class="card-title"><span class="badge badge-red">${c.name}</span> · ${studs.length} học sinh</div>`;
+    if(!studs.length){ html+='<div style="color:var(--gray);font-size:.88rem">Chưa có học sinh trong lớp này</div></div>'; return; }
+    html+='<div class="table-wrap"><table><thead><tr><th>Tên</th><th>Email</th><th></th></tr></thead><tbody>';
+    studs.forEach(function(e){var p=e.profiles||{};html+=`<tr><td><strong>${p.name||'—'}</strong></td><td style="color:var(--gray)">${p.email||'—'}</td><td><button class="btn btn-sm btn-danger" onclick="removeEnrollment(${e.id},'${(p.name||'').replace(/'/g,"\\'")}','${c.name.replace(/'/g,"\\'")}')">Gỡ khỏi lớp</button></td></tr>`;});
+    html+='</tbody></table></div></div>';
   });
-  g('students-tbody').innerHTML=html;
+  g('students-list').innerHTML=html;
 }
 
-async function removeStudent(id,name){ showConfirm('Xoá học sinh','Xoá "'+name+'" khỏi lớp?',async function(){ await sb.from('profiles').delete().eq('id',id); toast('Đã xoá '+name); loadStudents(); }); }
+async function removeEnrollment(enrollId,name,className){ showConfirm('Gỡ khỏi lớp','Gỡ "'+name+'" khỏi lớp '+className+'?',async function(){ await sb.from('enrollments').delete().eq('id',enrollId); toast('Đã gỡ '+name); loadStudents(); }); }
 
 async function loadSessions(){
   var classes=await getClasses();
@@ -894,35 +920,44 @@ async function loadExercises(filter){
   var classIds=classes.map(function(c){return c.id;});
   populateClassDropdown('ex-class-id',classes);
   populateClassDropdown('ex-filter-class',classes,true);
+  if(window._presetExClass){ var pf=g('ex-filter-class'); if(pf)pf.value=window._presetExClass; window._presetExClass=null; }
   if(!classIds.length){g('exercises-list').innerHTML='<div class="empty"><div class="empty-icon">📝</div><p>Chưa có bài tập</p></div>';return;}
+  await loadEnrollments(classIds);
   var filterCls=g('ex-filter-class')&&g('ex-filter-class').value;
   var q=sb.from('exercises').select('*').in('class_id',classIds).order('created_at',{ascending:false});
   if(filterCls) q=q.eq('class_id',parseInt(filterCls));
   var exRes=await q;
   var exercises=exRes.data||[];
   if(!exercises.length){g('exercises-list').innerHTML='<div class="empty"><div class="empty-icon">📝</div><p>Chưa có bài tập nào</p></div>';return;}
+  var shownClasses=classes.filter(function(c){return !filterCls||c.id===parseInt(filterCls);});
   var html='';
-  for(var i=0;i<exercises.length;i++){
-    var ex=exercises[i];
-    var cls=classesCache.find(function(c){return c.id===ex.class_id;});
-    var subRes=await sb.from('submissions').select('*,profiles(name)').eq('exercise_id',ex.id);
-    var subs=subRes.data||[];
-    var pending=subs.filter(function(s){return s.score===null;});
-    var graded=subs.filter(function(s){return s.score!==null;});
-    if(filter==='pending'&&!pending.length)continue;
-    if(filter==='done'&&!graded.length)continue;
-    var totalStu=studentsCache.filter(function(s){return s.class_id===ex.class_id;}).length;
-    var prog=totalStu?Math.round(subs.length/totalStu*100):0;
-    html+=`<div class="card" style="margin-bottom:.75rem">
-      <div style="display:flex;justify-content:space-between;align-items:start">
-        <div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="font-size:.8rem;color:var(--gray);margin-top:.25rem"><span class="badge badge-red">${cls?cls.name:'—'}</span>${ex.deadline?' · ⏰ '+fmtDate(ex.deadline):''}</div>${ex.description?`<div style="font-size:.85rem;color:var(--gray);margin-top:.4rem">${ex.description}</div>`:''}</div>
-        <button class="btn btn-sm btn-danger" onclick="deleteExercise(${ex.id},'${ex.title}')">🗑</button>
-      </div>
-      <div style="margin-top:.75rem"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--gray)">Tiến độ nộp bài</span><span style="font-weight:600">${subs.length}/${totalStu}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div></div>
-      <div id="ts-${ex.id}"></div>
-      ${pending.length?`<div style="margin-top:.75rem"><div style="font-size:.78rem;font-weight:700;color:var(--warning);margin-bottom:.4rem">⏳ Chờ chấm (${pending.length})</div>`+pending.map(function(sub){return`<div style="display:flex;align-items:center;gap:.75rem;padding:.5rem;background:var(--beige);border-radius:var(--radius-sm);margin-bottom:.35rem;font-size:.84rem"><span style="flex:1">👤 ${sub.profiles?sub.profiles.name:'—'}${sub.drive_link?' · <a href="'+sub.drive_link+'" target="_blank" style="color:var(--primary)">📄 Xem bài</a>':''}</span><button class="btn btn-sm btn-red" onclick="openGrade(${sub.id})">Chấm điểm</button></div>`;}).join('')+'</div>':''}
-      ${graded.length?`<div style="margin-top:.5rem"><div style="font-size:.78rem;font-weight:700;color:var(--success);margin-bottom:.4rem">✅ Đã chấm (${graded.length})</div>`+graded.map(function(sub){return`<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:#E8F8EF;border-radius:var(--radius-sm);margin-bottom:.3rem;font-size:.84rem"><span style="flex:1">👤 ${sub.profiles?sub.profiles.name:'—'}</span><span class="badge badge-green">⭐ ${sub.score}/10</span></div>`;}).join('')+'</div>':''}
-    </div>`;
+  for(var ci=0;ci<shownClasses.length;ci++){
+    var c=shownClasses[ci];
+    var exs=exercises.filter(function(e){return e.class_id===c.id;});
+    var totalStu=classStudentCount(c.id);
+    var cardsHtml='';
+    for(var i=0;i<exs.length;i++){
+      var ex=exs[i];
+      var subRes=await sb.from('submissions').select('*,profiles(name)').eq('exercise_id',ex.id);
+      var subs=subRes.data||[];
+      var pending=subs.filter(function(s){return s.score===null;});
+      var graded=subs.filter(function(s){return s.score!==null;});
+      if(filter==='pending'&&!pending.length)continue;
+      if(filter==='done'&&!graded.length)continue;
+      var prog=totalStu?Math.round(subs.length/totalStu*100):0;
+      cardsHtml+=`<div class="card" style="margin-bottom:.75rem">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div style="flex:1"><div style="font-weight:700">${ex.title}</div><div style="font-size:.8rem;color:var(--gray);margin-top:.25rem">${ex.deadline?'⏰ '+fmtDate(ex.deadline):''}</div>${ex.description?`<div style="font-size:.85rem;color:var(--gray);margin-top:.4rem">${ex.description}</div>`:''}</div>
+          <button class="btn btn-sm btn-danger" onclick="deleteExercise(${ex.id},'${ex.title.replace(/'/g,"\\'")}')">🗑</button>
+        </div>
+        <div style="margin-top:.75rem"><div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.35rem"><span style="color:var(--gray)">Tiến độ nộp bài</span><span style="font-weight:600">${subs.length}/${totalStu}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div></div>
+        <div id="ts-${ex.id}"></div>
+        ${pending.length?`<div style="margin-top:.75rem"><div style="font-size:.78rem;font-weight:700;color:var(--warning);margin-bottom:.4rem">⏳ Chờ chấm (${pending.length})</div>`+pending.map(function(sub){return`<div style="display:flex;align-items:center;gap:.75rem;padding:.5rem;background:var(--beige);border-radius:var(--radius-sm);margin-bottom:.35rem;font-size:.84rem"><span style="flex:1">👤 ${sub.profiles?sub.profiles.name:'—'}${sub.drive_link?' · <a href="'+sub.drive_link+'" target="_blank" style="color:var(--primary)">📄 Xem bài</a>':''}</span><button class="btn btn-sm btn-red" onclick="openGrade(${sub.id})">Chấm điểm</button></div>`;}).join('')+'</div>':''}
+        ${graded.length?`<div style="margin-top:.5rem"><div style="font-size:.78rem;font-weight:700;color:var(--success);margin-bottom:.4rem">✅ Đã chấm (${graded.length})</div>`+graded.map(function(sub){return`<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:#E8F8EF;border-radius:var(--radius-sm);margin-bottom:.3rem;font-size:.84rem"><span style="flex:1">👤 ${sub.profiles?sub.profiles.name:'—'}</span><span class="badge badge-green">⭐ ${sub.score}/10</span></div>`;}).join('')+'</div>':''}
+      </div>`;
+    }
+    if(!cardsHtml) continue;
+    html+=`<div class="class-section"><span class="badge badge-red">${c.name}</span><span style="font-size:.78rem;color:var(--gray);font-weight:500">${totalStu} học sinh</span></div>`+cardsHtml;
   }
   if(!html)html='<div class="empty"><div class="empty-icon">📝</div><p>Không có bài tập</p></div>';
   g('exercises-list').innerHTML=html;
@@ -934,7 +969,7 @@ async function submitGrade(){var subId=parseInt(g('grade-sub-id').value),score=p
 
 async function addExercise(){var classId=g('ex-class-id').value,title=v('ex-title'),desc=v('ex-desc'),deadline=g('ex-deadline').value,link=v('ex-link');if(!classId||!title){toast('Vui lòng chọn lớp và nhập tiêu đề','error');return;}var r=await sb.from('exercises').insert({class_id:parseInt(classId),title:title,description:desc||null,deadline:deadline||null,link:link||null,teacher_id:currentProfile.id}).select().single();if(r.error){toast('Lỗi: '+r.error.message,'error');return;}
 var tasksRaw=v('ex-tasks');if(tasksRaw&&r.data){var tasks=tasksRaw.split('\n').map(function(t){return t.trim();}).filter(function(t){return t.length>0;});if(tasks.length>0){var td=tasks.map(function(t,i){return{exercise_id:r.data.id,title:t,order_num:i};});await sb.from('task_items').insert(td);}}
-closeModal('modal-add-exercise');toast('Đã giao bài tập','success');loadExercises();}
+closeModal('modal-add-exercise');toast('Đã giao bài tập','success');['ex-title','ex-desc','ex-link','ex-tasks'].forEach(function(id){if(g(id))g(id).value='';});loadExercises();}
 async function deleteExercise(id,title){showConfirm('Xoá bài tập','Xoá "'+title+'"?',async function(){await sb.from('submissions').delete().eq('exercise_id',id);await sb.from('exercises').delete().eq('id',id);toast('Đã xoá');loadExercises();});}
 
 async function loadQA(filter){
@@ -989,20 +1024,23 @@ async function loadNotifications(tab){
   tab=tab||'sent';
   var classes=await getClasses();var classIds=classes.map(function(c){return c.id;});
   populateClassDropdown('notif-class-id',classes,true);
+  var cmap={};classes.forEach(function(c){cmap[c.id]=c.name;});
   if(tab==='sent'){
     var r=await sb.from('notifications').select('*').eq('sender_id',currentProfile.id).order('created_at',{ascending:false});
     var items=r.data||[];
     if(!items.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">📤</div><p>Chưa gửi thông báo nào</p></div>';return;}
-    g('notifications-list').innerHTML=items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="display:flex;justify-content:space-between"><div><div style="font-weight:700">${n.title}</div><div style="font-size:.75rem;color:var(--gray)">${timeAgo(n.created_at)}</div></div><button class="btn btn-sm btn-danger" onclick="deleteNotif(${n.id})">🗑</button></div><div style="margin-top:.5rem;font-size:.9rem">${n.body}</div></div>`;}).join('');
+    g('notifications-list').innerHTML=items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="display:flex;justify-content:space-between"><div><div style="font-weight:700">${n.title} ${n.class_id?'<span class="badge badge-red">'+(cmap[n.class_id]||'')+'</span>':'<span class="badge badge-gray">Tất cả lớp</span>'}</div><div style="font-size:.75rem;color:var(--gray)">${timeAgo(n.created_at)}</div></div><button class="btn btn-sm btn-danger" onclick="deleteNotif(${n.id})">🗑</button></div><div style="margin-top:.5rem;font-size:.9rem">${n.body}</div></div>`;}).join('');
   } else {
     if(!classIds.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">📥</div><p>Chưa có tin nhắn</p></div>';return;}
     var r2=await sb.from('student_messages').select('*,profiles(name)').in('class_id',classIds).order('created_at',{ascending:false});
     var items2=r2.data||[];
-    if(!items2.length){g('notifications-list').innerHTML='<div class="empty"><div class="empty-icon">📥</div><p>Chưa có học sinh nộp bài / nhắn tin</p></div>';return;}
-    g('notifications-list').innerHTML=items2.map(function(m){return`<div class="card" style="margin-bottom:.75rem"><div style="font-size:.8rem;color:var(--gray)">👤 ${m.profiles?m.profiles.name:'—'} · ${timeAgo(m.created_at)}</div><div style="font-weight:700;margin-top:.25rem">${m.subject||'Tin nhắn'}</div><div style="font-size:.9rem;margin-top:.25rem">${m.content||''}</div></div>`;}).join('');
+    if(window._recvClassFilter)items2=items2.filter(function(m){return m.class_id===parseInt(window._recvClassFilter);});
+    var filterHtml='<div class="form-row" style="max-width:220px"><select class="select" onchange="window._recvClassFilter=this.value;loadNotifications(\'received\')"><option value="">Tất cả lớp</option>'+classes.map(function(c){return '<option value="'+c.id+'" '+(window._recvClassFilter==String(c.id)?'selected':'')+'>'+c.name+'</option>';}).join('')+'</select></div>';
+    if(!items2.length){g('notifications-list').innerHTML=filterHtml+'<div class="empty"><div class="empty-icon">📥</div><p>Chưa có học sinh nộp bài / nhắn tin</p></div>';return;}
+    g('notifications-list').innerHTML=filterHtml+items2.map(function(m){return`<div class="card" style="margin-bottom:.75rem"><div style="font-size:.8rem;color:var(--gray);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">👤 ${m.profiles?m.profiles.name:'—'} <span class="badge badge-red">${cmap[m.class_id]||'—'}</span> · ${timeAgo(m.created_at)}</div><div style="font-weight:700;margin-top:.25rem">${m.subject||'Tin nhắn'}</div><div style="font-size:.9rem;margin-top:.25rem">${m.content||''}</div></div>`;}).join('');
   }
 }
-async function sendNotification(){var classId=g('notif-class-id').value,title=v('notif-title'),body=v('notif-body');if(!title||!body){toast('Vui lòng điền đầy đủ','error');return;}var data={title:title,body:body,sender_id:currentProfile.id};if(classId)data.class_id=parseInt(classId);await sb.from('notifications').insert(data);closeModal('modal-send-notif');toast('Đã gửi thông báo','success');loadNotifications('sent');}
+async function sendNotification(){var classId=g('notif-class-id').value,title=v('notif-title'),body=v('notif-body');if(!title||!body){toast('Vui lòng điền đầy đủ','error');return;}var data={title:title,body:body,sender_id:currentProfile.id};if(classId)data.class_id=parseInt(classId);await sb.from('notifications').insert(data);closeModal('modal-send-notif');toast('Đã gửi thông báo','success');g('notif-title').value='';g('notif-body').value='';loadNotifications('sent');}
 async function deleteNotif(id){showConfirm('Xoá thông báo','Xoá thông báo này?',async function(){await sb.from('notifications').delete().eq('id',id);toast('Đã xoá');loadNotifications('sent');});}
 
 async function loadSchedule(){
@@ -1027,7 +1065,7 @@ async function loadReports(){
   var html='<div class="grid-2">';
   for(var i=0;i<classes.length;i++){
     var cls=classes[i];
-    var stu=await sb.from('profiles').select('id',{count:'exact'}).eq('class_id',cls.id).eq('role','student');
+    var stu=await sb.from('enrollments').select('id',{count:'exact'}).eq('class_id',cls.id);
     var ex=await sb.from('exercises').select('id',{count:'exact'}).eq('class_id',cls.id);
     html+=`<div class="class-card"><div class="class-card-header"><div style="font-size:1.1rem;font-weight:800">${cls.name}</div>${cls.midterm_date?`<div style="font-size:.78rem;opacity:.85;margin-top:.5rem">📋 Midterm: ${fmtDate(cls.midterm_date)}</div>`:''} ${cls.final_date?`<div style="font-size:.78rem;opacity:.85">🎓 Final: ${fmtDate(cls.final_date)}</div>`:''}</div><div class="class-card-body"><div class="class-card-stat">👥 <strong>${stu.count||0}</strong> học sinh</div><div class="class-card-stat">📝 <strong>${ex.count||0}</strong> bài tập</div></div></div>`;
   }
@@ -1040,21 +1078,42 @@ function populateClassDropdown(selectId,classes,addAll){var sel=g(selectId);if(!
 
 <script>
 // ══════════════════════════════════════════════════════
-// STUDENT DATA
+// STUDENT DATA (đa lớp)
 // ══════════════════════════════════════════════════════
-var myClass=null;
+var myClasses=[];
+async function getMyClasses(){
+  if(!sb||!currentProfile)return [];
+  var r=await sb.from('enrollments').select('class_id,classes(*)').eq('student_id',currentProfile.id);
+  myClasses=(r.data||[]).map(function(e){return e.classes;}).filter(Boolean);
+  if(!myClasses.length && currentProfile.class_id){ var c=await sb.from('classes').select('*').eq('id',currentProfile.class_id).single(); if(c.data)myClasses=[c.data]; }
+  myClasses.sort(function(a,b){return (a.name||'').localeCompare(b.name||'');});
+  return myClasses;
+}
+function myClassIds(){ return myClasses.map(function(c){return c.id;}); }
+function fillStudentClassSelect(selId){ var sel=g(selId); if(!sel)return; sel.innerHTML=(myClasses.length>1?'<option value="">-- Chọn lớp --</option>':'')+myClasses.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join(''); }
 
-async function getMyClass(){if(!sb||!currentProfile)return null;var r=await sb.from('classes').select('*').eq('id',currentProfile.class_id).single();myClass=r.data;return myClass;}
+async function joinClass(){
+  var code=v('join-code').toUpperCase();
+  if(!code){toast('Nhập mã lớp','error');return;}
+  if(!sb){toast('Chưa kết nối','error');return;}
+  var ic=await sb.from('invite_codes').select('*').eq('code',code).limit(1);
+  if(!ic.data||!ic.data.length){toast('Mã lớp không đúng','error');return;}
+  var inv=ic.data[0];
+  var r=await sb.from('enrollments').insert({student_id:currentProfile.id,class_id:inv.class_id});
+  if(r.error){ if(/duplicate|unique/i.test(r.error.message)){toast('Bạn đã ở trong lớp này rồi','');} else {toast('Lỗi: '+r.error.message,'error');} return; }
+  g('join-code').value='';closeModal('modal-join-class');toast('Đã tham gia lớp '+(inv.class_name||code)+' 🎉','success');loadStudentDashboard();
+}
 
 async function loadStudentDashboard(){
-  var cls=await getMyClass();
+  var classes=await getMyClasses();
   if(g('student-name-display'))g('student-name-display').textContent=currentProfile.name;
-  if(g('student-class-display'))g('student-class-display').textContent=cls?'🏫 Lớp: '+cls.name:'Chưa có lớp';
-  if(!cls)return;
-  var sesRes=await sb.from('sessions').select('id',{count:'exact'}).eq('class_id',cls.id);
+  if(g('student-class-display'))g('student-class-display').textContent=classes.length?'🏫 Lớp: '+classes.map(function(c){return c.name;}).join(', '):'Chưa có lớp — bấm "➕ Tham gia lớp"';
+  if(!classes.length){['s-stat-sessions','s-stat-submitted','s-stat-pending'].forEach(function(id){if(g(id))g(id).textContent='0';});if(g('s-stat-avg'))g('s-stat-avg').textContent='—';if(g('s-upcoming-deadlines'))g('s-upcoming-deadlines').innerHTML='<div class="empty"><div class="empty-icon">🏫</div><p>Bạn chưa tham gia lớp nào</p></div>';return;}
+  var cids=myClassIds();
+  var sesRes=await sb.from('sessions').select('id',{count:'exact'}).in('class_id',cids);
   if(g('s-stat-sessions'))g('s-stat-sessions').textContent=sesRes.count||0;
-  var exRes=await sb.from('exercises').select('id').eq('class_id',cls.id);
-  var exIds=(exRes.data||[]).map(function(e){return e.id;});
+  var exRes=await sb.from('exercises').select('*').in('class_id',cids);
+  var exData=exRes.data||[];var exIds=exData.map(function(e){return e.id;});
   if(exIds.length){
     var subRes=await sb.from('submissions').select('*').eq('student_id',currentProfile.id).in('exercise_id',exIds);
     var subs=subRes.data||[];
@@ -1063,60 +1122,71 @@ async function loadStudentDashboard(){
     if(g('s-stat-submitted'))g('s-stat-submitted').textContent=subs.length;
     if(g('s-stat-pending'))g('s-stat-pending').textContent=subs.filter(function(s){return s.score===null;}).length;
     if(g('s-stat-avg'))g('s-stat-avg').textContent=avg;
-  }
-  var now=new Date();
-  var exAllRes=await sb.from('exercises').select('*').eq('class_id',cls.id).not('deadline','is',null).order('deadline');
-  var upcoming=(exAllRes.data||[]).filter(function(e){return new Date(e.deadline)>now;}).slice(0,5);
+  } else { if(g('s-stat-submitted'))g('s-stat-submitted').textContent='0';if(g('s-stat-pending'))g('s-stat-pending').textContent='0';if(g('s-stat-avg'))g('s-stat-avg').textContent='—'; }
+  var now=new Date();var clsMap={};classes.forEach(function(c){clsMap[c.id]=c.name;});
+  var upcoming=exData.filter(function(e){return e.deadline&&new Date(e.deadline)>now;}).sort(function(a,b){return new Date(a.deadline)-new Date(b.deadline);}).slice(0,6);
   var dlEl=g('s-upcoming-deadlines');
-  if(dlEl){dlEl.innerHTML=upcoming.length?upcoming.map(function(e){return`<div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)"><span>📝</span><span style="flex:1">${e.title}</span><span class="badge badge-amber">⏰ ${fmtDate(e.deadline)}</span></div>`;}).join(''):'<div class="empty"><div class="empty-icon">🎉</div><p>Không có deadline sắp tới</p></div>';}
+  if(dlEl){dlEl.innerHTML=upcoming.length?upcoming.map(function(e){return`<div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)"><span>📝</span><span style="flex:1">${e.title} <span class="badge badge-red" style="margin-left:.25rem">${clsMap[e.class_id]||''}</span></span><span class="badge badge-amber">⏰ ${fmtDate(e.deadline)}</span></div>`;}).join(''):'<div class="empty"><div class="empty-icon">🎉</div><p>Không có deadline sắp tới</p></div>';}
 }
 
 async function loadStudentSessions(){
-  var cls=await getMyClass();
-  if(!cls){g('s-sessions-list').innerHTML='<div class="empty"><div class="empty-icon">📹</div><p>Chưa có buổi học</p></div>';return;}
-  var r=await sb.from('sessions').select('*').eq('class_id',cls.id).order('session_date',{ascending:false});
+  var classes=await getMyClasses();
+  if(!classes.length){g('s-sessions-list').innerHTML='<div class="empty"><div class="empty-icon">📹</div><p>Chưa tham gia lớp nào</p></div>';return;}
+  var cids=myClassIds();
+  var r=await sb.from('sessions').select('*').in('class_id',cids).order('session_date',{ascending:false});
   var sessions=r.data||[];
   if(!sessions.length){g('s-sessions-list').innerHTML='<div class="empty"><div class="empty-icon">📹</div><p>Chưa có buổi học nào</p></div>';return;}
-  g('s-sessions-list').innerHTML=sessions.map(function(s){return`<div class="recording-card"><div class="recording-icon">📹</div><div class="recording-info"><div class="recording-title">${s.title}</div><div class="recording-meta">📅 ${fmtDate(s.session_date)}</div>${s.note?`<div class="recording-meta">${s.note}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:.4rem">${s.recording_url?`<a href="${s.recording_url}" target="_blank" class="btn btn-sm btn-red">🎥 Xem recording</a>`:'<span class="badge badge-gray">Chưa có recording</span>'}${s.attachment_url?`<a href="${s.attachment_url}" target="_blank" class="btn btn-sm btn-outline">📎 Tài liệu</a>`:''}</div></div>`;}).join('');}
+  var html='';
+  classes.forEach(function(c){
+    var ss=sessions.filter(function(s){return s.class_id===c.id;});
+    if(!ss.length)return;
+    html+=`<div class="class-section"><span class="badge badge-red">${c.name}</span></div>`;
+    html+=ss.map(function(s){return`<div class="recording-card"><div class="recording-icon">📹</div><div class="recording-info"><div class="recording-title">${s.title}</div><div class="recording-meta">📅 ${fmtDate(s.session_date)}</div>${s.note?`<div class="recording-meta">${s.note}</div>`:''}</div><div style="display:flex;flex-direction:column;gap:.4rem">${s.recording_url?`<a href="${s.recording_url}" target="_blank" class="btn btn-sm btn-red">🎥 Xem recording</a>`:'<span class="badge badge-gray">Chưa có recording</span>'}${s.attachment_url?`<a href="${s.attachment_url}" target="_blank" class="btn btn-sm btn-outline">📎 Tài liệu</a>`:''}</div></div>`;}).join('');
+  });
+  g('s-sessions-list').innerHTML=html||'<div class="empty"><div class="empty-icon">📹</div><p>Chưa có buổi học nào</p></div>';
+}
 
 async function loadStudentExercises(filter){
-  filter=filter||'todo';
-  window._sExFilter=filter;
-  var cls=await getMyClass();
-  if(!cls){g('s-exercises-list').innerHTML='<div class="empty"><div class="empty-icon">📝</div><p>Chưa có bài tập</p></div>';return;}
-  var exRes=await sb.from('exercises').select('*').eq('class_id',cls.id).order('created_at',{ascending:false});
-  var exercises=exRes.data||[];
-  var exIds=exercises.map(function(e){return e.id;});
+  filter=filter||'todo';window._sExFilter=filter;
+  var classes=await getMyClasses();
+  if(!classes.length){g('s-exercises-list').innerHTML='<div class="empty"><div class="empty-icon">📝</div><p>Chưa tham gia lớp nào</p></div>';return;}
+  var cids=myClassIds();
+  var exRes=await sb.from('exercises').select('*').in('class_id',cids).order('created_at',{ascending:false});
+  var exercises=exRes.data||[];var exIds=exercises.map(function(e){return e.id;});
   var subMap={};
   if(exIds.length){var subRes=await sb.from('submissions').select('*').eq('student_id',currentProfile.id).in('exercise_id',exIds);(subRes.data||[]).forEach(function(s){subMap[s.exercise_id]=s;});}
-  var html='';
-  var shown=[];
-  exercises.forEach(function(ex){
-    var sub=subMap[ex.id],submitted=!!sub,overdue=ex.deadline&&new Date(ex.deadline)<new Date()&&!submitted;
-    if(filter==='todo'&&submitted)return;
-    if(filter==='done'&&!submitted)return;
-    shown.push(ex);
-    html+=`<div class="card" style="margin-bottom:.75rem${overdue?';border-left:3px solid var(--danger)':''}">
-      <div style="display:flex;justify-content:space-between;align-items:start">
-        <div><div style="font-weight:700">${ex.title}</div>${ex.deadline?`<div style="font-size:.8rem;color:${overdue?'var(--danger)':'var(--gray)'};margin-top:.2rem">⏰ ${fmtDate(ex.deadline)}${overdue?' (Quá hạn)':''}</div>`:''} ${ex.description?`<div style="font-size:.85rem;color:var(--gray);margin-top:.35rem">${ex.description}</div>`:''}</div>
-        ${submitted?'<span class="badge badge-green">✅ Đã nộp</span>':'<span class="badge badge-amber">📌 Chưa nộp</span>'}
-      </div>
-      ${ex.link?`<div style="margin-top:.5rem"><a href="${ex.link}" target="_blank" class="btn btn-sm btn-outline">📄 Xem đề bài</a></div>`:''}
-      <div id="stask-${ex.id}"></div>
-      ${submitted?`<div style="margin-top:.75rem;background:var(--beige);border-radius:var(--radius-sm);padding:.75rem">
-        <div style="font-size:.78rem;font-weight:700;margin-bottom:.25rem;color:var(--gray)">📤 Bài đã nộp</div>
-        ${sub.drive_link?`<a href="${sub.drive_link}" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Xem bài làm</a>`:''}
-        ${sub.score!==null?`<div style="margin-top:.35rem"><span class="badge badge-green">⭐ Điểm: ${sub.score}/10</span></div>`:'<div style="font-size:.78rem;color:var(--gray);margin-top:.25rem">⏳ Chờ chấm điểm</div>'}
-        ${sub.teacher_comment?`<div style="font-size:.85rem;margin-top:.35rem;color:var(--gray);font-style:italic">💬 "${sub.teacher_comment}"</div>`:''}
-      </div>`:`<div style="margin-top:.75rem"><button class="btn btn-red" onclick="openSubmitEx(${ex.id},'${ex.title.replace(/'/g,"\\'")}')">📤 Nộp bài</button></div>`}
-    </div>`;
+  var html='';var shown=[];
+  classes.forEach(function(c){
+    var exs=exercises.filter(function(e){return e.class_id===c.id;});
+    var cardsHtml='';
+    exs.forEach(function(ex){
+      var sub=subMap[ex.id],submitted=!!sub,overdue=ex.deadline&&new Date(ex.deadline)<new Date()&&!submitted;
+      if(filter==='todo'&&submitted)return;
+      if(filter==='done'&&!submitted)return;
+      shown.push(ex);
+      cardsHtml+=`<div class="card" style="margin-bottom:.75rem${overdue?';border-left:3px solid var(--danger)':''}">
+        <div style="display:flex;justify-content:space-between;align-items:start">
+          <div><div style="font-weight:700">${ex.title}</div>${ex.deadline?`<div style="font-size:.8rem;color:${overdue?'var(--danger)':'var(--gray)'};margin-top:.2rem">⏰ ${fmtDate(ex.deadline)}${overdue?' (Quá hạn)':''}</div>`:''} ${ex.description?`<div style="font-size:.85rem;color:var(--gray);margin-top:.35rem">${ex.description}</div>`:''}</div>
+          ${submitted?'<span class="badge badge-green">✅ Đã nộp</span>':'<span class="badge badge-amber">📌 Chưa nộp</span>'}
+        </div>
+        ${ex.link?`<div style="margin-top:.5rem"><a href="${ex.link}" target="_blank" class="btn btn-sm btn-outline">📄 Xem đề bài</a></div>`:''}
+        <div id="stask-${ex.id}"></div>
+        ${submitted?`<div style="margin-top:.75rem;background:var(--beige);border-radius:var(--radius-sm);padding:.75rem">
+          <div style="font-size:.78rem;font-weight:700;margin-bottom:.25rem;color:var(--gray)">📤 Bài đã nộp</div>
+          ${sub.drive_link?`<a href="${sub.drive_link}" target="_blank" style="color:var(--primary);font-size:.85rem">🔗 Xem bài làm</a>`:''}
+          ${sub.score!==null?`<div style="margin-top:.35rem"><span class="badge badge-green">⭐ Điểm: ${sub.score}/10</span></div>`:'<div style="font-size:.78rem;color:var(--gray);margin-top:.25rem">⏳ Chờ chấm điểm</div>'}
+          ${sub.teacher_comment?`<div style="font-size:.85rem;margin-top:.35rem;color:var(--gray);font-style:italic">💬 "${sub.teacher_comment}"</div>`:''}
+        </div>`:`<div style="margin-top:.75rem"><button class="btn btn-red" onclick="openSubmitEx(${ex.id},'${ex.title.replace(/'/g,"\\'")}')">📤 Nộp bài</button></div>`}
+      </div>`;
+    });
+    if(!cardsHtml)return;
+    html+=`<div class="class-section"><span class="badge badge-red">${c.name}</span></div>`+cardsHtml;
   });
   if(!html)html='<div class="empty"><div class="empty-icon">📝</div><p>Không có bài tập '+(filter==='todo'?'cần làm':'đã nộp')+'</p></div>';
   g('s-exercises-list').innerHTML=html;
   shown.forEach(function(ex){loadStudentTasks(ex.id);});
 }
 
-// Checklist task phía học sinh — luôn hiện nếu bài có task, không phụ thuộc đã nộp hay chưa
 async function loadStudentTasks(exId){
   var el=document.getElementById('stask-'+exId);
   if(!el||!sb) return;
@@ -1137,8 +1207,7 @@ async function loadStudentTasks(exId){
   h+='</div>';
   el.innerHTML=h;
 }
-
-async function setTaskStatus(taskId, status, exId){
+async function setTaskStatus(taskId,status,exId){
   if(!sb||!currentProfile) return;
   await sb.from('task_submissions').upsert({task_id:taskId,student_id:currentProfile.id,status:status,updated_at:new Date().toISOString()},{onConflict:'task_id,student_id'});
   loadStudentTasks(exId);
@@ -1149,52 +1218,52 @@ async function submitExercise(){
   var exId=parseInt(g('submit-ex-id').value),link=v('submit-link'),note=v('submit-note');
   var r=await sb.from('submissions').insert({exercise_id:exId,student_id:currentProfile.id,drive_link:link||null,note:note||null,submitted_at:new Date().toISOString()});
   if(r.error){toast('Lỗi: '+r.error.message,'error');return;}
-  // Báo cho giáo viên: đẩy vào hộp thư "HS nộp bài / nhắn" (chỉ giáo viên thấy)
   var exInfo=await sb.from('exercises').select('title,class_id').eq('id',exId).single();
-  if(exInfo.data){
-    await sb.from('student_messages').insert({
-      class_id:exInfo.data.class_id,
-      student_id:currentProfile.id,
-      subject:'📝 Nộp bài: '+exInfo.data.title,
-      content:currentProfile.name+' vừa nộp bài "'+exInfo.data.title+'". Vào mục Bài tập để chấm điểm.'
-    });
-  }
+  if(exInfo.data){await sb.from('student_messages').insert({class_id:exInfo.data.class_id,student_id:currentProfile.id,subject:'📝 Nộp bài: '+exInfo.data.title,content:currentProfile.name+' vừa nộp bài "'+exInfo.data.title+'". Vào mục Bài tập để chấm điểm.'});}
   closeModal('modal-submit-ex');toast('Đã nộp bài! Giáo viên đã được thông báo ✅','success');loadStudentExercises(window._sExFilter||'todo');
 }
 
 async function loadStudentResults(){
-  var cls=await getMyClass();
-  if(!cls){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">🏆</div><p>Chưa có kết quả</p></div>';return;}
-  var exRes=await sb.from('exercises').select('*').eq('class_id',cls.id);
-  var exIds=(exRes.data||[]).map(function(e){return e.id;});
+  var classes=await getMyClasses();
+  if(!classes.length){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">🏆</div><p>Chưa có kết quả</p></div>';return;}
+  var cids=myClassIds();
+  var exRes=await sb.from('exercises').select('*').in('class_id',cids);
+  var exData=exRes.data||[];var exIds=exData.map(function(e){return e.id;});
   if(!exIds.length){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">🏆</div><p>Chưa có bài tập</p></div>';return;}
   var subRes=await sb.from('submissions').select('*').eq('student_id',currentProfile.id).in('exercise_id',exIds).not('score','is',null);
   var subs=subRes.data||[];
   if(!subs.length){g('s-results-content').innerHTML='<div class="empty"><div class="empty-icon">🏆</div><p>Chưa có bài được chấm</p></div>';return;}
-  var exMap={};(exRes.data||[]).forEach(function(e){exMap[e.id]=e;});
+  var exMap={};exData.forEach(function(e){exMap[e.id]=e;});
+  var clsMap={};classes.forEach(function(c){clsMap[c.id]=c.name;});
   var avg=(subs.reduce(function(a,s){return a+parseFloat(s.score);},0)/subs.length).toFixed(1);
-  g('s-results-content').innerHTML=`<div class="stats-grid" style="margin-bottom:1.5rem"><div class="stat-card red"><div class="stat-icon">📝</div><div class="stat-num">${subs.length}</div><div class="stat-label">Bài đã chấm</div></div><div class="stat-card green"><div class="stat-icon">⭐</div><div class="stat-num">${avg}</div><div class="stat-label">Điểm trung bình</div></div></div><div class="card"><div class="card-title">📊 Chi tiết điểm</div><div class="table-wrap"><table><thead><tr><th>Bài tập</th><th>Điểm</th><th>Nhận xét</th><th>Ngày chấm</th></tr></thead><tbody>${subs.map(function(s){var ex=exMap[s.exercise_id];return`<tr><td>${ex?ex.title:'—'}</td><td><span class="badge ${parseFloat(s.score)>=8?'badge-green':parseFloat(s.score)>=6?'badge-amber':'badge-red'}">${s.score}/10</span></td><td style="font-size:.85rem;color:var(--gray);font-style:italic">${s.teacher_comment||'—'}</td><td>${fmtDate(s.graded_at)}</td></tr>`;}).join('')}</tbody></table></div></div>`;
+  g('s-results-content').innerHTML=`<div class="stats-grid" style="margin-bottom:1.5rem"><div class="stat-card red"><div class="stat-icon">📝</div><div class="stat-num">${subs.length}</div><div class="stat-label">Bài đã chấm</div></div><div class="stat-card green"><div class="stat-icon">⭐</div><div class="stat-num">${avg}</div><div class="stat-label">Điểm trung bình</div></div></div><div class="card"><div class="card-title">📊 Chi tiết điểm</div><div class="table-wrap"><table><thead><tr><th>Bài tập</th><th>Lớp</th><th>Điểm</th><th>Nhận xét</th><th>Ngày chấm</th></tr></thead><tbody>${subs.map(function(s){var ex=exMap[s.exercise_id];return`<tr><td>${ex?ex.title:'—'}</td><td><span class="badge badge-red">${ex?(clsMap[ex.class_id]||'—'):'—'}</span></td><td><span class="badge ${parseFloat(s.score)>=8?'badge-green':parseFloat(s.score)>=6?'badge-amber':'badge-red'}">${s.score}/10</span></td><td style="font-size:.85rem;color:var(--gray);font-style:italic">${s.teacher_comment||'—'}</td><td>${fmtDate(s.graded_at)}</td></tr>`;}).join('')}</tbody></table></div></div>`;
 }
 
 async function loadStudentQA(){
-  var cls=await getMyClass();
-  if(!cls){g('s-qa-list').innerHTML='<div class="empty"><div class="empty-icon">❓</div><p>Chưa có câu hỏi</p></div>';return;}
-  var r=await sb.from('qa_items').select('*,profiles(name)').eq('class_id',cls.id).order('created_at',{ascending:false});
+  var classes=await getMyClasses();
+  fillStudentClassSelect('qa-class-id');
+  if(!classes.length){g('s-qa-list').innerHTML='<div class="empty"><div class="empty-icon">❓</div><p>Chưa tham gia lớp nào</p></div>';return;}
+  var cids=myClassIds();
+  var r=await sb.from('qa_items').select('*,profiles(name)').in('class_id',cids).order('created_at',{ascending:false});
   var items=r.data||[];
   var html='';
-  items.forEach(function(item){
-    var isMe=item.student_id===currentProfile.id;
-    html+=`<div class="qa-item ${item.answer?'answered':''}">
-      <div class="qa-meta">${item.is_anonymous?'🎭 Ẩn danh':(item.profiles?'👤 '+item.profiles.name:'—')} · ${timeAgo(item.created_at)}</div>
-      <div style="font-size:.92rem;margin:.35rem 0">${item.question}</div>
-      ${item.answer?`<div class="qa-answer"><div class="qa-answer-label">💬 Giáo viên trả lời</div>${item.answer}</div>`:'<span class="badge badge-gray">⏳ Chờ giáo viên trả lời</span>'}
-      <div class="reactions" id="reactions-${item.id}"></div>
-      <div id="cmts-${item.id}" style="margin-top:.4rem"></div>
-      <div style="display:flex;gap:.5rem;margin-top:.5rem"><input class="input" id="ci-${item.id}" placeholder="Bình luận / trả lời thêm..." style="font-size:.82rem;padding:.35rem .65rem" onkeydown="if(event.key==='Enter')submitQAComment(${item.id})"><button class="btn btn-sm btn-red" onclick="submitQAComment(${item.id})">Gửi</button></div>
-      ${isMe?`<div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyQA(${item.id})">🗑</button></div>`:''}
-    </div>`;
+  classes.forEach(function(c){
+    var its=items.filter(function(i){return i.class_id===c.id;});
+    html+=`<div class="class-section"><span class="badge badge-red">${c.name}</span></div>`;
+    if(!its.length){html+='<div style="color:var(--gray);font-size:.85rem;padding:.1rem 0 .5rem">Chưa có câu hỏi nào trong lớp này.</div>';return;}
+    its.forEach(function(item){
+      var isMe=item.student_id===currentProfile.id;
+      html+=`<div class="qa-item ${item.answer?'answered':''}">
+        <div class="qa-meta">${item.is_anonymous?'🎭 Ẩn danh':(item.profiles?'👤 '+item.profiles.name:'—')} · ${timeAgo(item.created_at)}</div>
+        <div style="font-size:.92rem;margin:.35rem 0">${item.question}</div>
+        ${item.answer?`<div class="qa-answer"><div class="qa-answer-label">💬 Giáo viên trả lời</div>${item.answer}</div>`:'<span class="badge badge-gray">⏳ Chờ giáo viên trả lời</span>'}
+        <div class="reactions" id="reactions-${item.id}"></div>
+        <div id="cmts-${item.id}" style="margin-top:.4rem"></div>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem"><input class="input" id="ci-${item.id}" placeholder="Bình luận / trả lời thêm..." style="font-size:.82rem;padding:.35rem .65rem" onkeydown="if(event.key==='Enter')submitQAComment(${item.id})"><button class="btn btn-sm btn-red" onclick="submitQAComment(${item.id})">Gửi</button></div>
+        ${isMe?`<div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyQA(${item.id})">🗑</button></div>`:''}
+      </div>`;
+    });
   });
-  if(!html)html='<div class="empty"><div class="empty-icon">❓</div><p>Chưa có câu hỏi nào. Hỏi điều gì đó!</p></div>';
   g('s-qa-list').innerHTML=html;
   items.forEach(function(item){loadReactions(item.id);loadQAComments(item.id);});
 }
@@ -1202,28 +1271,32 @@ async function loadStudentQA(){
 async function loadReactions(qaId){var el=g('reactions-'+qaId);if(!el)return;var r=await sb.from('qa_reactions').select('emoji').eq('qa_id',qaId);var counts={};(r.data||[]).forEach(function(rx){counts[rx.emoji]=(counts[rx.emoji]||0)+1;});el.innerHTML=['👍','❤️','🤔','😮'].map(function(e){return`<button class="reaction-btn" onclick="toggleReaction(${qaId},'${e}')">${e} ${counts[e]||0}</button>`;}).join('');}
 async function toggleReaction(qaId,emoji){var check=await sb.from('qa_reactions').select('id').eq('qa_id',qaId).eq('user_id',currentProfile.id).eq('emoji',emoji).limit(1);if(check.data&&check.data.length){await sb.from('qa_reactions').delete().eq('id',check.data[0].id);}else{await sb.from('qa_reactions').insert({qa_id:qaId,user_id:currentProfile.id,emoji:emoji});}loadReactions(qaId);}
 
-async function submitQuestion(){var cls=await getMyClass();var text=v('qa-question-text'),anon=g('qa-anonymous').checked;if(!text){toast('Vui lòng nhập câu hỏi','error');return;}await sb.from('qa_items').insert({class_id:cls.id,question:text,student_id:currentProfile.id,is_anonymous:anon});closeModal('modal-ask-qa');toast('Đã gửi câu hỏi!','success');g('qa-question-text').value='';loadStudentQA();}
+async function submitQuestion(){var text=v('qa-question-text'),anon=g('qa-anonymous').checked;var cid=g('qa-class-id')&&g('qa-class-id').value;if(!cid&&myClasses.length===1)cid=myClasses[0].id;if(!cid){toast('Vui lòng chọn lớp','error');return;}if(!text){toast('Vui lòng nhập câu hỏi','error');return;}await sb.from('qa_items').insert({class_id:parseInt(cid),question:text,student_id:currentProfile.id,is_anonymous:anon});closeModal('modal-ask-qa');toast('Đã gửi câu hỏi!','success');g('qa-question-text').value='';loadStudentQA();}
 async function deleteMyQA(id){showConfirm('Xoá câu hỏi','Xoá câu hỏi của bạn?',async function(){await sb.from('qa_items').delete().eq('id',id).eq('student_id',currentProfile.id);toast('Đã xoá');loadStudentQA();});}
 
 async function loadStudentConfessions(){
-  var cls=await getMyClass();
-  if(!cls){g('s-confessions-list').innerHTML='<div class="empty"><div class="empty-icon">💌</div><p>Chưa có chia sẻ</p></div>';return;}
-  var r=await sb.from('confessions').select('*').eq('class_id',cls.id).eq('student_id',currentProfile.id).order('created_at',{ascending:false});
+  var classes=await getMyClasses();
+  fillStudentClassSelect('confession-class-id');
+  if(!classes.length){g('s-confessions-list').innerHTML='<div class="empty"><div class="empty-icon">💌</div><p>Chưa tham gia lớp nào</p></div>';return;}
+  var cids=myClassIds();var clsMap={};classes.forEach(function(c){clsMap[c.id]=c.name;});
+  var r=await sb.from('confessions').select('*').in('class_id',cids).eq('student_id',currentProfile.id).order('created_at',{ascending:false});
   var items=r.data||[];
-  g('s-confessions-list').innerHTML=items.length?items.map(function(item){return`<div class="confession-item"><div class="confession-meta">${item.is_anonymous?'🎭 Ẩn danh':'👤 Bạn'} · ${timeAgo(item.created_at)}</div><div style="font-size:.9rem;margin-top:.25rem">${item.content}</div><div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyConfession(${item.id})">🗑</button></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">💌</div><p>Chia sẻ cảm nhận, góp ý với giáo viên! (Chỉ bạn và giáo viên thấy)</p></div>';
+  g('s-confessions-list').innerHTML=items.length?items.map(function(item){return`<div class="confession-item"><div class="confession-meta">${item.is_anonymous?'🎭 Ẩn danh':'👤 Bạn'} · <span class="badge badge-red">${clsMap[item.class_id]||'—'}</span> · ${timeAgo(item.created_at)}</div><div style="font-size:.9rem;margin-top:.25rem">${item.content}</div><div style="display:flex;justify-content:flex-end;margin-top:.5rem"><button class="btn btn-sm btn-danger" onclick="deleteMyConfession(${item.id})">🗑</button></div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">💌</div><p>Chia sẻ cảm nhận, góp ý với giáo viên! (Chỉ bạn và giáo viên thấy)</p></div>';
 }
-async function submitConfession(){var cls=await getMyClass();var text=v('confession-text'),anon=g('confession-anon').checked;if(!text){toast('Vui lòng nhập nội dung','error');return;}await sb.from('confessions').insert({class_id:cls.id,content:text,student_id:currentProfile.id,is_anonymous:anon});closeModal('modal-add-confession');toast('Đã gửi!','success');g('confession-text').value='';loadStudentConfessions();}
+async function submitConfession(){var text=v('confession-text'),anon=g('confession-anon').checked;var cid=g('confession-class-id')&&g('confession-class-id').value;if(!cid&&myClasses.length===1)cid=myClasses[0].id;if(!cid){toast('Vui lòng chọn lớp','error');return;}if(!text){toast('Vui lòng nhập nội dung','error');return;}await sb.from('confessions').insert({class_id:parseInt(cid),content:text,student_id:currentProfile.id,is_anonymous:anon});closeModal('modal-add-confession');toast('Đã gửi!','success');g('confession-text').value='';loadStudentConfessions();}
 async function deleteMyConfession(id){showConfirm('Xoá','Xoá chia sẻ này?',async function(){await sb.from('confessions').delete().eq('id',id).eq('student_id',currentProfile.id);toast('Đã xoá');loadStudentConfessions();});}
 
 async function loadStudentNotifications(){
-  var cls=await getMyClass();
-  if(!cls){g('s-notif-list').innerHTML='<div class="empty"><div class="empty-icon">🔔</div><p>Chưa có thông báo</p></div>';return;}
-  var r=await sb.from('notifications').select('*').or('class_id.eq.'+cls.id+',class_id.is.null').order('created_at',{ascending:false});
+  var classes=await getMyClasses();
+  if(!classes.length){g('s-notif-list').innerHTML='<div class="empty"><div class="empty-icon">🔔</div><p>Chưa có thông báo</p></div>';return;}
+  var cids=myClassIds();var clsMap={};classes.forEach(function(c){clsMap[c.id]=c.name;});
+  var orStr=cids.map(function(id){return 'class_id.eq.'+id;}).join(',')+',class_id.is.null';
+  var r=await sb.from('notifications').select('*').or(orStr).order('created_at',{ascending:false});
   var items=r.data||[];
-  g('s-notif-list').innerHTML=items.length?items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="font-weight:700">${n.title}</div><div style="font-size:.75rem;color:var(--gray);margin-bottom:.4rem">${timeAgo(n.created_at)}</div><div style="font-size:.9rem">${n.body}</div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">🔔</div><p>Chưa có thông báo</p></div>';
+  g('s-notif-list').innerHTML=items.length?items.map(function(n){return`<div class="card" style="margin-bottom:.75rem"><div style="font-weight:700">${n.title} ${n.class_id?'<span class="badge badge-red">'+(clsMap[n.class_id]||'')+'</span>':'<span class="badge badge-gray">Chung</span>'}</div><div style="font-size:.75rem;color:var(--gray);margin-bottom:.4rem">${timeAgo(n.created_at)}</div><div style="font-size:.9rem">${n.body}</div></div>`;}).join(''):'<div class="empty"><div class="empty-icon">🔔</div><p>Chưa có thông báo</p></div>';
 }
 
-// ── Q&A: COMMENT (bình luận thảo luận, chung cả lớp) ──
+// ── Q&A comment / react / task stats (dùng chung GV & HS) ──
 async function loadQAComments(qaId, prefix) {
   prefix = prefix||'';
   var elId = prefix ? 'tc-'+qaId : 'cmts-'+qaId;
@@ -1240,7 +1313,6 @@ async function loadQAComments(qaId, prefix) {
         '<div>'+cm.content+'</div></div>';
     }).join('') + '</div>';
 }
-
 async function submitQAComment(qaId) {
   if(!sb||!currentProfile) return;
   var inputId = currentProfile.role==='teacher' ? 'tci-'+qaId : 'ci-'+qaId;
@@ -1254,8 +1326,6 @@ async function submitQAComment(qaId) {
   loadQAComments(qaId,'t');
   toast('Đã bình luận','success');
 }
-
-// ── Q&A: REACT phía giáo viên ──
 function loadTeacherReactions(qaId) {
   var el = document.getElementById('tr-'+qaId);
   if(!el||!sb) return;
@@ -1267,7 +1337,6 @@ function loadTeacherReactions(qaId) {
     }).join('');
   });
 }
-
 async function toggleTReact(qaId, emoji, btn) {
   if(!sb||!currentProfile) return;
   var chk = await sb.from('qa_reactions').select('id').eq('qa_id',qaId).eq('user_id',currentProfile.id).eq('emoji',emoji).limit(1);
@@ -1278,8 +1347,6 @@ async function toggleTReact(qaId, emoji, btn) {
   }
   loadTeacherReactions(qaId);
 }
-
-// ── Thống kê task phía giáo viên (căn cứ chữa theo số đông) ──
 async function loadTaskStats(exId, containerId) {
   if(!sb) return;
   var el = document.getElementById(containerId);
