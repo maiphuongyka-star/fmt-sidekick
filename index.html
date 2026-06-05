@@ -515,7 +515,7 @@ function teacherPages(){
 
 <!-- CLASSES -->
 <div class="page" id="page-classes">
-  <div class="page-header"><h2>🏫 Quản lý lớp học</h2><button class="btn btn-red" onclick="openModal('modal-add-class')">+ Tạo lớp mới</button></div>
+  <div class="page-header"><h2>🏫 Quản lý lớp học</h2><button class="btn btn-red" onclick="openAddClass()">+ Tạo lớp mới</button></div>
   <div id="classes-list"></div>
 </div>
 
@@ -527,7 +527,7 @@ function teacherPages(){
 
 <!-- SESSIONS -->
 <div class="page" id="page-sessions">
-  <div class="page-header"><h2>📹 Buổi học & Recording</h2><button class="btn btn-red" onclick="openModal('modal-add-session')">+ Thêm buổi học</button></div>
+  <div class="page-header"><h2>📹 Buổi học & Recording</h2><button class="btn btn-red" onclick="openAddSession()">+ Thêm buổi học</button></div>
   <div class="form-row" style="max-width:200px"><select class="select" id="session-filter-class" onchange="loadSessions()"><option value="">Tất cả lớp</option></select></div>
   <div id="sessions-list"></div>
 </div>
@@ -795,7 +795,7 @@ async function loadClasses(){
       <div class="class-card-header">
         <div style="display:flex;justify-content:space-between;align-items:start">
           <div><div style="font-size:1.15rem;font-weight:800">${c.name}</div><div style="font-size:.82rem;opacity:.85;margin-top:.2rem">${c.description||''}</div></div>
-          <div style="display:flex;gap:.4rem"><button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3)" onclick="deleteClass(${c.id},'${c.name}')">🗑</button></div>
+          <div style="display:flex;gap:.4rem"><button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3)" onclick="openEditClass(${c.id})">✏️</button><button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3)" onclick="deleteClass(${c.id},'${c.name}')">🗑</button></div>
         </div>
         <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
           ${c.midterm_date?`<span style="background:rgba(255,255,255,.2);color:white;font-size:.75rem;padding:.2rem .6rem;border-radius:20px">📋 Midterm: ${fmtDate(c.midterm_date)}</span>`:''}
@@ -833,14 +833,18 @@ async function loadInviteCode(classId){
 
 function copyCode(classId){ var el=g('code-'+classId); if(el&&navigator.clipboard){navigator.clipboard.writeText(el.textContent);toast('Đã sao chép mã: '+el.textContent,'success');} }
 
+function openAddClass(){ resetClassModal(); openModal('modal-add-class'); }
+function resetClassModal(){ window._editClsId=null; var t=document.querySelector('#modal-add-class .modal-title'); if(t)t.textContent='🏫 Tạo lớp mới'; var b=document.querySelector('#modal-add-class .modal-footer .btn-red'); if(b)b.textContent='Tạo lớp'; ['new-class-name','new-class-desc','new-class-midterm','new-class-final'].forEach(function(id){if(g(id))g(id).value='';}); }
+async function openEditClass(id){ var r=await sb.from('classes').select('*').eq('id',id).single(); if(!r.data){toast('Không tìm thấy lớp','error');return;} window._editClsId=id; g('new-class-name').value=r.data.name||''; g('new-class-desc').value=r.data.description||''; g('new-class-midterm').value=r.data.midterm_date?String(r.data.midterm_date).slice(0,10):''; g('new-class-final').value=r.data.final_date?String(r.data.final_date).slice(0,10):''; var t=document.querySelector('#modal-add-class .modal-title'); if(t)t.textContent='✏️ Sửa lớp'; var b=document.querySelector('#modal-add-class .modal-footer .btn-red'); if(b)b.textContent='Lưu thay đổi'; openModal('modal-add-class'); }
 async function addClass(){
   var name=v('new-class-name'),desc=v('new-class-desc'),midterm=g('new-class-midterm').value,final=g('new-class-final').value;
   if(!name){toast('Vui lòng nhập tên lớp','error');return;}
   if(!sb){toast('Không kết nối Supabase','error');return;}
+  if(window._editClsId){var u=await sb.from('classes').update({name:name,description:desc,midterm_date:midterm||null,final_date:final||null}).eq('id',window._editClsId);if(u.error){toast('Lỗi: '+u.error.message,'error');return;}closeModal('modal-add-class');toast('Đã cập nhật lớp','success');resetClassModal();loadClasses();return;}
   var r=await sb.from('classes').insert({name:name,description:desc,teacher_id:currentProfile.id,midterm_date:midterm||null,final_date:final||null}).select().single();
   if(r.error){toast('Lỗi: '+r.error.message,'error');return;}
   closeModal('modal-add-class'); toast('Đã tạo lớp '+name,'success');
-  ['new-class-name','new-class-desc'].forEach(function(id){g(id).value='';});
+  resetClassModal();
   loadClasses();
 }
 
@@ -893,7 +897,7 @@ async function loadSessions(){
     html+=`<div class="card" style="margin-bottom:.75rem">
       <div style="display:flex;justify-content:space-between;align-items:start">
         <div><div style="font-weight:700">${s.title}</div><div style="font-size:.8rem;color:var(--gray);margin-top:.25rem">📅 ${fmtDate(s.session_date)} · <span class="badge badge-red">${cls?cls.name:'—'}</span></div>${s.note?`<div style="font-size:.85rem;color:var(--gray);margin-top:.4rem">${s.note}</div>`:''}</div>
-        <button class="btn btn-sm btn-danger" onclick="deleteSession(${s.id},'${s.title}')">🗑</button>
+        <button class="btn btn-sm btn-outline" onclick="openEditSession(${s.id})">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteSession(${s.id},'${s.title}')">🗑</button>
       </div>
       <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
         ${s.recording_url?`<a href="${s.recording_url}" target="_blank" class="btn btn-sm btn-red">🎥 Recording</a>`:'<span class="badge badge-gray">Chưa có recording</span>'}
@@ -904,12 +908,16 @@ async function loadSessions(){
   g('sessions-list').innerHTML=html;
 }
 
+async function openAddSession(){ resetSessionModal(); var classes=await getClasses(); populateClassDropdown('session-class-id',classes); openModal('modal-add-session'); }
+function resetSessionModal(){ window._editSesId=null; var t=document.querySelector('#modal-add-session .modal-title'); if(t)t.textContent='📹 Thêm buổi học'; var b=document.querySelector('#modal-add-session .modal-footer .btn-red'); if(b)b.textContent='Lưu'; ['session-title','session-date','session-recording','session-attachment','session-note'].forEach(function(id){if(g(id))g(id).value='';}); }
+async function openEditSession(id){ var r=await sb.from('sessions').select('*').eq('id',id).single(); if(!r.data){toast('Không tìm thấy buổi học','error');return;} var classes=await getClasses(); populateClassDropdown('session-class-id',classes); window._editSesId=id; g('session-class-id').value=r.data.class_id; g('session-title').value=r.data.title||''; g('session-date').value=r.data.session_date?String(r.data.session_date).slice(0,10):''; g('session-recording').value=r.data.recording_url||''; g('session-attachment').value=r.data.attachment_url||''; g('session-note').value=r.data.note||''; var t=document.querySelector('#modal-add-session .modal-title'); if(t)t.textContent='✏️ Sửa buổi học'; var b=document.querySelector('#modal-add-session .modal-footer .btn-red'); if(b)b.textContent='Lưu thay đổi'; openModal('modal-add-session'); }
 async function addSession(){
   var classId=g('session-class-id').value,title=v('session-title'),date=g('session-date').value,rec=v('session-recording'),att=v('session-attachment'),note=v('session-note');
   if(!classId||!title){toast('Vui lòng chọn lớp và nhập tiêu đề','error');return;}
+  if(window._editSesId){var u=await sb.from('sessions').update({class_id:parseInt(classId),title:title,session_date:date||null,recording_url:rec||null,attachment_url:att||null,note:note||null}).eq('id',window._editSesId);if(u.error){toast('Lỗi: '+u.error.message,'error');return;}closeModal('modal-add-session');toast('Đã cập nhật buổi học','success');resetSessionModal();loadSessions();return;}
   var r=await sb.from('sessions').insert({class_id:parseInt(classId),title:title,session_date:date||null,recording_url:rec||null,attachment_url:att||null,note:note||null});
   if(r.error){toast('Lỗi: '+r.error.message,'error');return;}
-  closeModal('modal-add-session'); toast('Đã thêm buổi học','success'); loadSessions();
+  closeModal('modal-add-session'); toast('Đã thêm buổi học','success'); resetSessionModal(); loadSessions();
 }
 
 async function deleteSession(id,title){ showConfirm('Xoá buổi học','Xoá "'+title+'"?',async function(){ await sb.from('sessions').delete().eq('id',id); toast('Đã xoá'); loadSessions(); }); }
